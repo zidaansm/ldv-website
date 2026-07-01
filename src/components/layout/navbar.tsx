@@ -212,10 +212,10 @@ export function Navbar() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-40 md:hidden"
+            className="fixed inset-0 z-40 md:hidden overflow-y-auto"
             style={{ backgroundColor: "rgba(248, 246, 242, 0.98)" }}
           >
-            <div className="flex flex-col items-center justify-center min-h-screen gap-6 px-4">
+            <div className="flex flex-col items-center justify-start min-h-screen gap-4 px-4 pt-28 pb-12">
               {NAV_LINKS.map((link, i) => (
                 <motion.div
                   key={link.href}
@@ -234,7 +234,7 @@ export function Navbar() {
                       setIsMobileMenuOpen(false);
                       handleNavClick(e, link.href);
                     }}
-                    className="text-3xl font-extrabold text-foreground hover:text-primary transition-colors"
+                    className="text-2xl font-extrabold text-foreground hover:text-primary transition-colors py-1"
                     style={{ fontFamily: "var(--font-space-grotesk)" }}
                   >
                     {t(`nav.${link.label.toLowerCase()}`)}
@@ -243,7 +243,7 @@ export function Navbar() {
               ))}
 
               {/* Mobile Language Toggle */}
-              <div className="mt-8">
+              <div className="mt-4 w-full max-w-[280px]">
                 <button
                   onClick={() => setLanguage(language === "en" ? "id" : "en")}
                   className="w-full flex items-center justify-center gap-2 neo-border neo-shadow-sm neo-press rounded-xl px-5 py-4 font-bold text-lg bg-card text-foreground transition-all hover:bg-muted"
@@ -254,7 +254,7 @@ export function Navbar() {
               </div>
 
               {/* Mobile CTA */}
-              <div className="mt-4">
+              <div className="mt-2 w-full max-w-[280px]">
                 <a
                   href={SITE_CONFIG.discordInvite}
                   target="_blank"
