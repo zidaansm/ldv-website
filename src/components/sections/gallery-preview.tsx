@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { useMediaQuery } from "@/hooks/use-media-query";
 import { motion, AnimatePresence } from "framer-motion";
 import { Section } from "@/components/layout";
 import { SectionHeading } from "@/components/shared";
@@ -23,8 +24,9 @@ export function GalleryPreview() {
   const [startIndex, setStartIndex] = useState(0);
   const [direction, setDirection] = useState(0);
   const supabase = createClient();
+  const isDesktop = useMediaQuery("(min-width: 768px)");
 
-  const VISIBLE = 4;
+  const VISIBLE = isDesktop ? 4 : 2;
 
   useEffect(() => {
     const fetchImages = async () => {
@@ -52,19 +54,19 @@ export function GalleryPreview() {
       result.push({ image: images[idx], originalIndex: idx });
     }
     return result;
-  }, [images, startIndex]);
+  }, [images, startIndex, VISIBLE]);
 
   const next = useCallback(() => {
     if (images.length <= VISIBLE) return;
     setDirection(1);
     setStartIndex((s) => (s + 1) % images.length);
-  }, [images.length]);
+  }, [images.length, VISIBLE]);
 
   const prev = useCallback(() => {
     if (images.length <= VISIBLE) return;
     setDirection(-1);
     setStartIndex((s) => (s - 1 + images.length) % images.length);
-  }, [images.length]);
+  }, [images.length, VISIBLE]);
 
   const visibleImages = getVisibleImages();
 
@@ -93,7 +95,7 @@ export function GalleryPreview() {
       >
         {loading ? (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 animate-pulse">
-            {[1, 2, 3, 4].map((i) => (
+            {Array.from({ length: VISIBLE }).map((_, i) => (
               <div key={i} className="aspect-[3/4] bg-card neo-border rounded-2xl" />
             ))}
           </div>
