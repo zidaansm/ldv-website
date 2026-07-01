@@ -1,26 +1,351 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
+
+/* ============================================
+   LDV DESIGN SYSTEM — Neo-Brutalist Dark Theme
+   ============================================ */
 
 @theme inline {
+  /* --- Base Colors --- */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
-}
+  --font-heading: var(--font-sans);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  /* --- shadcn mapped colors --- */
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* --- LDV Custom Colors --- */
+  --color-neo-border: var(--neo-border);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-purple: var(--purple);
+  --color-pink: var(--pink);
+  --color-cyan: var(--cyan);
+
+  /* --- LDV Neo-Brutalist Shadows --- */
+  --shadow-neo-sm: 4px 4px 0 0 var(--neo-border);
+  --shadow-neo: 6px 6px 0 0 var(--neo-border);
+  --shadow-neo-lg: 8px 8px 0 0 var(--neo-border);
+  --shadow-neo-purple: 6px 6px 0 0 var(--purple);
+  --shadow-neo-pink: 6px 6px 0 0 var(--pink);
+  --shadow-neo-cyan: 6px 6px 0 0 var(--cyan);
+
+  /* --- LDV Animation Tokens --- */
+  --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+  --ease-out-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --duration-fast: 150ms;
+  --duration-base: 300ms;
+  --duration-slow: 600ms;
+
+  /* --- LDV Spacing Tokens --- */
+  --space-section: clamp(4rem, 10vw, 8rem);
+  --space-block: clamp(2rem, 5vw, 4rem);
+  --space-element: 1.5rem;
+  --space-inline: 1rem;
+
+  /* --- LDV Typography Scale --- */
+  --text-heading-xl: clamp(3rem, 8vw, 6rem);
+  --text-heading-lg: clamp(2rem, 5vw, 4rem);
+  --text-heading-md: clamp(1.5rem, 3vw, 2.5rem);
+  --text-heading-sm: clamp(1.25rem, 2vw, 1.75rem);
+
+  /* --- LDV Animations --- */
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-float-delayed: float 6s ease-in-out 2s infinite;
+  --animate-float-slow: float 8s ease-in-out 1s infinite;
+  --animate-pulse-glow: pulse-glow 3s ease-in-out infinite;
+  --animate-spin-slow: spin 20s linear infinite;
+  --animate-bounce-subtle: bounce-subtle 2s ease-in-out infinite;
+  --animate-slide-up: slide-up 0.6s var(--ease-out-expo) forwards;
+  --animate-slide-down: slide-down 0.6s var(--ease-out-expo) forwards;
+  --animate-fade-in: fade-in 0.6s var(--ease-out-expo) forwards;
+  --animate-scale-in: scale-in 0.5s var(--ease-out-back) forwards;
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    33% { transform: translateY(-10px) rotate(1deg); }
+    66% { transform: translateY(5px) rotate(-1deg); }
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% { opacity: 0.4; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.05); }
+  }
+
+  @keyframes bounce-subtle {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+  }
+
+  @keyframes slide-up {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes slide-down {
+    from { opacity: 0; transform: translateY(-30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes scale-in {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ============================================
+   LDV COLOR PALETTE — Premium Light Mode
+   ============================================ */
+
+:root {
+  /* --- Core --- */
+  --background: #F8F6F2;
+  --foreground: #1E1E1E;
+  --card: #F2E8D5;
+  --card-foreground: #1E1E1E;
+  --popover: #F2E8D5;
+  --popover-foreground: #1E1E1E;
+
+  /* --- Brand: Burgundy Primary --- */
+  --primary: #6D071A;
+  --primary-foreground: #F8F6F2;
+
+  /* --- Brand: Gold Secondary --- */
+  --secondary: #D4AF37;
+  --secondary-foreground: #1E1E1E;
+
+  /* --- Brand: Beige Accent --- */
+  --accent: #F2E8D5;
+  --accent-foreground: #1E1E1E;
+
+  /* --- Muted --- */
+  --muted: #E8DFCC;
+  --muted-foreground: #555555;
+
+  /* --- Borders & Inputs --- */
+  --border: #1E1E1E;
+  --input: #1E1E1E;
+  --ring: #6D071A;
+
+  /* --- Neo-Brutalist --- */
+  --neo-border: #1E1E1E;
+
+  /* --- Semantic --- */
+  --destructive: #6D071A;
+  --success: #22c55e;
+  --warning: #D4AF37;
+  --danger: #6D071A;
+
+  /* --- Extended Palette --- */
+  --purple: #6D071A;
+  --pink: #D4AF37;
+  --cyan: #1E1E1E;
+
+  /* --- Charts --- */
+  --chart-1: #6D071A;
+  --chart-2: #D4AF37;
+  --chart-3: #1E1E1E;
+  --chart-4: #22c55e;
+  --chart-5: #D4AF37;
+
+  /* --- Radius --- */
+  --radius: 1rem;
+
+  /* --- Sidebar (light) --- */
+  --sidebar: #F8F6F2;
+  --sidebar-foreground: #1E1E1E;
+  --sidebar-primary: #6D071A;
+  --sidebar-primary-foreground: #F8F6F2;
+  --sidebar-accent: #F2E8D5;
+  --sidebar-accent-foreground: #1E1E1E;
+  --sidebar-border: #1E1E1E;
+  --sidebar-ring: #6D071A;
+}
+
+/* ============================================
+   BASE STYLES
+   ============================================ */
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  html {
+    @apply font-sans;
+    scroll-behavior: smooth;
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #F8F6F2;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #D4AF37;
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #6D071A;
+  }
+
+  /* Selection */
+  ::selection {
+    background: rgba(109, 7, 26, 0.3);
+    color: #1E1E1E;
+  }
+}
+
+/* ============================================
+   NEO-BRUTALIST UTILITIES
+   ============================================ */
+
+@layer utilities {
+  .neo-border {
+    border: 3px solid var(--neo-border);
+  }
+
+  .neo-border-primary {
+    border: 3px solid var(--primary);
+  }
+
+  .neo-border-secondary {
+    border: 3px solid var(--secondary);
+  }
+
+  .neo-border-accent {
+    border: 3px solid var(--accent);
+  }
+
+  .neo-shadow {
+    box-shadow: 6px 6px 0 0 var(--neo-border);
+  }
+
+  .neo-shadow-sm {
+    box-shadow: 4px 4px 0 0 var(--neo-border);
+  }
+
+  .neo-shadow-lg {
+    box-shadow: 8px 8px 0 0 var(--neo-border);
+  }
+
+  .neo-shadow-primary {
+    box-shadow: 6px 6px 0 0 var(--primary);
+  }
+
+  .neo-shadow-secondary {
+    box-shadow: 6px 6px 0 0 var(--secondary);
+  }
+
+  .neo-shadow-accent {
+    box-shadow: 6px 6px 0 0 var(--accent);
+  }
+
+  /* Neo-brutalist button press effect */
+  .neo-press {
+    transition: transform 100ms ease, box-shadow 100ms ease;
+  }
+
+  .neo-press:hover {
+    transform: translate(-2px, -2px);
+  }
+
+  .neo-press:active {
+    transform: translate(4px, 4px);
+    box-shadow: none !important;
+  }
+
+  /* Neo-brutalist card hover */
+  .neo-hover {
+    transition: transform 200ms var(--ease-out-expo), box-shadow 200ms var(--ease-out-expo);
+  }
+
+  .neo-hover:hover {
+    transform: translate(-4px, -4px);
+    box-shadow: 10px 10px 0 0 var(--neo-border);
+  }
+
+  /* Solid text color utilities */
+  .text-brand-purple {
+    color: var(--purple);
+  }
+
+  .text-brand-pink {
+    color: var(--pink);
+  }
+
+  .text-brand-cyan {
+    color: var(--cyan);
+  }
+
+  /* Geometric decoration */
+  .geo-grid {
+    background-image:
+      linear-gradient(rgba(109, 7, 26, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(109, 7, 26, 0.05) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+
+  .geo-dots {
+    background-image: radial-gradient(rgba(109, 7, 26, 0.15) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
 }

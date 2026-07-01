@@ -1,0 +1,235 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { createClient } from "@/lib/supabase/client";
+import { Trash2, Plus, ArrowLeft, Edit2, CalendarX2 } from "lucide-react";
+import Link from "next/link";
+import toast from "react-hot-toast";
+import { confirmDelete } from "@/components/shared";
+
+type Event = {
+  id: string;
+  title: string;
+  description: string;
+  date: string;
+  time: string;
+  category: string;
+  type: "upcoming" | "past";
+  participants: number;
+  link?: string;
+};
+
+export default function EventsAdminPage() {
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const supabase = createClient();
+
+  // Form State
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [date, setDate] = useState("");
+  const [time, setTime] = useState("");
+  const [category, setCategory] = useState("");
+  const [link, setLink] = useState("");
+  const [type, setType] = useState<"upcoming" | "past">("upcoming");
+
+  useEffect(() => {
+    fetchEvents();
+  }, []);
+
+  const fetchEvents = async () => {
+    const { data } = await supabase.from("events").select("*").order("date", { ascending: false });
+    if (data) setEvents(data);
+    setLoading(false);
+  };
+
+  const handleEditClick = (event: Event) => {
+    setEditingId(event.id);
+    setTitle(event.title);
+    setDescription(event.description);
+    setDate(event.date);
+    setTime(event.time);
+    setCategory(event.category);
+    setLink(event.link || "");
+    setType(event.type);
+    setIsFormOpen(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const resetForm = () => {
+    setEditingId(null);
+    setTitle("");
+    setDescription("");
+    setDate("");
+    setTime("");
+    setCategory("");
+    setLink("");
+    setType("upcoming");
+    setIsFormOpen(false);
+  };
+
+  const handleDelete = async (id: string) => {
+    confirmDelete("event", async () => {
+      const loadingToast = toast.loading("Deleting event...");
+      const { error } = await supabase.from("events").delete().eq("id", id);
+      
+      if (error) {
+        toast.error("Failed to delete event", { id: loadingToast });
+      } else {
+        toast.success("Event deleted successfully!", { id: loadingToast });
+        fetchEvents();
+      }
+    });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    const loadingToast = toast.loading(editingId ? "Updating event..." : "Creating event...");
+    
+    const eventData = { title, description, date, time, category, type, link };
+    
+    let error;
+    if (editingId) {
+      const res = await supabase.from("events").update(eventData).eq("id", editingId);
+      error = res.error;
+    } else {
+      const res = await supabase.from("events").insert([eventData]);
+      error = res.error;
+    }
+
+    setIsSubmitting(false);
+
+    if (error) {
+      toast.error(`Failed to ${editingId ? "update" : "create"} event`, { id: loadingToast });
+    } else {
+      toast.success(`Event ${editingId ? "updated" : "created"} successfully!`, { id: loadingToast });
+      resetForm();
+      fetchEvents();
+    }
+  };
+
+  if (loading) return <div className="p-8 font-bold text-center">Loading events...</div>;
+
+  return (
+    <div className="max-w-6xl mx-auto p-4 md:p-8 space-y-8">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Link href="/admin" className="p-2 rounded-xl neo-border bg-card hover:bg-muted transition-colors">
+            <ArrowLeft className="w-5 h-5" />
+          </Link>
+          <h1 className="text-3xl font-extrabold" style={{ fontFamily: "var(--font-space-grotesk)" }}>
+            Events Management
+          </h1>
+        </div>
+        <button
+          onClick={() => isFormOpen ? resetForm() : setIsFormOpen(true)}
+          className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground neo-border neo-shadow-sm neo-press rounded-xl font-bold"
+        >
+          <Plus className={`w-5 h-5 transition-transform ${isFormOpen ? "rotate-45" : ""}`} />
+          {isFormOpen ? "Cancel" : "New Event"}
+        </button>
+      </div>
+
+      {isFormOpen && (
+        <form onSubmit={handleSubmit} className="neo-border rounded-2xl p-6 bg-card space-y-4 animate-in fade-in slide-in-from-top-4 duration-300">
+          <h2 className="text-xl font-bold mb-4">{editingId ? "Edit Event" : "Create New Event"}</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-bold mb-1">Title</label>
+              <input required value={title} onChange={e => setTitle(e.target.value)} className="w-full neo-border rounded-lg px-3 py-2 bg-background" />
+            </div>
+            <div>
+              <label className="block text-sm font-bold mb-1">Category (e.g. Gaming, Social)</label>
+              <input required value={category} onChange={e => setCategory(e.target.value)} className="w-full neo-border rounded-lg px-3 py-2 bg-background" />
+            </div>
+            <div>
+              <label className="block text-sm font-bold mb-1">Date</label>
+              <input required type="date" value={date} onChange={e => setDate(e.target.value)} className="w-full neo-border rounded-lg px-3 py-2 bg-background" />
+            </div>
+            <div>
+              <label className="block text-sm font-bold mb-1">Time (e.g. 20:00 EST)</label>
+              <input required value={time} onChange={e => setTime(e.target.value)} className="w-full neo-border rounded-lg px-3 py-2 bg-background" />
+            </div>
+            <div>
+              <label className="block text-sm font-bold mb-1">Type</label>
+              <select value={type} onChange={e => setType(e.target.value as any)} className="w-full neo-border rounded-lg px-3 py-2 bg-background">
+                <option value="upcoming">Upcoming</option>
+                <option value="past">Past</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-bold mb-1">Discord Message Link (Optional)</label>
+              <input type="url" placeholder="https://discord.com/channels/..." value={link} onChange={e => setLink(e.target.value)} className="w-full neo-border rounded-lg px-3 py-2 bg-background" />
+            </div>
+            <div className="md:col-span-2">
+              <label className="block text-sm font-bold mb-1">Description</label>
+              <textarea required value={description} onChange={e => setDescription(e.target.value)} className="w-full neo-border rounded-lg px-3 py-2 bg-background h-24" />
+            </div>
+          </div>
+          <div className="flex justify-end pt-4">
+            <button 
+              type="submit" 
+              disabled={isSubmitting}
+              className="px-6 py-2 bg-accent text-accent-foreground font-bold neo-border rounded-xl disabled:opacity-50"
+            >
+              {isSubmitting ? "Saving..." : "Save Event"}
+            </button>
+          </div>
+        </form>
+      )}
+
+      <div className="neo-border rounded-2xl overflow-hidden bg-card">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-muted border-b-2 border-[var(--border)]">
+                <th className="p-4 font-bold">Title</th>
+                <th className="p-4 font-bold">Date & Time</th>
+                <th className="p-4 font-bold">Category</th>
+                <th className="p-4 font-bold">Type</th>
+                <th className="p-4 font-bold text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {events.map((event) => (
+                <tr key={event.id} className="border-b-2 border-[var(--border)] last:border-0 hover:bg-muted/50 transition-colors">
+                  <td className="p-4 font-bold">{event.title}</td>
+                  <td className="p-4 font-medium text-muted-foreground">{event.date} | {event.time}</td>
+                  <td className="p-4">
+                    <span className="px-2 py-1 bg-secondary text-secondary-foreground rounded-md text-xs font-bold uppercase">{event.category}</span>
+                  </td>
+                  <td className="p-4 font-medium">{event.type}</td>
+                  <td className="p-4 text-right">
+                    <div className="flex justify-end gap-2">
+                      <button onClick={() => handleEditClick(event)} className="p-2 text-primary hover:bg-primary/10 rounded-lg transition-colors">
+                        <Edit2 className="w-5 h-5" />
+                      </button>
+                      <button onClick={() => handleDelete(event.id)} className="p-2 text-danger hover:bg-danger/10 rounded-lg transition-colors">
+                        <Trash2 className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {events.length === 0 && (
+                <tr>
+                  <td colSpan={5} className="p-12 text-center">
+                    <div className="flex flex-col items-center justify-center text-muted-foreground">
+                      <CalendarX2 className="w-12 h-12 mb-4 opacity-50" />
+                      <p className="font-bold text-lg">No events found</p>
+                      <p className="text-sm">Click "New Event" to create your first community event.</p>
+                    </div>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
