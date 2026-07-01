@@ -170,10 +170,10 @@ export function AboutGSAP() {
            style={{ backgroundImage: "radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)", backgroundSize: "32px 32px" }}>
       </div>
 
-      <div className="absolute top-10 md:top-20 left-0 w-full px-8 md:px-16 z-10">
+      <div className="absolute top-6 md:top-20 left-0 w-full px-6 md:px-16 z-10">
         <h2 
             ref={headingRef}
-            className="text-5xl md:text-7xl font-extrabold uppercase mb-4"
+            className="text-5xl md:text-7xl font-extrabold uppercase mb-2 md:mb-4"
             style={{ 
                 fontFamily: "var(--font-space-grotesk)",
                 fontVariationSettings: '"wght" 400',
@@ -185,8 +185,8 @@ export function AboutGSAP() {
       </div>
 
       {/* Horizontal Scroll Container */}
-      <div ref={scrollContainerRef} className="flex h-full items-center pl-8 md:pl-16 pr-[15vw] flex-nowrap w-max">
-        <div className="flex gap-8 md:gap-16 mt-20 flex-nowrap">
+      <div ref={scrollContainerRef} className="flex h-full items-center pl-6 md:pl-16 pr-[15vw] flex-nowrap w-max">
+        <div className="flex gap-6 md:gap-16 mt-16 md:mt-20 flex-nowrap">
           {featureData.map((feature) => {
             const Icon = feature.icon;
             const borderClass =
@@ -206,27 +206,27 @@ export function AboutGSAP() {
             return (
               <div
                 key={feature.key}
-                className={`feature-card w-[80vw] md:w-[450px] shrink-0 ${borderClass} ${shadowClass} rounded-3xl p-10 bg-card flex flex-col justify-between`}
+                className={`feature-card w-[85vw] md:w-[450px] shrink-0 ${borderClass} ${shadowClass} rounded-3xl p-6 md:p-10 bg-card flex flex-col justify-between`}
               >
                 <div
-                  className="w-20 h-20 rounded-2xl mb-12 flex items-center justify-center neo-border"
+                  className="w-16 h-16 md:w-20 md:h-20 rounded-2xl mb-6 md:mb-12 flex items-center justify-center neo-border"
                   style={{
                     backgroundColor: `var(--${feature.color})`,
                     color: feature.color === "foreground" ? "var(--background)" : `var(--${feature.color}-foreground)`,
                   }}
                 >
-                  <Icon className="w-10 h-10" />
+                  <Icon className="w-8 h-8 md:w-10 md:h-10" />
                 </div>
                 
                 <div>
                     <h3
-                        className="card-title font-black text-3xl mb-4 text-foreground uppercase tracking-tight"
+                        className="card-title font-black text-2xl md:text-3xl mb-3 md:mb-4 text-foreground uppercase tracking-tight"
                         style={{ fontFamily: "var(--font-space-grotesk)" }}
                     >
                     {t(`about.features.${feature.key}.title`)}
                     </h3>
                     
-                    <p className="card-desc text-muted-foreground text-lg leading-relaxed font-medium">
+                    <p className="card-desc text-muted-foreground text-base md:text-lg leading-relaxed font-medium">
                     {t(`about.features.${feature.key}.description`)}
                     </p>
                 </div>
@@ -237,7 +237,7 @@ export function AboutGSAP() {
       </div>
 
       {/* Scroll Progress Tracker */}
-      <div className="absolute bottom-10 left-8 md:left-16 right-8 md:right-16 h-12 flex items-center">
+      <div className="absolute bottom-6 md:bottom-10 left-6 md:left-16 right-6 md:right-16 h-12 flex items-center">
          <div ref={progressLineRef} className="w-full h-2 bg-muted rounded-full neo-border relative overflow-visible">
             <div 
                 ref={iconRef}
