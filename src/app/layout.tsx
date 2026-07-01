@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     template: "%s | LDV",
   },
   description:
-    "La Dolce Vita — A premium Discord community for gamers, creators, and friends. Join the sweetest community on Discord.",
+    "Komunitas Discord buat sosial, gaming, dan nyawit bareng. Banyak bot premium yang bisa dipake gratis di sini. Yuk gabung!",
   keywords: [
     "Discord",
     "community",
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     siteName: "La Dolce Vita",
     title: "La Dolce Vita — Premium Discord Community",
     description:
-      "A premium Discord community for gamers, creators, and friends.",
+      "Komunitas Discord buat sosial, gaming, dan nyawit bareng. Banyak bot premium yang bisa dipake gratis di sini. Yuk gabung!",
     images: [
       {
         url: "/og/og-default.png",
@@ -49,7 +49,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "La Dolce Vita — Premium Discord Community",
     description:
-      "A premium Discord community for gamers, creators, and friends.",
+      "Komunitas Discord buat sosial, gaming, dan nyawit bareng. Banyak bot premium yang bisa dipake gratis di sini. Yuk gabung!",
     images: ["/og/og-default.png"],
   },
   robots: {

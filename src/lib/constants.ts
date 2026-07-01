@@ -8,7 +8,7 @@ export const SITE_CONFIG = {
   name: "La Dolce Vita",
   shortName: "LDV",
   description:
-    "La Dolce Vita — A premium Discord community for gamers, creators, and friends. Join the sweetest community on Discord.",
+    "Komunitas Discord buat sosial, gaming, dan nyawit bareng. Banyak bot premium yang bisa dipake gratis di sini. Yuk gabung!",
   url: "https://ldv.gg",
   ogImage: "/og/og-default.png",
   discordInvite: "https://discord.gg/ladolcevita",

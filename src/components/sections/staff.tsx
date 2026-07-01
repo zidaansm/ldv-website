@@ -36,10 +36,10 @@ export function Staff() {
           accentColor="cyan"
         />
 
-        <div className="relative overflow-hidden w-full py-4 -mx-4 px-4 sm:mx-0 sm:px-0">
-          {/* Gradient Edges for Premium Look (Desktop) */}
-          <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-background to-transparent z-10 hidden md:block pointer-events-none"></div>
-          <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-background to-transparent z-10 hidden md:block pointer-events-none"></div>
+        <div className="relative overflow-hidden py-4 -mx-4 px-4 sm:mx-0 sm:px-0">
+          {/* Gradient Edges for Premium Look */}
+          <div className="absolute left-0 top-0 bottom-0 w-12 md:w-24 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none"></div>
+          <div className="absolute right-0 top-0 bottom-0 w-12 md:w-24 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none"></div>
           
           <div className="flex group">
             {/* We render two identical blocks that slide to the left */}
