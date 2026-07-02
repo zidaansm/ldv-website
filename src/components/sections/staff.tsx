@@ -62,6 +62,14 @@ export function Staff() {
                     danger: "#e53e3e",
                     success: "#38a169",
                     warning: "#d69e2e",
+                    "neo-red": "#FF2B2B",
+                    "neo-yellow": "#FFD600",
+                    "neo-blue": "#0047FF",
+                    "neo-purple": "#7B00FF",
+                    "neo-pink": "#FF006E",
+                    "neo-orange": "#FF5C00",
+                    "neo-green": "#00C44F",
+                    "neo-dark": "#1A1A2E",
                   };
                   const color = colorMap[member.accent_color] || colorMap.purple;
 

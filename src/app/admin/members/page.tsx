@@ -141,12 +141,24 @@ export default function memberAdminPage() {
             <div>
               <label className="block text-sm font-bold mb-1">Theme Color</label>
               <select value={accentColor} onChange={e => setAccentColor(e.target.value)} className="w-full neo-border rounded-lg px-3 py-2 bg-background">
-                <option value="purple">Purple</option>
-                <option value="pink">Pink</option>
-                <option value="cyan">Cyan</option>
-                <option value="danger">Red</option>
-                <option value="success">Green</option>
-                <option value="warning">Yellow</option>
+                <optgroup label="Pastel Colors">
+                  <option value="purple">Purple</option>
+                  <option value="pink">Pink</option>
+                  <option value="cyan">Cyan</option>
+                  <option value="danger">Red</option>
+                  <option value="success">Green</option>
+                  <option value="warning">Yellow</option>
+                </optgroup>
+                <optgroup label="Neo Colors">
+                  <option value="neo-red">Neo Red</option>
+                  <option value="neo-yellow">Neo Yellow</option>
+                  <option value="neo-blue">Neo Blue</option>
+                  <option value="neo-purple">Neo Purple</option>
+                  <option value="neo-pink">Neo Pink</option>
+                  <option value="neo-orange">Neo Orange</option>
+                  <option value="neo-green">Neo Green</option>
+                  <option value="neo-dark">Neo Dark</option>
+                </optgroup>
               </select>
             </div>
           </div>
@@ -178,6 +190,14 @@ export default function memberAdminPage() {
               danger: "#e53e3e",
               success: "#38a169",
               warning: "#d69e2e",
+              "neo-red": "#FF2B2B",
+              "neo-yellow": "#FFD600",
+              "neo-blue": "#0047FF",
+              "neo-purple": "#7B00FF",
+              "neo-pink": "#FF006E",
+              "neo-orange": "#FF5C00",
+              "neo-green": "#00C44F",
+              "neo-dark": "#1A1A2E",
             };
             const color = colorMap[member.accent_color] || colorMap.purple;
 

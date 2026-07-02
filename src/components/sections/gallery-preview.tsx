@@ -9,6 +9,8 @@ import { SectionHeading } from "@/components/shared";
 import { fadeInUp } from "@/lib/animations";
 import Link from "next/link";
 import { ArrowRight, Image as ImageIcon } from "lucide-react";
+import { TikTokEmbed } from "@/components/shared/tiktok-embed";
+import { GalleryLightbox } from "@/components/shared/gallery-lightbox";
 import { useTranslation } from "@/lib/i18n/LanguageContext";
 
 type GalleryImage = {
@@ -23,6 +25,7 @@ export function GalleryPreview() {
   const [loading, setLoading] = useState(true);
   const [startIndex, setStartIndex] = useState(0);
   const [direction, setDirection] = useState(0);
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const supabase = createClient();
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
@@ -130,6 +133,11 @@ export function GalleryPreview() {
                         transition: { duration: 0.2 },
                       }}
                       className="group relative aspect-[3/4] overflow-hidden rounded-xl border-2 border-primary/30 hover:border-primary transition-colors duration-300 cursor-pointer"
+                      onClick={() => {
+                        // Find the actual index in the full images array
+                        const realIdx = images.indexOf(img);
+                        setActiveIndex(realIdx);
+                      }}
                     >
                       {img.image_url.match(/\.(mp4|webm|ogg)$/i) ||
                       img.image_url.includes("mp4") ? (
@@ -198,6 +206,15 @@ export function GalleryPreview() {
           </Link>
         </div>
       </motion.div>
+
+      {/* Lightbox */}
+      <GalleryLightbox
+        items={images}
+        activeIndex={activeIndex}
+        onClose={() => setActiveIndex(null)}
+        onPrev={() => setActiveIndex((i) => i !== null ? (i - 1 + images.length) % images.length : null)}
+        onNext={() => setActiveIndex((i) => i !== null ? (i + 1) % images.length : null)}
+      />
     </Section>
   );
 }
