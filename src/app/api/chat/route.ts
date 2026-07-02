@@ -97,7 +97,6 @@ ${
         model: groq("llama-3.3-70b-versatile"),
         system: systemPrompt,
         messages: sanitizedMessages,
-        maxTokens: 400,
       });
     } catch (e) {
       console.warn("Groq failed, falling back to Gemini", e);
@@ -105,7 +104,6 @@ ${
         model: google("gemini-2.5-flash"),
         system: systemPrompt,
         messages: sanitizedMessages,
-        maxTokens: 400,
       });
     }
 
