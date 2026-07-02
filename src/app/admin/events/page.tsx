@@ -35,6 +35,7 @@ export default function EventsAdminPage() {
   const [category, setCategory] = useState("");
   const [link, setLink] = useState("");
   const [type, setType] = useState<"upcoming" | "past">("upcoming");
+  const [participants, setParticipants] = useState<number>(0);
 
   useEffect(() => {
     fetchEvents();
@@ -55,6 +56,7 @@ export default function EventsAdminPage() {
     setCategory(event.category);
     setLink(event.link || "");
     setType(event.type);
+    setParticipants(event.participants || 0);
     setIsFormOpen(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -68,6 +70,7 @@ export default function EventsAdminPage() {
     setCategory("");
     setLink("");
     setType("upcoming");
+    setParticipants(0);
     setIsFormOpen(false);
   };
 
@@ -90,7 +93,7 @@ export default function EventsAdminPage() {
     setIsSubmitting(true);
     const loadingToast = toast.loading(editingId ? "Updating event..." : "Creating event...");
     
-    const eventData = { title, description, date, time, category, type, link };
+    const eventData = { title, description, date, time, category, type, link, participants };
     
     let error;
     if (editingId) {
@@ -162,6 +165,10 @@ export default function EventsAdminPage() {
               </select>
             </div>
             <div>
+              <label className="block text-sm font-bold mb-1">Registered Participants</label>
+              <input required type="number" min="0" value={participants} onChange={e => setParticipants(parseInt(e.target.value) || 0)} className="w-full neo-border rounded-lg px-3 py-2 bg-background" />
+            </div>
+            <div className="md:col-span-2">
               <label className="block text-sm font-bold mb-1">Discord Message Link (Optional)</label>
               <input type="url" placeholder="https://discord.com/channels/..." value={link} onChange={e => setLink(e.target.value)} className="w-full neo-border rounded-lg px-3 py-2 bg-background" />
             </div>
