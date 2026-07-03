@@ -5,6 +5,7 @@ import { CustomCursor } from "@/components/ui/custom-cursor";
 import { ChatWidget } from "@/components/shared/chat-widget";
 import "./globals.css";
 import { ToastProvider } from "@/components/providers/ToastProvider";
+import { MenfessLiveToaster } from "@/components/sections/menfess-live-toaster";
 
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
@@ -77,6 +78,7 @@ export default function RootLayout({
         <CustomCursor />
         <LanguageProvider>
           <ToastProvider />
+          <MenfessLiveToaster />
           <main className="flex-grow">
             {children}
           </main>

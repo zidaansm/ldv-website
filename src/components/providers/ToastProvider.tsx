@@ -6,6 +6,7 @@ export function ToastProvider() {
   return (
     <Toaster
       position="bottom-right"
+      containerStyle={{ bottom: 100 }}
       toastOptions={{
         style: {
           background: "var(--card)",
