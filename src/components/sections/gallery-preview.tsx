@@ -139,8 +139,7 @@ export function GalleryPreview() {
                         setActiveIndex(realIdx);
                       }}
                     >
-                      {img.image_url.match(/\.(mp4|webm|ogg)$/i) ||
-                      img.image_url.includes("mp4") ? (
+                      {!!(img.image_url.match(/\.(mp4|webm|ogg|mov)$/i) || img.image_url.includes("mp4")) ? (
                         <video
                           src={img.image_url}
                           autoPlay
