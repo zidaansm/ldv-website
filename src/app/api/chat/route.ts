@@ -52,14 +52,35 @@ export async function POST(req: Request) {
     // --- 2. Fetch Context from Supabase ---
     let contextText = "";
     try {
-      const { data: faq } = await supabase.from("faq").select("*");
-      const { data: events } = await supabase.from("events").select("*").eq("type", "upcoming");
+      // Fetch data from multiple tables in parallel for efficiency
+      const [
+        { data: faq }, 
+        { data: events },
+        { data: members },
+        { data: team },
+        { data: banlist }
+      ] = await Promise.all([
+        supabase.from("faq").select("*"),
+        supabase.from("events").select("*").eq("type", "upcoming"),
+        supabase.from("members").select("name, motto"),
+        supabase.from("team").select("name, role"),
+        supabase.from("banlist").select("name, reason, is_permanent, unban_date")
+      ]);
 
       if (faq && faq.length > 0) {
         contextText += "FAQ:\n" + faq.map((f: any) => `Q: ${f.question}\nA: ${f.answer}`).join("\n\n") + "\n\n";
       }
       if (events && events.length > 0) {
-        contextText += "Upcoming Events:\n" + events.map((e: any) => `- ${e.title} on ${e.date} at ${e.time} (${e.category})`).join("\n") + "\n\n";
+        contextText += "Upcoming Events:\n" + events.map((e: any) => `- ${e.title} on ${e.date} at ${e.time}`).join("\n") + "\n\n";
+      }
+      if (team && team.length > 0) {
+        contextText += "LDV Staff/Team:\n" + team.map((t: any) => `- ${t.name} (Role: ${t.role})`).join("\n") + "\n\n";
+      }
+      if (members && members.length > 0) {
+        contextText += "LDV Members List:\n" + members.map((m: any) => `- ${m.name} (Motto: "${m.motto}")`).join("\n") + "\n\n";
+      }
+      if (banlist && banlist.length > 0) {
+        contextText += "Banned Users:\n" + banlist.map((b: any) => `- ${b.name} (Reason: ${b.reason}. Permanent: ${b.is_permanent ? 'Yes' : 'No'})`).join("\n") + "\n\n";
       }
     } catch (e) {
       console.error("Failed to fetch context from Supabase:", e);
@@ -69,10 +90,11 @@ export async function POST(req: Request) {
     // --- 3. Construct System Prompt ---
     const systemPrompt = `You are Vita (also known as Dolce's Assistant), the official AI assistant for La Dolce Vita (LDV) community.
 Your role is to help visitors by answering questions about LDV based ONLY on the context provided below.
+If a user asks about members, staff, events, or banned users, use the provided context lists.
 If a user asks something completely unrelated to LDV, gaming, or the context provided, politely decline to answer and steer them back to LDV topics.
 Keep your answers brief, friendly, and in a gaming community tone.
 
-Community Context:
+Community Context & Database Records:
 ${contextText}
 
 Language Instruction:
