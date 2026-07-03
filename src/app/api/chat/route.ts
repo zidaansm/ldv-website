@@ -58,30 +58,28 @@ export async function POST(req: Request) {
         { data: events },
         { data: members },
         { data: team },
-        { data: banlist }
+        { data: banlist },
+        { data: menfess }
       ] = await Promise.all([
         supabase.from("faq").select("*"),
         supabase.from("events").select("*").eq("type", "upcoming"),
         supabase.from("members").select("name, motto"),
         supabase.from("team").select("name, role"),
-        supabase.from("banlist").select("name, reason, is_permanent, unban_date")
+        supabase.from("banlist").select("name, reason, is_permanent, unban_date"),
+        supabase.from("menfess").select("content, sender_name, is_anonymous").order("created_at", { ascending: false }).limit(10)
       ]);
 
-      if (faq && faq.length > 0) {
-        contextText += "FAQ:\n" + faq.map((f: any) => `Q: ${f.question}\nA: ${f.answer}`).join("\n\n") + "\n\n";
-      }
-      if (events && events.length > 0) {
-        contextText += "Upcoming Events:\n" + events.map((e: any) => `- ${e.title} on ${e.date} at ${e.time}`).join("\n") + "\n\n";
-      }
-      if (team && team.length > 0) {
-        contextText += "LDV Staff/Team:\n" + team.map((t: any) => `- ${t.name} (Role: ${t.role})`).join("\n") + "\n\n";
-      }
-      if (members && members.length > 0) {
-        contextText += "LDV Members List:\n" + members.map((m: any) => `- ${m.name} (Motto: "${m.motto}")`).join("\n") + "\n\n";
-      }
-      if (banlist && banlist.length > 0) {
-        contextText += "Banned Users:\n" + banlist.map((b: any) => `- ${b.name} (Reason: ${b.reason}. Permanent: ${b.is_permanent ? 'Yes' : 'No'})`).join("\n") + "\n\n";
-      }
+      contextText += "FAQ:\n" + (faq && faq.length > 0 ? faq.map((f: any) => `Q: ${f.question}\nA: ${f.answer}`).join("\n\n") : "No FAQ available.") + "\n\n";
+      
+      contextText += "Upcoming Events:\n" + (events && events.length > 0 ? events.map((e: any) => `- ${e.title} on ${e.date} at ${e.time}`).join("\n") : "No upcoming events.") + "\n\n";
+      
+      contextText += "LDV Staff/Team:\n" + (team && team.length > 0 ? team.map((t: any) => `- ${t.name} (Role: ${t.role})`).join("\n") : "No staff listed.") + "\n\n";
+      
+      contextText += "LDV Members List:\n" + (members && members.length > 0 ? members.map((m: any) => `- ${m.name} (Motto: "${m.motto}")`).join("\n") : "No members listed.") + "\n\n";
+      
+      contextText += "Banned Users:\n" + (banlist && banlist.length > 0 ? banlist.map((b: any) => `- ${b.name} (Reason: ${b.reason}. Permanent: ${b.is_permanent ? 'Yes' : 'No'})`).join("\n") : "No banned users.") + "\n\n";
+      
+      contextText += "Recent Menfess (Secret Messages):\n" + (menfess && menfess.length > 0 ? menfess.map((m: any) => `- From ${m.is_anonymous ? 'Anonymous' : m.sender_name}: "${m.content}"`).join("\n") : "No secret messages yet.") + "\n\n";
     } catch (e) {
       console.error("Failed to fetch context from Supabase:", e);
       // We don't throw here; we still want the AI to reply even if context fails.
