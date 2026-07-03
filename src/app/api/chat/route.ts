@@ -57,14 +57,14 @@ export async function POST(req: Request) {
         { data: faq }, 
         { data: events },
         { data: members },
-        { data: team },
+        { data: staff },
         { data: banlist },
         { data: menfess }
       ] = await Promise.all([
         supabase.from("faq").select("*"),
         supabase.from("events").select("*").eq("type", "upcoming"),
         supabase.from("members").select("name, motto"),
-        supabase.from("team").select("name, role"),
+        supabase.from("staff").select("name, role"),
         supabase.from("banlist").select("name, reason, is_permanent, unban_date"),
         supabase.from("menfess").select("content, sender_name, is_anonymous").order("created_at", { ascending: false }).limit(10)
       ]);
@@ -73,7 +73,7 @@ export async function POST(req: Request) {
       
       contextText += "Upcoming Events:\n" + (events && events.length > 0 ? events.map((e: any) => `- ${e.title} on ${e.date} at ${e.time}`).join("\n") : "No upcoming events.") + "\n\n";
       
-      contextText += "LDV Staff/Team:\n" + (team && team.length > 0 ? team.map((t: any) => `- ${t.name} (Role: ${t.role})`).join("\n") : "No staff listed.") + "\n\n";
+      contextText += "LDV Staff/Team:\n" + (staff && staff.length > 0 ? staff.map((t: any) => `- ${t.name} (Role: ${t.role})`).join("\n") : "No staff listed.") + "\n\n";
       
       contextText += "LDV Members List:\n" + (members && members.length > 0 ? members.map((m: any) => `- ${m.name} (Motto: "${m.motto}")`).join("\n") : "No members listed.") + "\n\n";
       
