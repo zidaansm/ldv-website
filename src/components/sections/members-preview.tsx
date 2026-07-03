@@ -68,14 +68,14 @@ export function MembersPreview({ direction = "left", speed = 40 }: MembersPrevie
               className="flex items-center gap-3 bg-card neo-border rounded-xl p-3 shrink-0"
               style={{ minWidth: "250px" }}
             >
-              <div className="w-12 h-12 shrink-0 flex items-center justify-center">
+              <div 
+                className="w-12 h-12 rounded-lg border-2 border-black shrink-0 overflow-hidden"
+                style={{ backgroundColor: `var(--${member.accent_color})` }}
+              >
                 {member.avatar_url ? (
-                  <img src={member.avatar_url} alt={member.name} className="w-full h-full object-contain drop-shadow-md" />
+                  <img src={member.avatar_url} alt={member.name} className="w-full h-full object-cover" />
                 ) : (
-                  <div 
-                    className="w-full h-full flex items-center justify-center font-bold text-white rounded-lg border-2 border-black overflow-hidden"
-                    style={{ backgroundColor: `var(--${member.accent_color})` }}
-                  >
+                  <div className="w-full h-full flex items-center justify-center font-bold text-white">
                     {member.name.charAt(0).toUpperCase()}
                   </div>
                 )}
