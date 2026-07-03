@@ -38,9 +38,16 @@ export function MenfessPreview() {
         .from("menfess")
         .select("*, menfess_comments(id)")
         .order("created_at", { ascending: false })
-        .limit(3);
+        .limit(50);
       
-      if (data) setPosts(data);
+      if (data) {
+        // Sort by highest number of comments
+        const sortedData = [...data].sort(
+          (a, b) => (b.menfess_comments?.length || 0) - (a.menfess_comments?.length || 0)
+        );
+        // Take the top 3 most commented posts
+        setPosts(sortedData.slice(0, 3));
+      }
     };
     fetchPosts();
   }, []);
