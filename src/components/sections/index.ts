@@ -6,3 +6,5 @@ export { FAQ } from "./faq";
 export { BanList } from "./banlist";
 export { GalleryPreview } from "./gallery-preview";
 export { Partners } from "./partners";
+export { MembersPreview } from "./members-preview";
+export { MenfessPreview } from "./menfess-preview";

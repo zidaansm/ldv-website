@@ -6,6 +6,8 @@ export const id = {
     members: "Anggota",
     team: "Tim",
     faq: "FAQ",
+    banlist: "Daftar Banned",
+    menfess: "Menfess",
     joinDiscord: "Gabung Discord",
   },
   hero: {

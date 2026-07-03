@@ -6,6 +6,8 @@ export const en = {
     members: "Members",
     team: "Team",
     faq: "FAQ",
+    banlist: "Ban List",
+    menfess: "Menfess",
     joinDiscord: "Join Discord",
   },
   hero: {

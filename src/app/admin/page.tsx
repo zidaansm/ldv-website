@@ -21,6 +21,7 @@ export default function AdminDashboard() {
     { name: "FAQ", icon: MessageSquare, path: "/admin/faq", color: "accent", count: 3 },
     { name: "Ban List", icon: ShieldAlert, path: "/admin/banlist", color: "danger", count: 3 },
     { name: "Gallery", icon: ImageIcon, path: "/admin/gallery", color: "warning", count: 0 },
+    { name: "Menfess", icon: MessageSquare, path: "/admin/menfess", color: "purple", count: 0 },
   ];
 
   return (
