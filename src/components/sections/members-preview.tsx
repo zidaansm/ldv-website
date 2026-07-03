@@ -65,7 +65,7 @@ export function MembersPreview({ direction = "left", speed = 40 }: MembersPrevie
           {members.map((member, i) => (
             <div 
               key={`${member.id}-${i}`}
-              className="flex items-center gap-3 shrink-0 px-4"
+              className="flex items-center gap-3 bg-card neo-border rounded-xl p-3 shrink-0"
               style={{ minWidth: "250px" }}
             >
               <div className="w-12 h-12 shrink-0 flex items-center justify-center">
