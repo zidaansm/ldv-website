@@ -7,6 +7,7 @@ import { useTranslation } from "@/lib/i18n/LanguageContext";
 import { Container, Section } from "@/components/layout";
 import { SectionHeading } from "@/components/shared";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ArrowRight, MessageSquare, Heart } from "lucide-react";
 
 type Menfess = {
@@ -33,6 +34,7 @@ export function MenfessPreview() {
   const [likedPosts, setLikedPosts] = useState<Record<string, boolean>>({});
   const supabase = createClient();
   const { t } = useTranslation();
+  const router = useRouter();
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -105,8 +107,8 @@ export function MenfessPreview() {
                 stiffness: 100,
                 damping: 15,
                 delay: i * 0.15
-              }}
-              className="bg-card neo-border neo-shadow rounded-2xl p-6 flex flex-col gap-4 group"
+              className="bg-card neo-border neo-shadow rounded-2xl p-6 flex flex-col gap-4 group cursor-pointer hover:scale-[1.02] transition-transform"
+              onClick={() => router.push(`/menfess?post=${post.id}`)}
               style={{
                 // Add the subtle float animation via style or class
                 animation: `float 6s ease-in-out ${i * 1.5}s infinite`
