@@ -7,7 +7,7 @@ import { SectionHeading } from "@/components/shared/section-heading";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageSquare, Plus, X, Loader2, Heart } from "lucide-react";
 import toast from "react-hot-toast";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { Suspense } from "react";
 import { playClick, playPop } from "@/lib/sounds";
 
@@ -49,6 +49,9 @@ function getAvatarStyle(color: string) {
 
 function MenfessContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+  
   const [posts, setPosts] = useState<Menfess[]>([]);
   const [likedPosts, setLikedPosts] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
@@ -133,6 +136,14 @@ function MenfessContent() {
       }
     }
   }, [searchParams, posts]);
+
+  const handleCloseModal = () => {
+    setActivePost(null);
+    // Clear the query parameter so it doesn't re-open when 'posts' state changes
+    if (searchParams.has('post')) {
+      router.replace(pathname, { scroll: false });
+    }
+  };
 
   const handleSubmitPost = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -428,7 +439,7 @@ function MenfessContent() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-              onClick={() => setActivePost(null)}
+              onClick={handleCloseModal}
             />
             <motion.div
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
@@ -444,7 +455,7 @@ function MenfessContent() {
                 <button
                   onClick={() => {
                     playClick();
-                    setActivePost(null);
+                    handleCloseModal();
                   }}
                   className="p-2 hover:bg-muted rounded-xl transition-colors neo-border neo-press"
                 >
