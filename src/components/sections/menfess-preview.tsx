@@ -107,6 +107,7 @@ export function MenfessPreview() {
                 stiffness: 100,
                 damping: 15,
                 delay: i * 0.15
+              }}
               className="bg-card neo-border neo-shadow rounded-2xl p-6 flex flex-col gap-4 group cursor-pointer hover:scale-[1.02] transition-transform"
               onClick={() => router.push(`/menfess?post=${post.id}`)}
               style={{
