@@ -7,7 +7,7 @@ import { useTranslation } from "@/lib/i18n/LanguageContext";
 import { Container, Section } from "@/components/layout";
 import { SectionHeading } from "@/components/shared";
 import Link from "next/link";
-import { ArrowRight, MessageSquare } from "lucide-react";
+import { ArrowRight, MessageSquare, Heart } from "lucide-react";
 
 type Menfess = {
   id: string;
@@ -17,6 +17,7 @@ type Menfess = {
   avatar_color: string;
   created_at: string;
   menfess_comments: { id: string }[];
+  menfess_likes?: { id: string }[];
 };
 
 function getAvatarStyle(color: string) {
@@ -29,6 +30,7 @@ function getAvatarStyle(color: string) {
 
 export function MenfessPreview() {
   const [posts, setPosts] = useState<Menfess[]>([]);
+  const [likedPosts, setLikedPosts] = useState<Record<string, boolean>>({});
   const supabase = createClient();
   const { t } = useTranslation();
 
@@ -36,20 +38,36 @@ export function MenfessPreview() {
     const fetchPosts = async () => {
       const { data } = await supabase
         .from("menfess")
-        .select("*, menfess_comments(id)")
+        .select("*, menfess_comments(id), menfess_likes(id)")
         .order("created_at", { ascending: false })
         .limit(50);
       
       if (data) {
-        // Sort by highest number of comments
+        // Sort by (likes + comments)
         const sortedData = [...data].sort(
-          (a, b) => (b.menfess_comments?.length || 0) - (a.menfess_comments?.length || 0)
+          (a, b) => {
+            const scoreA = (a.menfess_comments?.length || 0) + (a.menfess_likes?.length || 0);
+            const scoreB = (b.menfess_comments?.length || 0) + (b.menfess_likes?.length || 0);
+            return scoreB - scoreA;
+          }
         );
         // Take the top 3 most commented posts
         setPosts(sortedData.slice(0, 3));
       }
     };
+    
     fetchPosts();
+
+    // Read likes from localStorage
+    const likes: Record<string, boolean> = {};
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key?.startsWith('liked_menfess_')) {
+        const postId = key.replace('liked_menfess_', '');
+        likes[postId] = true;
+      }
+    }
+    setLikedPosts(likes);
   }, []);
 
   return (
@@ -116,9 +134,15 @@ export function MenfessPreview() {
               </p>
 
               <div className="mt-2 pt-4 border-t-2 border-[var(--border)] flex justify-between items-center text-muted-foreground font-semibold text-sm">
-                <div className="flex items-center gap-1.5">
-                  <MessageSquare className="w-4 h-4" />
-                  <span>{post.menfess_comments?.length || 0} Comments</span>
+                <div className="flex gap-4">
+                  <div className={`flex items-center gap-1.5 transition-colors ${likedPosts[post.id] ? 'text-danger' : 'group-hover:text-danger'}`}>
+                    <Heart className={`w-4 h-4 ${likedPosts[post.id] ? 'fill-current' : ''}`} />
+                    <span>{post.menfess_likes?.length || 0} Likes</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 group-hover:text-primary transition-colors">
+                    <MessageSquare className="w-4 h-4" />
+                    <span>{post.menfess_comments?.length || 0} Comments</span>
+                  </div>
                 </div>
               </div>
             </motion.div>

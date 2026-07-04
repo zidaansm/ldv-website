@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import { Container } from "@/components/layout/container";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageSquare, Plus, X, Loader2 } from "lucide-react";
+import { MessageSquare, Plus, X, Loader2, Heart } from "lucide-react";
 import toast from "react-hot-toast";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
@@ -16,8 +16,10 @@ type Menfess = {
   sender_name: string;
   is_anonymous: boolean;
   avatar_color: string;
+  avatar_color: string;
   created_at: string;
   menfess_comments: { id: string }[];
+  menfess_likes?: { id: string }[];
 };
 
 type Comment = {
@@ -48,6 +50,7 @@ function getAvatarStyle(color: string) {
 function MenfessContent() {
   const searchParams = useSearchParams();
   const [posts, setPosts] = useState<Menfess[]>([]);
+  const [likedPosts, setLikedPosts] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [activePost, setActivePost] = useState<Menfess | null>(null);
@@ -70,7 +73,7 @@ function MenfessContent() {
   const fetchPosts = async () => {
     const { data, error } = await supabase
       .from("menfess")
-      .select("*, menfess_comments(id)")
+      .select("*, menfess_comments(id), menfess_likes(id)")
       .order("created_at", { ascending: false });
     
     if (data) setPosts(data);
@@ -85,7 +88,19 @@ function MenfessContent() {
       .channel("public:menfess")
       .on("postgres_changes", { event: "*", schema: "public", table: "menfess" }, fetchPosts)
       .on("postgres_changes", { event: "*", schema: "public", table: "menfess_comments" }, fetchPosts)
+      .on("postgres_changes", { event: "*", schema: "public", table: "menfess_likes" }, fetchPosts)
       .subscribe();
+
+    // Read likes from localStorage
+    const likes: Record<string, string> = {};
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key?.startsWith('liked_menfess_')) {
+        const postId = key.replace('liked_menfess_', '');
+        likes[postId] = localStorage.getItem(key) || '';
+      }
+    }
+    setLikedPosts(likes);
 
     return () => {
       supabase.removeChannel(channel);
@@ -144,6 +159,62 @@ function MenfessContent() {
       setSenderName("");
       setIsAnonymous(true);
       fetchPosts();
+    }
+  };
+
+  const handleLike = async (e: React.MouseEvent, postId: string) => {
+    e.stopPropagation(); // prevent modal opening
+    
+    const existingLikeId = likedPosts[postId];
+    
+    if (existingLikeId) {
+      // UNLIKE FLOW
+      // Optimistic UI update
+      setLikedPosts((prev) => {
+        const next = { ...prev };
+        delete next[postId];
+        return next;
+      });
+      setPosts((prev) => prev.map(p => 
+        p.id === postId ? { ...p, menfess_likes: p.menfess_likes?.slice(0, -1) } : p
+      ));
+      if (activePost?.id === postId) {
+        setActivePost((prev) => prev ? { ...prev, menfess_likes: prev.menfess_likes?.slice(0, -1) } : null);
+      }
+      
+      localStorage.removeItem(`liked_menfess_${postId}`);
+      
+      if (existingLikeId !== "true" && existingLikeId !== "temp") {
+        await supabase.from("menfess_likes").delete().eq("id", existingLikeId);
+      }
+    } else {
+      // LIKE FLOW
+      // Optimistic UI update
+      setLikedPosts((prev) => ({ ...prev, [postId]: "temp" }));
+      setPosts((prev) => prev.map(p => 
+        p.id === postId 
+          ? { ...p, menfess_likes: [...(p.menfess_likes || []), { id: 'temp' }] }
+          : p
+      ));
+      if (activePost?.id === postId) {
+        setActivePost((prev) => prev ? { ...prev, menfess_likes: [...(prev.menfess_likes || []), { id: 'temp' }] } : null);
+      }
+      
+      const { data, error } = await supabase.from("menfess_likes").insert([{ menfess_id: postId }]).select('id').single();
+      
+      if (error) {
+        toast.error("Failed to like.");
+        setLikedPosts((prev) => {
+          const next = { ...prev };
+          delete next[postId];
+          return next;
+        });
+        localStorage.removeItem(`liked_menfess_${postId}`);
+        fetchPosts(); // revert
+      } else if (data) {
+        localStorage.setItem(`liked_menfess_${postId}`, data.id);
+        setLikedPosts((prev) => ({ ...prev, [postId]: data.id }));
+      }
     }
   };
 
@@ -234,9 +305,18 @@ function MenfessContent() {
                 </p>
 
                 <div className="mt-2 pt-4 border-t-2 border-[var(--border)] flex justify-between items-center text-muted-foreground font-semibold text-sm">
-                  <div className="flex items-center gap-1.5 group-hover:text-primary transition-colors">
-                    <MessageSquare className="w-4 h-4" />
-                    <span>{post.menfess_comments?.length || 0} Comments</span>
+                  <div className="flex gap-4">
+                    <button 
+                      onClick={(e) => handleLike(e, post.id)}
+                      className={`flex items-center gap-1.5 transition-colors ${likedPosts[post.id] ? 'text-danger' : 'hover:text-danger'}`}
+                    >
+                      <Heart className={`w-4 h-4 ${likedPosts[post.id] ? 'fill-current' : ''}`} />
+                      <span>{post.menfess_likes?.length || 0} Likes</span>
+                    </button>
+                    <div className="flex items-center gap-1.5 group-hover:text-primary transition-colors">
+                      <MessageSquare className="w-4 h-4" />
+                      <span>{post.menfess_comments?.length || 0} Comments</span>
+                    </div>
                   </div>
                 </div>
               </motion.div>
@@ -373,6 +453,16 @@ function MenfessContent() {
                     <p className="text-foreground whitespace-pre-wrap leading-relaxed text-lg">
                       {activePost.content}
                     </p>
+                    
+                    <div className="mt-4 flex gap-4 text-muted-foreground font-semibold text-sm">
+                      <button 
+                        onClick={(e) => handleLike(e, activePost.id)}
+                        className={`flex items-center gap-1.5 transition-colors bg-muted px-3 py-1.5 rounded-lg border-2 hover:border-danger/20 ${likedPosts[activePost.id] ? 'text-danger border-danger/20' : 'border-transparent hover:text-danger'}`}
+                      >
+                        <Heart className={`w-4 h-4 ${likedPosts[activePost.id] ? 'fill-current' : ''}`} />
+                        <span>{activePost.menfess_likes?.length || 0} Likes</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
 
