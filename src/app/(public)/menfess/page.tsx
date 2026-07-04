@@ -16,7 +16,6 @@ type Menfess = {
   sender_name: string;
   is_anonymous: boolean;
   avatar_color: string;
-  avatar_color: string;
   created_at: string;
   menfess_comments: { id: string }[];
   menfess_likes?: { id: string }[];
