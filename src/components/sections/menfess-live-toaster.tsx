@@ -36,7 +36,7 @@ export function MenfessLiveToaster() {
             }`}
             onClick={() => {
               toast.dismiss(t.id);
-              router.push('/menfess');
+              router.push(`/menfess?post=${newMenfess.id}`);
             }}
           >
             <div className={`w-10 h-10 shrink-0 rounded-full border-2 border-black flex items-center justify-center`} style={{ backgroundColor: `var(--${newMenfess.avatar_color})` }}>
@@ -82,7 +82,7 @@ export function MenfessLiveToaster() {
             }`}
             onClick={() => {
               toast.dismiss(t.id);
-              router.push('/menfess');
+              router.push(`/menfess?post=${newComment.menfess_id}`);
             }}
           >
             <div className={`w-10 h-10 shrink-0 rounded-full border-2 border-black flex items-center justify-center`} style={{ backgroundColor: `var(--${newComment.avatar_color})` }}>

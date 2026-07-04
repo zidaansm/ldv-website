@@ -7,6 +7,8 @@ import { SectionHeading } from "@/components/shared/section-heading";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageSquare, Plus, X, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
+import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
 type Menfess = {
   id: string;
@@ -43,7 +45,8 @@ function getAvatarStyle(color: string) {
   };
 }
 
-export default function MenfessPage() {
+function MenfessContent() {
+  const searchParams = useSearchParams();
   const [posts, setPosts] = useState<Menfess[]>([]);
   const [loading, setLoading] = useState(true);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -104,6 +107,17 @@ export default function MenfessPage() {
       fetchComments(activePost.id);
     }
   }, [activePost, posts]);
+
+  // Open modal if ?post= parameter is present
+  useEffect(() => {
+    const postId = searchParams.get('post');
+    if (postId && posts.length > 0) {
+      const target = posts.find((p) => p.id === postId);
+      if (target && (!activePost || activePost.id !== target.id)) {
+        setActivePost(target);
+      }
+    }
+  }, [searchParams, posts]);
 
   const handleSubmitPost = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -452,5 +466,13 @@ export default function MenfessPage() {
         )}
       </AnimatePresence>
     </div>
+  );
+}
+
+export default function MenfessPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[var(--background)] flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin" /></div>}>
+      <MenfessContent />
+    </Suspense>
   );
 }
