@@ -5,6 +5,8 @@ import { motion } from "framer-motion";
 import { MessageCircle, ArrowRight, Users, Activity, Calendar } from "lucide-react";
 import { Container } from "@/components/layout";
 import { GeoShapes } from "@/components/decorations/geo-shapes";
+import { RetroTV } from "@/components/decorations/retro-tv";
+import { RetroRobot } from "@/components/decorations/retro-robot";
 import { SITE_CONFIG, COMMUNITY_STATS } from "@/lib/constants";
 import { fadeInUp, staggerContainer } from "@/lib/animations";
 import { useTranslation } from "@/lib/i18n/LanguageContext";
@@ -42,6 +44,20 @@ export function Hero() {
     <section className="relative min-h-screen flex items-center pt-20 overflow-hidden geo-grid">
       {/* Animated Background Shapes */}
       <GeoShapes />
+
+      {/* Floating 3D Retro TV (Right) */}
+      <div className="absolute right-0 lg:right-10 top-1/2 -translate-y-1/2 w-1/3 hidden lg:block z-20 transition-opacity" style={{ pointerEvents: "none" }}>
+        <div style={{ pointerEvents: "auto", width: "100%", height: "100%" }}>
+          <RetroTV />
+        </div>
+      </div>
+
+      {/* Floating 3D Retro Robot (Left) */}
+      <div className="absolute left-0 lg:left-10 bottom-0 w-1/4 hidden lg:block z-20 transition-opacity" style={{ pointerEvents: "none" }}>
+        <div style={{ pointerEvents: "auto", width: "100%", height: "100%" }}>
+          <RetroRobot />
+        </div>
+      </div>
 
       <Container className="relative z-10">
         <motion.div
