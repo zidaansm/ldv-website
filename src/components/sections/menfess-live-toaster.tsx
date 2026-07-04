@@ -4,9 +4,11 @@ import { useEffect, useRef } from "react";
 import toast from "react-hot-toast";
 import { createBrowserClient } from '@supabase/ssr';
 import { Mail, MessageCircle } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export function MenfessLiveToaster() {
   const toastedIds = useRef<Set<string>>(new Set());
+  const router = useRouter();
 
   useEffect(() => {
     // We only need this on the client side
@@ -34,9 +36,7 @@ export function MenfessLiveToaster() {
             }`}
             onClick={() => {
               toast.dismiss(t.id);
-              // Scroll to menfess section if clicked
-              const el = document.getElementById('menfess');
-              if (el) el.scrollIntoView({ behavior: 'smooth' });
+              router.push('/menfess');
             }}
           >
             <div className={`w-10 h-10 shrink-0 rounded-full border-2 border-black flex items-center justify-center`} style={{ backgroundColor: `var(--${newMenfess.avatar_color})` }}>
@@ -72,8 +72,7 @@ export function MenfessLiveToaster() {
             }`}
             onClick={() => {
               toast.dismiss(t.id);
-              const el = document.getElementById('menfess');
-              if (el) el.scrollIntoView({ behavior: 'smooth' });
+              router.push('/menfess');
             }}
           >
             <div className={`w-10 h-10 shrink-0 rounded-full border-2 border-black flex items-center justify-center`} style={{ backgroundColor: `var(--${newComment.avatar_color})` }}>
