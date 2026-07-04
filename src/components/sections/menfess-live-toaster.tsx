@@ -26,6 +26,11 @@ export function MenfessLiveToaster() {
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'menfess' }, (payload) => {
         const newMenfess = payload.new;
         
+        if (sessionStorage.getItem(`my_action_${newMenfess.id}`)) {
+          sessionStorage.removeItem(`my_action_${newMenfess.id}`);
+          return;
+        }
+
         if (toastedIds.current.has(newMenfess.id)) return;
         toastedIds.current.add(newMenfess.id);
         setTimeout(() => toastedIds.current.delete(newMenfess.id), 10000);
@@ -65,6 +70,11 @@ export function MenfessLiveToaster() {
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'menfess_comments' }, async (payload) => {
         const newComment = payload.new;
         
+        if (sessionStorage.getItem(`my_action_${newComment.id}`)) {
+          sessionStorage.removeItem(`my_action_${newComment.id}`);
+          return;
+        }
+
         if (toastedIds.current.has(newComment.id)) return;
         toastedIds.current.add(newComment.id);
         setTimeout(() => toastedIds.current.delete(newComment.id), 10000);
@@ -113,6 +123,11 @@ export function MenfessLiveToaster() {
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'menfess_likes' }, async (payload) => {
         const newLike = payload.new;
         
+        if (sessionStorage.getItem(`my_action_${newLike.id}`)) {
+          sessionStorage.removeItem(`my_action_${newLike.id}`);
+          return;
+        }
+
         if (toastedIds.current.has(newLike.id)) return;
         toastedIds.current.add(newLike.id);
         setTimeout(() => toastedIds.current.delete(newLike.id), 10000);

@@ -90,38 +90,9 @@ function MenfessContent() {
     // Subscribe to realtime changes
     const channel = supabase
       .channel("public:menfess")
-      .on("postgres_changes", { event: "*", schema: "public", table: "menfess" }, (payload) => {
-        if (payload.eventType === 'INSERT') {
-          if (!sessionStorage.getItem(`my_action_${payload.new.id}`)) {
-            toast.success("Someone dropped a new secret!");
-            playPop();
-          } else {
-            sessionStorage.removeItem(`my_action_${payload.new.id}`);
-          }
-        }
-        fetchPosts();
-      })
-      .on("postgres_changes", { event: "*", schema: "public", table: "menfess_comments" }, (payload) => {
-        if (payload.eventType === 'INSERT') {
-          if (!sessionStorage.getItem(`my_action_${payload.new.id}`)) {
-            toast.success("Someone replied to a thread!");
-            playPop();
-          } else {
-            sessionStorage.removeItem(`my_action_${payload.new.id}`);
-          }
-        }
-        fetchPosts();
-      })
-      .on("postgres_changes", { event: "*", schema: "public", table: "menfess_likes" }, (payload) => {
-        if (payload.eventType === 'INSERT') {
-          if (!sessionStorage.getItem(`my_action_${payload.new.id}`)) {
-            toast.success("Someone liked a menfess!");
-          } else {
-            sessionStorage.removeItem(`my_action_${payload.new.id}`);
-          }
-        }
-        fetchPosts();
-      })
+      .on("postgres_changes", { event: "*", schema: "public", table: "menfess" }, fetchPosts)
+      .on("postgres_changes", { event: "*", schema: "public", table: "menfess_comments" }, fetchPosts)
+      .on("postgres_changes", { event: "*", schema: "public", table: "menfess_likes" }, fetchPosts)
       .subscribe();
 
     // Read likes from localStorage
