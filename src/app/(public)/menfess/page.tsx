@@ -442,14 +442,15 @@ function MenfessContent() {
               onClick={handleCloseModal}
             />
             <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="relative z-10 bg-background neo-border shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-2xl p-6 max-w-2xl w-full max-h-[85vh] overflow-y-auto"
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="relative z-10 w-full max-w-2xl max-h-[90vh] bg-card neo-border neo-shadow sm:rounded-3xl rounded-t-3xl overflow-hidden flex flex-col"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="font-extrabold text-2xl" style={{ fontFamily: "var(--font-space-grotesk)" }}>
+              <div className="p-4 sm:p-6 border-b-2 border-black bg-muted flex justify-between items-center shrink-0">
+                <h3 className="font-extrabold text-lg" style={{ fontFamily: "var(--font-space-grotesk)" }}>
                   Thread
                 </h3>
                 <button
@@ -457,9 +458,9 @@ function MenfessContent() {
                     playClick();
                     handleCloseModal();
                   }}
-                  className="p-2 hover:bg-muted rounded-xl transition-colors neo-border neo-press"
+                  className="p-2 hover:bg-background rounded-xl neo-border bg-background transition-colors neo-press"
                 >
-                  <X className="w-5 h-5" />
+                  <X className="w-4 h-4" />
                 </button>
               </div>
               
