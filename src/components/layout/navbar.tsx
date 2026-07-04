@@ -9,6 +9,7 @@ import { NAV_LINKS, SITE_CONFIG } from "@/lib/constants";
 import { Container } from "./container";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/lib/i18n/LanguageContext";
+import { playClick } from "@/lib/sounds";
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -76,6 +77,7 @@ export function Navbar() {
   }, []);
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    playClick(); // Play sound on nav click
     // Only intercept if it's a hash link and we are on the homepage
     if (href.startsWith("/#") && pathname === "/") {
       e.preventDefault();
@@ -120,6 +122,7 @@ export function Navbar() {
             <Link
               href="/"
               onClick={(e) => {
+                playClick();
                 if (pathname === "/") {
                   e.preventDefault();
                   window.scrollTo({ top: 0, behavior: "smooth" });
@@ -175,7 +178,10 @@ export function Navbar() {
             {/* Language Toggle & CTA (Desktop) */}
             <div className="hidden md:flex items-center gap-4">
               <button
-                onClick={() => setLanguage(language === "en" ? "id" : "en")}
+                onClick={() => {
+                  playClick();
+                  setLanguage(language === "en" ? "id" : "en");
+                }}
                 className="flex items-center gap-2 px-3 py-2 text-sm font-bold neo-border rounded-lg bg-card hover:bg-muted transition-colors"
                 title="Toggle Language"
               >
@@ -187,6 +193,7 @@ export function Navbar() {
                 href={SITE_CONFIG.discordInvite}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => playClick()}
                 className="inline-flex items-center justify-center gap-2 neo-border neo-shadow-sm neo-press rounded-xl px-5 py-2.5 font-bold text-sm bg-primary text-primary-foreground transition-all hover:bg-primary/90"
               >
                 <MessageCircle className="w-4 h-4" />
@@ -196,7 +203,10 @@ export function Navbar() {
 
             {/* Mobile Menu Toggle */}
             <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              onClick={() => {
+                playClick();
+                setIsMobileMenuOpen(!isMobileMenuOpen);
+              }}
               className="md:hidden neo-border neo-shadow-sm neo-press rounded-xl p-2.5 bg-card text-foreground"
               aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
               aria-expanded={isMobileMenuOpen}
@@ -252,7 +262,10 @@ export function Navbar() {
               {/* Mobile Language Toggle */}
               <div className="mt-4 w-full max-w-[280px]">
                 <button
-                  onClick={() => setLanguage(language === "en" ? "id" : "en")}
+                  onClick={() => {
+                    playClick();
+                    setLanguage(language === "en" ? "id" : "en");
+                  }}
                   className="w-full flex items-center justify-center gap-2 neo-border neo-shadow-sm neo-press rounded-xl px-5 py-4 font-bold text-lg bg-card text-foreground transition-all hover:bg-muted"
                 >
                   <Globe className="w-5 h-5" />
@@ -266,6 +279,7 @@ export function Navbar() {
                   href={SITE_CONFIG.discordInvite}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => playClick()}
                   className="w-full inline-flex items-center justify-center gap-3 neo-border neo-shadow-sm neo-press rounded-xl px-5 py-4 font-bold text-lg bg-primary text-primary-foreground transition-all hover:bg-primary/90"
                 >
                   <MessageCircle className="w-5 h-5" />

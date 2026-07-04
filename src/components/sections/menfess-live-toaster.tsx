@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { createBrowserClient } from '@supabase/ssr';
 import { Mail, MessageCircle, Heart } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { playDing } from "@/lib/sounds";
 
 export function MenfessLiveToaster() {
   const toastedIds = useRef<Set<string>>(new Set());
@@ -28,6 +29,8 @@ export function MenfessLiveToaster() {
         if (toastedIds.current.has(newMenfess.id)) return;
         toastedIds.current.add(newMenfess.id);
         setTimeout(() => toastedIds.current.delete(newMenfess.id), 10000);
+
+        playDing(); // Notification sound
 
         toast.custom((t) => (
           <div
@@ -75,6 +78,8 @@ export function MenfessLiveToaster() {
 
         const repliedTo = originalMenfess?.sender_name || "Anonymous";
 
+        playDing(); // Notification sound
+
         toast.custom((t) => (
           <div
             className={`max-w-sm w-full bg-[var(--background)] border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] rounded-xl pointer-events-auto flex items-center p-3 gap-3 cursor-pointer transition-all duration-300 ${
@@ -120,6 +125,8 @@ export function MenfessLiveToaster() {
           .single();
 
         if (!originalMenfess) return;
+
+        playDing(); // Notification sound
 
         toast.custom((t) => (
           <div

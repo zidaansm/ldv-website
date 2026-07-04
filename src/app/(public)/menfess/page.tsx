@@ -9,6 +9,7 @@ import { MessageSquare, Plus, X, Loader2, Heart } from "lucide-react";
 import toast from "react-hot-toast";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
+import { playClick, playPop } from "@/lib/sounds";
 
 type Menfess = {
   id: string;
@@ -138,7 +139,7 @@ function MenfessContent() {
     if (!content.trim()) return;
 
     setIsSubmitting(true);
-    const loadingToast = toast.loading("Sending menfess...");
+    const loadingToast = toast.loading("Sending your secret...");
 
     const { error } = await supabase.from("menfess").insert([{
       content: content.trim(),
@@ -150,8 +151,9 @@ function MenfessContent() {
     setIsSubmitting(false);
 
     if (error) {
-      toast.error("Failed to send menfess. Please try again.", { id: loadingToast });
+      toast.error("Failed to post menfess.", { id: loadingToast });
     } else {
+      playClick();
       toast.success("Menfess posted!", { id: loadingToast });
       setIsFormOpen(false);
       setContent("");
@@ -186,8 +188,10 @@ function MenfessContent() {
       if (existingLikeId !== "true" && existingLikeId !== "temp") {
         await supabase.from("menfess_likes").delete().eq("id", existingLikeId);
       }
+      playPop(); // Play pop on unlike too
     } else {
       // LIKE FLOW
+      playPop(); // Play pop instantly
       // Optimistic UI update
       setLikedPosts((prev) => ({ ...prev, [postId]: "temp" }));
       setPosts((prev) => prev.map(p => 
@@ -236,6 +240,7 @@ function MenfessContent() {
     if (error) {
       toast.error("Failed to send comment.");
     } else {
+      playClick();
       setCommentContent("");
       fetchComments(activePost.id);
     }
@@ -250,13 +255,17 @@ function MenfessContent() {
             subtitle="Drop a confession, shoutout, or just say hi. Post anonymously or leave your mark."
             className="mb-0 text-left max-w-2xl"
           />
-          <button
-            onClick={() => setIsFormOpen(true)}
-            className="inline-flex items-center gap-2 px-6 py-3 font-bold text-primary-foreground bg-primary neo-border neo-shadow-sm neo-press rounded-xl shrink-0 h-fit"
-          >
-            <Plus className="w-5 h-5" />
-            Write Menfess
-          </button>
+          <div className="flex justify-center mb-8 sticky top-[100px] z-10 pointer-events-none">
+            <button
+              onClick={() => {
+                playClick();
+                setIsFormOpen(!isFormOpen);
+              }}
+              className="pointer-events-auto flex items-center gap-2 px-6 py-3 font-extrabold text-lg text-primary-foreground bg-primary neo-border neo-shadow-sm neo-press rounded-full hover:bg-primary/90 transition-all"
+              style={{ fontFamily: "var(--font-space-grotesk)" }}
+            >Write Menfess
+            </button>
+          </div>
         </div>
 
         {loading ? (
@@ -279,7 +288,10 @@ function MenfessContent() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 whileHover={{ y: -4 }}
-                onClick={() => setActivePost(post)}
+                onClick={() => {
+                  playClick();
+                  setActivePost(post);
+                }}
                 className="break-inside-avoid cursor-pointer bg-card neo-border neo-shadow-sm rounded-2xl p-6 flex flex-col gap-4 relative overflow-hidden group transition-all"
               >
                 <div className="flex items-center gap-3">
@@ -346,7 +358,10 @@ function MenfessContent() {
                   <h2 className="text-2xl font-extrabold" style={{ fontFamily: "var(--font-space-grotesk)" }}>
                     Write Menfess
                   </h2>
-                  <button onClick={() => setIsFormOpen(false)} className="p-2 hover:bg-muted rounded-xl transition-colors">
+                  <button onClick={() => {
+                    playClick();
+                    setIsFormOpen(false);
+                  }} className="p-2 hover:bg-muted rounded-xl transition-colors">
                     <X className="w-5 h-5" />
                   </button>
                 </div>
@@ -416,18 +431,24 @@ function MenfessContent() {
               onClick={() => setActivePost(null)}
             />
             <motion.div
-              initial={{ y: "100%" }}
-              animate={{ y: 0 }}
-              exit={{ y: "100%" }}
-              transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="relative w-full max-w-2xl max-h-[90vh] bg-card neo-border neo-shadow sm:rounded-3xl rounded-t-3xl overflow-hidden flex flex-col"
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="bg-background neo-border shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-2xl p-6 max-w-2xl w-full max-h-[85vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
             >
-              <div className="p-4 sm:p-6 border-b-2 border-black bg-muted flex justify-between items-center shrink-0">
-                <h3 className="font-extrabold text-lg" style={{ fontFamily: "var(--font-space-grotesk)" }}>
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="font-extrabold text-2xl" style={{ fontFamily: "var(--font-space-grotesk)" }}>
                   Thread
                 </h3>
-                <button onClick={() => setActivePost(null)} className="p-2 hover:bg-background rounded-xl neo-border bg-background transition-colors">
-                  <X className="w-4 h-4" />
+                <button
+                  onClick={() => {
+                    playClick();
+                    setActivePost(null);
+                  }}
+                  className="p-2 hover:bg-muted rounded-xl transition-colors neo-border neo-press"
+                >
+                  <X className="w-5 h-5" />
                 </button>
               </div>
               
