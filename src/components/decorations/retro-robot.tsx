@@ -15,8 +15,10 @@ function RobotModel() {
 
   const colors = ["#f59e0b", "#3b82f6", "#ef4444", "#10b981", "#8B5CF6"]; // yellow, blue, red, green, purple
 
+  const lastMouse = useRef({ x: typeof window !== "undefined" ? window.innerWidth / 2 : 0, y: typeof window !== "undefined" ? window.innerHeight / 2 : 0 });
+
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
+    const updateRotation = () => {
       const container = document.getElementById("retro-robot-container");
       if (!container) return;
 
@@ -24,8 +26,8 @@ function RobotModel() {
       const centerX = rect.left + rect.width / 2;
       const centerY = rect.top + rect.height / 2 - 20;
 
-      const deltaX = e.clientX - centerX;
-      const deltaY = e.clientY - centerY;
+      const deltaX = lastMouse.current.x - centerX;
+      const deltaY = lastMouse.current.y - centerY;
 
       const x = (deltaX / window.innerWidth) * 2.5;
       const y = -(deltaY / window.innerHeight) * 2.5;
@@ -36,8 +38,25 @@ function RobotModel() {
       targetRot.current = { x: clampedX, y: clampedY };
     };
 
+    const handleMouseMove = (e: MouseEvent) => {
+      lastMouse.current = { x: e.clientX, y: e.clientY };
+      updateRotation();
+    };
+
+    const handleScroll = () => {
+      updateRotation();
+    };
+
     window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    
+    // Initial update
+    updateRotation();
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, []);
 
   useFrame((state) => {

@@ -15,18 +15,19 @@ function TVModel() {
 
   const colors = ["#8B5CF6", "#ef4444", "#3b82f6", "#10b981", "#f59e0b"]; // primary, danger, blue, green, yellow
 
+  const lastMouse = useRef({ x: typeof window !== "undefined" ? window.innerWidth / 2 : 0, y: typeof window !== "undefined" ? window.innerHeight / 2 : 0 });
+
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
+    const updateRotation = () => {
       const container = document.getElementById("retro-tv-container");
       if (!container) return;
 
       const rect = container.getBoundingClientRect();
       const tvCenterX = rect.left + rect.width / 2;
-      // Geser titik tengah sedikit ke atas (karena ada dudukan penyangga TV di bawah)
       const tvCenterY = rect.top + rect.height / 2 - 20;
 
-      const deltaX = e.clientX - tvCenterX;
-      const deltaY = e.clientY - tvCenterY;
+      const deltaX = lastMouse.current.x - tvCenterX;
+      const deltaY = lastMouse.current.y - tvCenterY;
 
       const x = (deltaX / window.innerWidth) * 2.5;
       const y = -(deltaY / window.innerHeight) * 2.5;
@@ -37,8 +38,25 @@ function TVModel() {
       targetRot.current = { x: clampedX, y: clampedY };
     };
 
+    const handleMouseMove = (e: MouseEvent) => {
+      lastMouse.current = { x: e.clientX, y: e.clientY };
+      updateRotation();
+    };
+
+    const handleScroll = () => {
+      updateRotation();
+    };
+
     window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    
+    // Initial update
+    updateRotation();
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, []);
 
   useFrame((state) => {
