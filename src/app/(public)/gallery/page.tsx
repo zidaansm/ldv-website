@@ -92,6 +92,7 @@ export default function GalleryPage() {
                       variants={{ hover: hoverScale }}
                       src={img.image_url}
                       alt={img.title}
+                      loading="lazy"
                       className="w-full h-auto object-cover"
                       onError={(e) => (e.currentTarget.src = "https://placehold.co/600x800/png?text=Broken+Link")}
                     />

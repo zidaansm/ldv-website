@@ -9,7 +9,6 @@ import { SectionHeading } from "@/components/shared";
 import { fadeInUp } from "@/lib/animations";
 import Link from "next/link";
 import { ArrowRight, Image as ImageIcon } from "lucide-react";
-import { TikTokEmbed } from "@/components/shared/tiktok-embed";
 import { GalleryLightbox } from "@/components/shared/gallery-lightbox";
 import { useTranslation } from "@/lib/i18n/LanguageContext";
 
@@ -152,6 +151,7 @@ export function GalleryPreview() {
                         <img
                           src={img.image_url}
                           alt={img.title}
+                          loading="lazy"
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           onError={(e) =>
                             (e.currentTarget.src =
