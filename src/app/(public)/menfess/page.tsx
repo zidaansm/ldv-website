@@ -434,7 +434,7 @@ function MenfessContent() {
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="bg-background neo-border shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-2xl p-6 max-w-2xl w-full max-h-[85vh] overflow-y-auto"
+              className="relative z-10 bg-background neo-border shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-2xl p-6 max-w-2xl w-full max-h-[85vh] overflow-y-auto"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex justify-between items-center mb-6">
