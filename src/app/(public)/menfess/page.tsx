@@ -90,9 +90,38 @@ function MenfessContent() {
     // Subscribe to realtime changes
     const channel = supabase
       .channel("public:menfess")
-      .on("postgres_changes", { event: "*", schema: "public", table: "menfess" }, fetchPosts)
-      .on("postgres_changes", { event: "*", schema: "public", table: "menfess_comments" }, fetchPosts)
-      .on("postgres_changes", { event: "*", schema: "public", table: "menfess_likes" }, fetchPosts)
+      .on("postgres_changes", { event: "*", schema: "public", table: "menfess" }, (payload) => {
+        if (payload.eventType === 'INSERT') {
+          if (!sessionStorage.getItem(`my_action_${payload.new.id}`)) {
+            toast.success("Someone dropped a new secret!");
+            playPop();
+          } else {
+            sessionStorage.removeItem(`my_action_${payload.new.id}`);
+          }
+        }
+        fetchPosts();
+      })
+      .on("postgres_changes", { event: "*", schema: "public", table: "menfess_comments" }, (payload) => {
+        if (payload.eventType === 'INSERT') {
+          if (!sessionStorage.getItem(`my_action_${payload.new.id}`)) {
+            toast.success("Someone replied to a thread!");
+            playPop();
+          } else {
+            sessionStorage.removeItem(`my_action_${payload.new.id}`);
+          }
+        }
+        fetchPosts();
+      })
+      .on("postgres_changes", { event: "*", schema: "public", table: "menfess_likes" }, (payload) => {
+        if (payload.eventType === 'INSERT') {
+          if (!sessionStorage.getItem(`my_action_${payload.new.id}`)) {
+            toast.success("Someone liked a menfess!");
+          } else {
+            sessionStorage.removeItem(`my_action_${payload.new.id}`);
+          }
+        }
+        fetchPosts();
+      })
       .subscribe();
 
     // Read likes from localStorage
@@ -158,7 +187,11 @@ function MenfessContent() {
     setIsSubmitting(true);
     const loadingToast = toast.loading("Sending your secret...");
 
+    const newId = crypto.randomUUID();
+    sessionStorage.setItem(`my_action_${newId}`, 'true');
+
     const { error } = await supabase.from("menfess").insert([{
+      id: newId,
       content: content.trim(),
       sender_name: isAnonymous ? "Anonymous" : senderName.trim() || "Anonymous",
       is_anonymous: isAnonymous,
@@ -220,7 +253,10 @@ function MenfessContent() {
         setActivePost((prev) => prev ? { ...prev, menfess_likes: [...(prev.menfess_likes || []), { id: 'temp' }] } : null);
       }
       
-      const { data, error } = await supabase.from("menfess_likes").insert([{ menfess_id: postId }]).select('id').single();
+      const newId = crypto.randomUUID();
+      sessionStorage.setItem(`my_action_${newId}`, 'true');
+      
+      const { error } = await supabase.from("menfess_likes").insert([{ id: newId, menfess_id: postId }]);
       
       if (error) {
         toast.error("Failed to like.");
@@ -231,9 +267,9 @@ function MenfessContent() {
         });
         localStorage.removeItem(`liked_menfess_${postId}`);
         fetchPosts(); // revert
-      } else if (data) {
-        localStorage.setItem(`liked_menfess_${postId}`, data.id);
-        setLikedPosts((prev) => ({ ...prev, [postId]: data.id }));
+      } else {
+        localStorage.setItem(`liked_menfess_${postId}`, newId);
+        setLikedPosts((prev) => ({ ...prev, [postId]: newId }));
       }
     }
   };
@@ -244,7 +280,11 @@ function MenfessContent() {
 
     setIsSubmittingComment(true);
 
+    const newId = crypto.randomUUID();
+    sessionStorage.setItem(`my_action_${newId}`, 'true');
+
     const { error } = await supabase.from("menfess_comments").insert([{
+      id: newId,
       menfess_id: activePost.id,
       content: commentContent.trim(),
       sender_name: commentIsAnonymous ? "Anonymous" : commentSenderName.trim() || "Anonymous",
