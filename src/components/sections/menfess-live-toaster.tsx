@@ -45,9 +45,10 @@ export function MenfessLiveToaster() {
             <div className="flex-1 min-w-0">
               <p className="text-sm font-bold text-[var(--foreground)] truncate">
                 <span className="text-[var(--primary)]">{newMenfess.sender_name}</span>
+                <span className="text-xs text-[var(--muted-foreground)] ml-1 font-normal">dropped a menfess 💌</span>
               </p>
-              <p className="text-xs font-semibold text-[var(--muted-foreground)] mt-0.5 truncate">
-                just dropped a new menfess! 💌
+              <p className="text-sm font-semibold text-[var(--foreground)] mt-0.5 line-clamp-2">
+                "{newMenfess.content}"
               </p>
             </div>
           </div>
@@ -58,12 +59,21 @@ export function MenfessLiveToaster() {
     // Subscribe to new comments
     const commentsSubscription = supabase
       .channel('comments-inserts')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'menfess_comments' }, (payload) => {
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'menfess_comments' }, async (payload) => {
         const newComment = payload.new;
         
         if (toastedIds.current.has(newComment.id)) return;
         toastedIds.current.add(newComment.id);
         setTimeout(() => toastedIds.current.delete(newComment.id), 10000);
+
+        // Fetch original menfess to know who they are replying to
+        const { data: originalMenfess } = await supabase
+          .from('menfess')
+          .select('sender_name')
+          .eq('id', newComment.menfess_id)
+          .single();
+
+        const repliedTo = originalMenfess?.sender_name || "Anonymous";
 
         toast.custom((t) => (
           <div
@@ -81,9 +91,10 @@ export function MenfessLiveToaster() {
             <div className="flex-1 min-w-0">
               <p className="text-sm font-bold text-[var(--foreground)] truncate">
                 <span className="text-[var(--primary)]">{newComment.sender_name}</span>
+                <span className="text-xs text-[var(--muted-foreground)] ml-1 font-normal">replied to {repliedTo} 💬</span>
               </p>
-              <p className="text-xs font-semibold text-[var(--muted-foreground)] mt-0.5 truncate">
-                just replied to a menfess! 💬
+              <p className="text-sm font-semibold text-[var(--foreground)] mt-0.5 line-clamp-2">
+                "{newComment.content}"
               </p>
             </div>
           </div>
