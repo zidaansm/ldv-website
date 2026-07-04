@@ -53,7 +53,7 @@ export function Hero() {
       </div>
 
       {/* Floating 3D Retro Robot (Left) */}
-      <div className="absolute left-0 lg:left-10 bottom-0 w-1/4 hidden lg:block z-20 transition-opacity" style={{ pointerEvents: "none" }}>
+      <div className="absolute left-0 lg:left-10 -bottom-24 w-1/4 hidden lg:block z-20 transition-opacity" style={{ pointerEvents: "none" }}>
         <div style={{ pointerEvents: "auto", width: "100%", height: "100%" }}>
           <RetroRobot />
         </div>
