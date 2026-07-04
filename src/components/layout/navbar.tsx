@@ -117,9 +117,16 @@ export function Navbar() {
       >
         <Container>
           <div className="flex items-center justify-between">
-            {/* Logo */}
             <Link
               href="/"
+              onClick={(e) => {
+                if (pathname === "/") {
+                  e.preventDefault();
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                  window.history.pushState(null, "", "/");
+                  setActiveHash("");
+                }
+              }}
               className="group flex items-center gap-3"
             >
               <div className="neo-border neo-shadow-sm neo-press rounded-xl px-4 py-2 bg-primary">
