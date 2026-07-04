@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
+import { VisitorBadge } from "@/components/shared";
+
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
@@ -44,5 +46,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     );
   }
 
-  return <div className="min-h-screen bg-background text-foreground">{children}</div>;
+  return (
+    <div className="min-h-screen bg-background text-foreground">
+      {children}
+      {pathname !== "/admin/login" && <VisitorBadge />}
+    </div>
+  );
 }
