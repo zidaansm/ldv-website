@@ -70,6 +70,7 @@ function MenfessContent() {
   const [commentIsAnonymous, setCommentIsAnonymous] = useState(true);
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
   const [activeComments, setActiveComments] = useState<Comment[]>([]);
+  const [isLoadingComments, setIsLoadingComments] = useState(false);
 
   const supabase = createClient();
 
@@ -111,6 +112,7 @@ function MenfessContent() {
   }, []);
 
   const fetchComments = async (menfessId: string) => {
+    setIsLoadingComments(true);
     const { data } = await supabase
       .from("menfess_comments")
       .select("*")
@@ -118,13 +120,17 @@ function MenfessContent() {
       .order("created_at", { ascending: true });
     
     if (data) setActiveComments(data);
+    setIsLoadingComments(false);
   };
 
   useEffect(() => {
     if (activePost) {
+      setActiveComments([]); // Clear old comments instantly
       fetchComments(activePost.id);
+    } else {
+      setActiveComments([]);
     }
-  }, [activePost, posts]);
+  }, [activePost]); // Removed 'posts' dependency to avoid re-fetching on likes
 
   // Open modal if ?post= parameter is present
   useEffect(() => {
@@ -433,7 +439,7 @@ function MenfessContent() {
       {/* Post Detail Modal (Comments) */}
       <AnimatePresence>
         {activePost && (
-          <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4">
+          <div key="modal" className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -502,7 +508,11 @@ function MenfessContent() {
 
                 {/* Comments List */}
                 <div className="space-y-5 pl-4 sm:pl-12">
-                  {activeComments.length === 0 ? (
+                  {isLoadingComments ? (
+                    <div className="flex justify-center py-8">
+                      <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+                    </div>
+                  ) : activeComments.length === 0 ? (
                     <p className="text-muted-foreground font-semibold text-sm text-center py-4">No comments yet. Be the first to reply!</p>
                   ) : (
                     activeComments.map((comment) => (
