@@ -36,11 +36,7 @@ export function Staff() {
           accentColor="cyan"
         />
 
-        <div className="relative overflow-hidden py-4 -mx-4 px-4 sm:mx-0 sm:px-0">
-          {/* Gradient Edges for Premium Look */}
-          <div className="absolute left-0 top-0 bottom-0 w-12 md:w-24 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none"></div>
-          <div className="absolute right-0 top-0 bottom-0 w-12 md:w-24 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none"></div>
-          
+        <div className="relative overflow-hidden py-8 -mx-4 px-4 sm:mx-0 sm:px-0">
           <div className="flex group">
             {/* We render two identical blocks that slide to the left */}
             {[1, 2].map((blockIdx) => (
@@ -56,12 +52,12 @@ export function Staff() {
               >
                 {staffList.map((member) => {
                   const colorMap: Record<string, string> = {
-                    purple: "#6b2157",
-                    pink: "#db2777",
-                    cyan: "#0891b2",
-                    danger: "#e53e3e",
-                    success: "#38a169",
-                    warning: "#d69e2e",
+                    purple: "#E9D5FF", // pastel purple
+                    pink: "#FBCFE8",   // pastel pink
+                    cyan: "#CFFAFE",   // pastel cyan
+                    danger: "#FECACA", // pastel red
+                    success: "#BBF7D0",// pastel green
+                    warning: "#FEF08A",// pastel yellow
                     "neo-red": "#FF2B2B",
                     "neo-yellow": "#FFD600",
                     "neo-blue": "#0047FF",
@@ -71,47 +67,61 @@ export function Staff() {
                     "neo-green": "#00C44F",
                     "neo-dark": "#1A1A2E",
                   };
-                  const color = colorMap[member.accent_color] || colorMap.purple;
+                  
+                  // Use a solid contrasting background based on their accent color, defaulting to white
+                  const bgColor = colorMap[member.accent_color] || "#ffffff";
+                  // The text color for the badge (black for light backgrounds, white for dark)
+                  const isDarkBg = member.accent_color?.startsWith('neo-') && !member.accent_color.includes('yellow');
 
                   return (
                     <motion.div
                       key={`${blockIdx}-${member.id}`}
-                      className="w-[280px] shrink-0 rounded-3xl p-6 bg-card flex flex-col items-center text-center cursor-pointer"
+                      className="w-[280px] shrink-0 rounded-none p-6 flex flex-col items-center text-center cursor-pointer relative"
                       style={{
-                        border: `3px solid ${color}`,
-                        boxShadow: `4px 4px 0 ${color}`,
+                        backgroundColor: "#ffffff",
+                        border: `4px solid #000000`,
+                        boxShadow: `8px 8px 0px 0px #000000`,
                       }}
                       whileHover={{
-                        x: -4,
-                        y: -4,
-                        boxShadow: "10px 10px 0 0 var(--neo-border)",
+                        x: 4,
+                        y: 4,
+                        boxShadow: "0px 0px 0px 0px #000000",
                       }}
-                      transition={{ duration: 0.2, ease: "easeOut" }}
+                      transition={{ duration: 0.1 }}
                     >
                       {/* Roblox Avatar from Supabase */}
-                      <div className="w-40 h-40 mb-6 flex items-center justify-center relative drop-shadow-lg">
+                      <div className="w-40 h-40 mb-6 flex items-center justify-center relative">
                         <img
                           src={member.avatar_url}
                           alt={`${member.name} Roblox Avatar`}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-cover filter drop-shadow-md"
                           loading="lazy"
                           draggable="false"
                         />
                       </div>
 
-                      <div className="space-y-1">
+                      <div className="space-y-4 w-full flex flex-col items-center">
                         <h3
-                          className="font-bold text-xl text-foreground"
+                          className="font-black text-2xl text-black tracking-tight"
                           style={{ fontFamily: "var(--font-space-grotesk)" }}
                         >
                           {member.name}
                         </h3>
-                        <p className="text-sm font-semibold uppercase tracking-wider" style={{ color }}>
+                        
+                        {/* Neobrutalism Role Badge */}
+                        <div 
+                          className="px-4 py-2 font-bold text-xs uppercase tracking-widest text-black"
+                          style={{ 
+                            backgroundColor: bgColor,
+                            border: "3px solid #000000",
+                            boxShadow: "3px 3px 0px 0px #000000"
+                          }}
+                        >
                           {member.role === "Owner / Founder" ? t("team.role.owner") : 
                            member.role === "Server Admin" ? t("team.role.admin") :
                            member.role === "Moderator" ? t("team.role.mod") :
                            member.role === "Event Manager" ? t("team.role.event") : member.role}
-                        </p>
+                        </div>
                       </div>
                     </motion.div>
                   );
