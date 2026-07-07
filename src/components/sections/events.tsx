@@ -10,6 +10,8 @@ import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { useTranslation } from "@/lib/i18n/LanguageContext";
 import toast from "react-hot-toast";
+import { EventCard, EventRegistrationModal } from "@/components/shared";
+import Link from "next/link";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -93,121 +95,15 @@ export function Events() {
     }
   };
 
-  const ongoingEvents = events.filter((e) => e.type === "ongoing");
-  const upcomingEvents = events.filter((e) => e.type === "upcoming");
-  const pastEvents = events.filter((e) => e.type === "past").slice(0, 3);
-
-  const renderEventCard = (event: any, type: "upcoming" | "ongoing" | "past") => {
-    const isUpcoming = type === "upcoming";
-    const isOngoing = type === "ongoing";
-    const isPast = type === "past";
-    
-    return (
-    <motion.div
-      key={event.id}
-      variants={fadeInUp}
-      whileHover={hoverLift}
-      className={cn(
-        "neo-border rounded-2xl p-6 bg-card flex flex-col h-full neo-hover",
-        isOngoing ? "neo-shadow-danger border-danger/50" : isUpcoming ? "neo-shadow-primary" : "opacity-80 neo-shadow-sm"
-      )}
-      style={isPast ? { borderColor: "var(--muted-foreground)" } : undefined}
-    >
-      {/* Event Header: Category Badge & Status */}
-      <div className="flex justify-between items-start mb-4">
-        <span
-          className="text-xs font-bold uppercase tracking-wider px-3 py-1 neo-border rounded-full"
-          style={{
-            backgroundColor: isOngoing ? "var(--danger)" : isUpcoming ? "var(--secondary)" : "var(--muted)",
-            color: isOngoing ? "var(--danger-foreground)" : isUpcoming ? "var(--secondary-foreground)" : "var(--muted-foreground)",
-          }}
-        >
-          {event.category}
-        </span>
-        
-        {isOngoing ? (
-          <span className="flex items-center gap-1.5 text-xs font-extrabold text-danger animate-pulse">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-danger opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-danger"></span>
-            </span>
-            LIVE NOW
-          </span>
-        ) : isUpcoming ? (
-          <span className="flex items-center gap-1.5 text-xs font-semibold text-success">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-success"></span>
-            </span>
-            {t("events.upcoming")}
-          </span>
-        ) : (
-          <span className="text-xs font-medium text-muted-foreground">
-            {t("events.completed")}
-          </span>
-        )}
-      </div>
-
-      {/* Event Details */}
-      <h3
-        className="font-bold text-xl mb-2 text-foreground"
-        style={{ fontFamily: "var(--font-space-grotesk)" }}
-      >
-        {event.title}
-      </h3>
-      <p className="text-muted-foreground text-sm mb-6 flex-1">
-        {event.description}
-      </p>
-
-      {/* Event Metadata (Date, Time, Participants) */}
-      <div className="grid grid-cols-2 gap-3 pt-4 border-t-[2px] border-[var(--border)]">
-        <div className="flex items-center gap-2 text-sm text-foreground font-medium">
-          <Calendar className="w-4 h-4 text-primary" />
-          {new Date(event.date).toLocaleDateString(language === "id" ? "id-ID" : "en-US", { month: "short", day: "numeric" })}
-        </div>
-        <div className="flex items-center gap-2 text-sm text-foreground font-medium">
-          <Clock className="w-4 h-4 text-primary" />
-          {event.time}
-        </div>
-        <div className="col-span-2 flex items-center gap-2 text-sm text-foreground font-medium">
-          <Users className="w-4 h-4 text-primary" />
-          {event.participants} {isUpcoming || isOngoing ? t("events.registered") : t("events.participants")}
-        </div>
-      </div>
-      
-      {/* Join Button (Upcoming Only) */}
-      {isUpcoming && (
-        <button 
-          disabled={event.is_closed}
-          onClick={() => {
-            setSelectedEvent(event);
-            setIsModalOpen(true);
-          }}
-          className={cn(
-            "block text-center w-full mt-6 neo-border neo-shadow-sm rounded-xl py-2.5 font-bold text-sm transition-colors",
-            event.is_closed 
-              ? "bg-muted text-muted-foreground cursor-not-allowed opacity-70"
-              : "bg-primary text-primary-foreground hover:bg-primary/90 neo-press"
-          )}
-        >
-          {event.is_closed ? (language === "id" ? "Pendaftaran Ditutup" : "Registration Closed") : "Register Now"}
-        </button>
-      )}
-
-      {/* Live Button (Ongoing Only) */}
-      {isOngoing && (
-        <a 
-          href={event.link || "#"}
-          target="_blank"
-          rel="noreferrer"
-          className="block text-center w-full mt-6 neo-border neo-shadow-sm neo-press rounded-xl py-2.5 font-bold text-sm bg-danger text-danger-foreground hover:bg-danger/90 transition-colors"
-        >
-          {language === "id" ? "Gabung Live" : "Join Live"}
-        </a>
-      )}
-    </motion.div>
-    );
+  const handleRegisterClick = (event: any) => {
+    setSelectedEvent(event);
+    setIsModalOpen(true);
   };
+
+  // Limit events for homepage
+  const ongoingEvents = events.filter(e => e.type === "ongoing").slice(0, 2);
+  const upcomingEvents = events.filter(e => e.type === "upcoming").slice(0, 4);
+  const pastEvents = events.filter(e => e.type === "past").slice(0, 3);
 
   return (
     <>
@@ -235,7 +131,9 @@ export function Events() {
                     whileInView="visible"
                     viewport={{ once: true, margin: "-100px" }}
                   >
-                    {ongoingEvents.map(event => renderEventCard(event, "ongoing"))}
+                    {ongoingEvents.map(event => (
+                      <EventCard key={event.id} event={event} type="ongoing" language={language} t={t} onRegisterClick={handleRegisterClick} />
+                    ))}
                   </motion.div>
                 </div>
               )}
@@ -251,15 +149,23 @@ export function Events() {
                 whileInView="visible"
                 viewport={{ once: true, margin: "-100px" }}
               >
-                {upcomingEvents.map(event => renderEventCard(event, "upcoming"))}
+                {upcomingEvents.map(event => (
+                  <EventCard key={event.id} event={event} type="upcoming" language={language} t={t} onRegisterClick={handleRegisterClick} />
+                ))}
               </motion.div>
+              
+              <div className="pt-8">
+                <Link href="/events" className="inline-block w-full md:w-auto text-center px-8 py-3 neo-border neo-shadow-sm rounded-xl font-bold bg-background hover:bg-muted transition-colors neo-press">
+                  {language === "id" ? "Lihat Semua Events ➔" : "View All Events ➔"}
+                </Link>
+              </div>
             </div>
 
-            {/* Sidebar Column: Past Events */}
-            <div className="space-y-6">
-              <h3 className="font-extrabold text-2xl flex items-center gap-3 text-foreground" style={{ fontFamily: "var(--font-space-grotesk)" }}>
-                <span className="w-3 h-3 rounded-full bg-primary"></span>
-                {t("events.pastHighlights")}
+            {/* Sidebar Column: Past Highlights */}
+            <div className="lg:col-span-1 border-t lg:border-t-0 lg:border-l-4 border-dashed border-[var(--border)] pt-12 lg:pt-0 lg:pl-8">
+              <h3 className="font-extrabold text-2xl mb-8 flex items-center gap-3 text-foreground" style={{ fontFamily: "var(--font-space-grotesk)" }}>
+                <span className="w-3 h-3 rounded-full bg-muted-foreground"></span>
+                {t("events.past")}
               </h3>
               
               <motion.div
@@ -269,7 +175,9 @@ export function Events() {
                 whileInView="visible"
                 viewport={{ once: true, margin: "-100px" }}
               >
-                {pastEvents.map(event => renderEventCard(event, "past"))}
+                {pastEvents.map(event => (
+                  <EventCard key={event.id} event={event} type="past" language={language} t={t} onRegisterClick={handleRegisterClick} />
+                ))}
               </motion.div>
             </div>
           </div>
@@ -277,70 +185,16 @@ export function Events() {
       </Section>
 
       {/* Registration Modal */}
-      {isModalOpen && selectedEvent && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-card neo-border neo-shadow-sm rounded-2xl p-6 md:p-8 max-w-md w-full animate-in zoom-in-95 duration-200">
-            <h2 className="text-2xl font-bold mb-2">Register for {selectedEvent.title}</h2>
-            <p className="text-muted-foreground text-sm mb-6">Please complete the following required information to register.</p>
-            
-            <form onSubmit={handleRegister} className="space-y-4">
-              <div>
-                <label className="block font-bold text-sm mb-1">
-                  Email Address <span className="text-danger">*</span>
-                </label>
-                <input 
-                  required
-                  type="email"
-                  value={formData["email"] || ""}
-                  onChange={(e) => setFormData(prev => ({ ...prev, "email": e.target.value }))}
-                  className="w-full neo-border rounded-lg px-3 py-2 bg-background focus:ring-2 focus:ring-primary outline-none"
-                  placeholder="your@email.com"
-                />
-              </div>
-              {(selectedEvent.form_schema?.length ? selectedEvent.form_schema : [{ id: "discord_username", label: "Discord Username", type: "text", required: true }]).map((field: any) => (
-                <div key={field.id}>
-                  <label className="block font-bold text-sm mb-1">
-                    {field.label} {field.required && <span className="text-danger">*</span>}
-                  </label>
-                  {field.type === "image" ? (
-                    <input 
-                      required={field.required}
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => handleFileChange(field.label, e.target.files?.[0] || null)}
-                      className="w-full neo-border rounded-lg px-4 py-2 bg-background focus:outline-none focus:ring-2 focus:ring-primary file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-bold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90 file:cursor-pointer"
-                    />
-                  ) : (
-                    <input 
-                      required={field.required}
-                      type={field.type || "text"}
-                      value={formData[field.label] || ""}
-                      onChange={(e) => setFormData({ ...formData, [field.label]: e.target.value })}
-                      className="w-full neo-border rounded-lg px-4 py-2 bg-background focus:outline-none focus:ring-2 focus:ring-primary"
-                    />
-                  )}
-                </div>
-              ))}
-              <div className="flex justify-end gap-3 pt-4">
-                <button 
-                  type="button" 
-                  onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 font-bold neo-border rounded-xl bg-muted hover:bg-muted/80 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button 
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="px-4 py-2 font-bold neo-border rounded-xl bg-primary text-primary-foreground neo-press disabled:opacity-50"
-                >
-                  {isSubmitting ? "Submitting..." : "Submit"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <EventRegistrationModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        selectedEvent={selectedEvent}
+        formData={formData}
+        setFormData={setFormData}
+        handleFileChange={handleFileChange}
+        onSubmit={handleRegister}
+        isSubmitting={isSubmitting}
+      />
     </>
   );
 }
