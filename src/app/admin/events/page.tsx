@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { Trash2, Plus, ArrowLeft, Edit2, CalendarX2 } from "lucide-react";
+import { Trash2, Plus, ArrowLeft, Edit2, CalendarX2, Users } from "lucide-react";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import { confirmDelete } from "@/components/shared";
@@ -17,7 +17,12 @@ type Event = {
   type: "upcoming" | "past";
   participants: number;
   link?: string;
+  form_schema?: any[];
+  is_closed?: boolean;
 };
+
+type FormField = { id: string, label: string, type: string, required: boolean };
+const defaultSchema: FormField[] = [{ id: "discord_username", label: "Discord Username", type: "text", required: true }];
 
 export default function EventsAdminPage() {
   const [events, setEvents] = useState<Event[]>([]);
@@ -36,6 +41,8 @@ export default function EventsAdminPage() {
   const [link, setLink] = useState("");
   const [type, setType] = useState<"upcoming" | "past">("upcoming");
   const [participants, setParticipants] = useState<number>(0);
+  const [isClosed, setIsClosed] = useState(false);
+  const [formSchema, setFormSchema] = useState<FormField[]>(defaultSchema);
 
   useEffect(() => {
     fetchEvents();
@@ -57,6 +64,8 @@ export default function EventsAdminPage() {
     setLink(event.link || "");
     setType(event.type);
     setParticipants(event.participants || 0);
+    setIsClosed(event.is_closed || false);
+    setFormSchema(event.form_schema?.length ? event.form_schema : defaultSchema);
     setIsFormOpen(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -71,6 +80,8 @@ export default function EventsAdminPage() {
     setLink("");
     setType("upcoming");
     setParticipants(0);
+    setIsClosed(false);
+    setFormSchema(defaultSchema);
     setIsFormOpen(false);
   };
 
@@ -93,7 +104,7 @@ export default function EventsAdminPage() {
     setIsSubmitting(true);
     const loadingToast = toast.loading(editingId ? "Updating event..." : "Creating event...");
     
-    const eventData = { title, description, date, time, category, type, link, participants };
+    const eventData = { title, description, date, time, category, type, link, participants, form_schema: formSchema, is_closed: isClosed };
     
     let error;
     if (editingId) {
@@ -176,6 +187,64 @@ export default function EventsAdminPage() {
               <label className="block text-sm font-bold mb-1">Description</label>
               <textarea required value={description} onChange={e => setDescription(e.target.value)} className="w-full neo-border rounded-lg px-3 py-2 bg-background h-24" />
             </div>
+            <div className="md:col-span-2 flex items-center gap-3 p-4 bg-danger/10 neo-border rounded-xl">
+              <input 
+                type="checkbox" 
+                id="is_closed" 
+                checked={isClosed} 
+                onChange={e => setIsClosed(e.target.checked)} 
+                className="w-5 h-5 accent-danger" 
+              />
+              <div>
+                <label htmlFor="is_closed" className="font-bold text-danger block cursor-pointer">Close Registration</label>
+                <p className="text-sm text-danger/80">Check this box to lock the event and prevent any new users from registering.</p>
+              </div>
+            </div>
+            <div className="md:col-span-2 space-y-4 pt-4 border-t-2 border-[var(--border)]">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-bold text-lg">Registration Form Builder</h3>
+                  <p className="text-sm text-muted-foreground">Define custom questions for attendees when registering.</p>
+                </div>
+                <button type="button" onClick={() => setFormSchema([...formSchema, { id: `field_${Date.now()}`, label: "New Field", type: "text", required: false }])} className="text-sm px-4 py-2 bg-secondary text-secondary-foreground neo-press rounded-xl font-bold neo-border">Add Question</button>
+              </div>
+              {formSchema.map((field, index) => (
+                <div key={field.id} className="flex items-center gap-4 p-4 neo-border rounded-xl bg-[var(--muted)]/50">
+                  <div className="flex-1 space-y-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Question Label</label>
+                    <input value={field.label} onChange={(e) => {
+                      const newSchema = [...formSchema];
+                      newSchema[index].label = e.target.value;
+                      setFormSchema(newSchema);
+                    }} className="w-full px-3 py-2 rounded-lg neo-border bg-background font-medium" />
+                  </div>
+                  <div className="w-32 space-y-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Type</label>
+                    <select value={field.type} onChange={(e) => {
+                      const newSchema = [...formSchema];
+                      newSchema[index].type = e.target.value;
+                      setFormSchema(newSchema);
+                    }} className="w-full px-3 py-2 rounded-lg neo-border bg-background font-medium">
+                      <option value="text">Text</option>
+                      <option value="image">Image</option>
+                    </select>
+                  </div>
+                  <div className="flex items-center gap-2 mt-6">
+                    <input type="checkbox" id={`req_${field.id}`} checked={field.required} onChange={(e) => {
+                      const newSchema = [...formSchema];
+                      newSchema[index].required = e.target.checked;
+                      setFormSchema(newSchema);
+                    }} className="w-5 h-5 accent-primary cursor-pointer" />
+                    <label htmlFor={`req_${field.id}`} className="text-sm font-bold cursor-pointer">Required</label>
+                  </div>
+                  <button type="button" onClick={() => {
+                    setFormSchema(formSchema.filter((_, i) => i !== index));
+                  }} className="mt-6 p-2 text-danger hover:bg-danger/10 rounded-lg transition-colors cursor-pointer">
+                    <Trash2 className="w-5 h-5" />
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
           <div className="flex justify-end pt-4">
             <button 
@@ -212,6 +281,13 @@ export default function EventsAdminPage() {
                   <td className="p-4 font-medium">{event.type}</td>
                   <td className="p-4 text-right">
                     <div className="flex justify-end gap-2">
+                      <Link 
+                        href={`/admin/events/${event.id}`}
+                        className="p-2 text-secondary hover:bg-secondary/10 rounded-lg transition-colors"
+                        title="Manage Registrants"
+                      >
+                        <Users className="w-5 h-5" />
+                      </Link>
                       <button onClick={() => handleEditClick(event)} className="p-2 text-primary hover:bg-primary/10 rounded-lg transition-colors">
                         <Edit2 className="w-5 h-5" />
                       </button>
