@@ -165,8 +165,8 @@ export default function EventsAdminPage() {
               <input required type="date" value={date} onChange={e => setDate(e.target.value)} className="w-full neo-border rounded-lg px-3 py-2 bg-background" />
             </div>
             <div>
-              <label className="block text-sm font-bold mb-1">Time (e.g. 20:00 EST)</label>
-              <input required value={time} onChange={e => setTime(e.target.value)} className="w-full neo-border rounded-lg px-3 py-2 bg-background" />
+              <label className="block text-sm font-bold mb-1">Time</label>
+              <input required type="time" value={time} onChange={e => setTime(e.target.value)} className="w-full neo-border rounded-lg px-3 py-2 bg-background" />
             </div>
             <div>
               <label className="block text-sm font-bold mb-1">Type</label>
