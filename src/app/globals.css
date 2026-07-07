@@ -59,6 +59,7 @@
   --color-success: var(--success);
   --color-warning: var(--warning);
   --color-danger: var(--danger);
+  --color-danger-foreground: var(--danger-foreground);
   --color-purple: var(--purple);
   --color-pink: var(--pink);
   --color-cyan: var(--cyan);
