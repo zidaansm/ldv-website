@@ -206,7 +206,8 @@ export function Events() {
         </a>
       )}
     </motion.div>
-  );
+    );
+  };
 
   return (
     <>
