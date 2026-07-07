@@ -93,33 +93,47 @@ export function Events() {
     }
   };
 
+  const ongoingEvents = events.filter((e) => e.type === "ongoing");
   const upcomingEvents = events.filter((e) => e.type === "upcoming");
   const pastEvents = events.filter((e) => e.type === "past").slice(0, 3);
 
-  const renderEventCard = (event: any, isUpcoming: boolean) => (
+  const renderEventCard = (event: any, type: "upcoming" | "ongoing" | "past") => {
+    const isUpcoming = type === "upcoming";
+    const isOngoing = type === "ongoing";
+    const isPast = type === "past";
+    
+    return (
     <motion.div
       key={event.id}
       variants={fadeInUp}
       whileHover={hoverLift}
       className={cn(
         "neo-border rounded-2xl p-6 bg-card flex flex-col h-full neo-hover",
-        isUpcoming ? "neo-shadow-primary" : "opacity-80 neo-shadow-sm"
+        isOngoing ? "neo-shadow-danger border-danger/50" : isUpcoming ? "neo-shadow-primary" : "opacity-80 neo-shadow-sm"
       )}
-      style={!isUpcoming ? { borderColor: "var(--muted-foreground)" } : undefined}
+      style={isPast ? { borderColor: "var(--muted-foreground)" } : undefined}
     >
       {/* Event Header: Category Badge & Status */}
       <div className="flex justify-between items-start mb-4">
         <span
           className="text-xs font-bold uppercase tracking-wider px-3 py-1 neo-border rounded-full"
           style={{
-            backgroundColor: isUpcoming ? "var(--secondary)" : "var(--muted)",
-            color: isUpcoming ? "var(--secondary-foreground)" : "var(--muted-foreground)",
+            backgroundColor: isOngoing ? "var(--danger)" : isUpcoming ? "var(--secondary)" : "var(--muted)",
+            color: isOngoing ? "var(--danger-foreground)" : isUpcoming ? "var(--secondary-foreground)" : "var(--muted-foreground)",
           }}
         >
           {event.category}
         </span>
         
-        {isUpcoming ? (
+        {isOngoing ? (
+          <span className="flex items-center gap-1.5 text-xs font-extrabold text-danger animate-pulse">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-danger opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-danger"></span>
+            </span>
+            LIVE NOW
+          </span>
+        ) : isUpcoming ? (
           <span className="flex items-center gap-1.5 text-xs font-semibold text-success">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
@@ -157,7 +171,7 @@ export function Events() {
         </div>
         <div className="col-span-2 flex items-center gap-2 text-sm text-foreground font-medium">
           <Users className="w-4 h-4 text-primary" />
-          {event.participants} {isUpcoming ? t("events.registered") : t("events.participants")}
+          {event.participants} {isUpcoming || isOngoing ? t("events.registered") : t("events.participants")}
         </div>
       </div>
       
@@ -179,6 +193,18 @@ export function Events() {
           {event.is_closed ? (language === "id" ? "Pendaftaran Ditutup" : "Registration Closed") : "Register Now"}
         </button>
       )}
+
+      {/* Live Button (Ongoing Only) */}
+      {isOngoing && (
+        <a 
+          href={event.link || "#"}
+          target="_blank"
+          rel="noreferrer"
+          className="block text-center w-full mt-6 neo-border neo-shadow-sm neo-press rounded-xl py-2.5 font-bold text-sm bg-danger text-danger-foreground hover:bg-danger/90 transition-colors"
+        >
+          {language === "id" ? "Gabung Live" : "Join Live"}
+        </a>
+      )}
     </motion.div>
   );
 
@@ -195,6 +221,24 @@ export function Events() {
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Main Column: Upcoming Events */}
             <div className="lg:col-span-2 space-y-6">
+              {ongoingEvents.length > 0 && (
+                <div className="mb-12 space-y-6">
+                  <h3 className="font-extrabold text-2xl flex items-center gap-3 text-foreground" style={{ fontFamily: "var(--font-space-grotesk)" }}>
+                    <span className="w-3 h-3 rounded-full bg-danger animate-pulse"></span>
+                    {language === "id" ? "Sedang Berlangsung" : "Live Now"}
+                  </h3>  
+                  <motion.div
+                    className="grid md:grid-cols-2 gap-6"
+                    variants={staggerContainer}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, margin: "-100px" }}
+                  >
+                    {ongoingEvents.map(event => renderEventCard(event, "ongoing"))}
+                  </motion.div>
+                </div>
+              )}
+
               <h3 className="font-extrabold text-2xl flex items-center gap-3 text-foreground" style={{ fontFamily: "var(--font-space-grotesk)" }}>
                 <span className="w-3 h-3 rounded-full bg-secondary"></span>
                 {t("events.upcoming")}
@@ -206,7 +250,7 @@ export function Events() {
                 whileInView="visible"
                 viewport={{ once: true, margin: "-100px" }}
               >
-                {upcomingEvents.map(event => renderEventCard(event, true))}
+                {upcomingEvents.map(event => renderEventCard(event, "upcoming"))}
               </motion.div>
             </div>
 
@@ -224,7 +268,7 @@ export function Events() {
                 whileInView="visible"
                 viewport={{ once: true, margin: "-100px" }}
               >
-                {pastEvents.map(event => renderEventCard(event, false))}
+                {pastEvents.map(event => renderEventCard(event, "past"))}
               </motion.div>
             </div>
           </div>

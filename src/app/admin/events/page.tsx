@@ -14,7 +14,7 @@ type Event = {
   date: string;
   time: string;
   category: string;
-  type: "upcoming" | "past";
+  type: "upcoming" | "ongoing" | "past";
   participants: number;
   link?: string;
   form_schema?: any[];
@@ -39,7 +39,7 @@ export default function EventsAdminPage() {
   const [time, setTime] = useState("");
   const [category, setCategory] = useState("");
   const [link, setLink] = useState("");
-  const [type, setType] = useState<"upcoming" | "past">("upcoming");
+  const [type, setType] = useState<"upcoming" | "ongoing" | "past">("upcoming");
   const [participants, setParticipants] = useState<number>(0);
   const [isClosed, setIsClosed] = useState(false);
   const [formSchema, setFormSchema] = useState<FormField[]>(defaultSchema);
@@ -172,6 +172,7 @@ export default function EventsAdminPage() {
               <label className="block text-sm font-bold mb-1">Type</label>
               <select value={type} onChange={e => setType(e.target.value as any)} className="w-full neo-border rounded-lg px-3 py-2 bg-background">
                 <option value="upcoming">Upcoming</option>
+                <option value="ongoing">Ongoing (LIVE)</option>
                 <option value="past">Past</option>
               </select>
             </div>
