@@ -100,10 +100,21 @@ export function Events() {
     setIsModalOpen(true);
   };
 
-  // Limit events for homepage
-  const ongoingEvents = events.filter(e => e.type === "ongoing").slice(0, 2);
-  const upcomingEvents = events.filter(e => e.type === "upcoming").slice(0, 4);
-  const pastEvents = events.filter(e => e.type === "past").slice(0, 3);
+  // Limit and sort events for homepage
+  const ongoingEvents = events
+    .filter(e => e.type === "ongoing")
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+    .slice(0, 2);
+    
+  const upcomingEvents = events
+    .filter(e => e.type === "upcoming")
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+    .slice(0, 4);
+    
+  const pastEvents = events
+    .filter(e => e.type === "past")
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .slice(0, 3);
 
   return (
     <>

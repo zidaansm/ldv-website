@@ -39,9 +39,17 @@ export default function EventsGalleryPage() {
   const filteredEvents = events.filter(e => filter === "all" || e.type === filter);
 
   // Split into categories if filter is "all" to organize them visually
-  const ongoingEvents = filteredEvents.filter(e => e.type === "ongoing");
-  const upcomingEvents = filteredEvents.filter(e => e.type === "upcoming");
-  const pastEvents = filteredEvents.filter(e => e.type === "past");
+  const ongoingEvents = filteredEvents
+    .filter(e => e.type === "ongoing")
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    
+  const upcomingEvents = filteredEvents
+    .filter(e => e.type === "upcoming")
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    
+  const pastEvents = filteredEvents
+    .filter(e => e.type === "past")
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   const handleRegisterClick = (event: any) => {
     setSelectedEvent(event);
