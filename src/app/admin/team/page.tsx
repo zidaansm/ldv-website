@@ -7,6 +7,7 @@ import Link from "next/link";
 import { logAdminAction } from "@/lib/admin-logger";
 import toast from "react-hot-toast";
 import { confirmDelete } from "@/components/shared";
+import Image from "next/image";
 
 type Team = {
   id: string;
@@ -223,10 +224,10 @@ export default function TeamAdminPage() {
                   </button>
                 </div>
                 <div
-                  className="w-24 h-24 rounded-full mb-4 overflow-hidden flex items-center justify-center"
+                  className="w-24 h-24 rounded-full mb-4 overflow-hidden flex items-center justify-center relative"
                   style={{ border: `3px solid ${color}` }}
                 >
-                  <img src={Team.avatar_url} alt={Team.name} className="w-full h-full object-cover" onError={(e) => (e.currentTarget.src = "https://tr.rbxcdn.com/38c6edcb50633730ff4cf3945bf13655/150/150/AvatarHeadshot/Png")} />
+                  <Image src={Team.avatar_url} alt={Team.name} fill sizes="96px" className="object-cover" />
                 </div>
                 <h3 className="text-xl font-bold">{Team.name}</h3>
                 <p className="font-semibold" style={{ color }}>{Team.role}</p>

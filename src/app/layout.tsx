@@ -14,7 +14,7 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://ldv.gg"),
+  metadataBase: new URL("https://ldvarch.com"),
   title: {
     default: "LDV — Discord Community",
     template: "%s | LDV",
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://ldv.gg",
+    url: "https://ldvarch.com",
     siteName: "La Dolce Vita",
     title: "La Dolce Vita — Premium Discord Community",
     description:

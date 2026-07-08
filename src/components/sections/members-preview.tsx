@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import { motion } from "framer-motion";
 import { useTranslation } from "@/lib/i18n/LanguageContext";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 
 type Member = {
@@ -95,7 +96,7 @@ export function MembersPreview({ direction = "left", speed = 40 }: MembersPrevie
                 style={{ backgroundColor: color }}
               >
                 {member.avatar_url ? (
-                  <img src={member.avatar_url} alt={member.name} className="w-full h-full object-contain group-hover:scale-110 transition-transform" draggable="false" />
+                  <Image src={member.avatar_url} alt={member.name} fill sizes="56px" className="object-contain group-hover:scale-110 transition-transform" draggable="false" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center font-black text-white text-xl">
                     {member.name.charAt(0).toUpperCase()}

@@ -7,6 +7,7 @@ import Link from "next/link";
 import { logAdminAction } from "@/lib/admin-logger";
 import toast from "react-hot-toast";
 import { confirmDelete } from "@/components/shared";
+import Image from "next/image";
 
 type Member = {
   id: string;
@@ -234,8 +235,8 @@ export default function memberAdminPage() {
                   return (
                     <tr key={member.id} className="border-b last:border-0 border-[var(--neo-border)]/20 hover:bg-muted/30 transition-colors">
                       <td className="p-4">
-                        <div className="w-12 h-12 rounded-xl overflow-hidden bg-muted flex items-center justify-center border-2 border-[var(--neo-border)]" style={{ borderColor: color }}>
-                          <img src={member.avatar_url} alt={member.name} className="w-full h-full object-cover" onError={(e) => (e.currentTarget.src = "https://tr.rbxcdn.com/38c6edcb50633730ff4cf3945bf13655/150/150/AvatarHeadshot/Png")} />
+                        <div className="w-12 h-12 rounded-xl overflow-hidden bg-muted flex items-center justify-center border-2 border-[var(--neo-border)] relative" style={{ borderColor: color }}>
+                          <Image src={member.avatar_url} alt={member.name} fill sizes="48px" className="object-cover" />
                         </div>
                       </td>
                       <td className="p-4 font-bold">{member.name}</td>

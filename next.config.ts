@@ -7,6 +7,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "tr.rbxcdn.com",
       },
+      {
+        protocol: "https",
+        hostname: "yaggpenhxfszfkzeikio.supabase.co",
+      },
     ],
   },
 };

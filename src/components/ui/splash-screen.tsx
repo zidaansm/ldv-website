@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 export function SplashScreen() {
   const [isVisible, setIsVisible] = useState(true);
@@ -32,11 +33,13 @@ export function SplashScreen() {
             transition={{ duration: 0.7, type: "spring", bounce: 0.5 }}
             className="relative z-10 flex flex-col items-center gap-4"
           >
-            <img 
+            <Image 
               src="/logo-ldv.png" 
               alt="LDV Logo" 
+              width={256}
+              height={256}
               className="w-48 md:w-64 h-auto object-contain drop-shadow-2xl"
-              onError={(e) => (e.currentTarget.style.display = 'none')}
+              priority
             />
             <motion.div 
               initial={{ width: 0 }}

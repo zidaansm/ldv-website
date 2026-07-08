@@ -36,11 +36,11 @@ export function Partners() {
                 rel="noopener noreferrer"
                 className="relative flex items-center justify-center p-4 bg-[#800000] neo-border neo-shadow-sm neo-hover rounded-2xl h-24 md:h-28 w-48 md:w-56 transition-transform hover:scale-105"
               >
-                <img
+                <Image
                   src={partner.logo}
                   alt={`${partner.name} logo`}
-                  className="w-full h-full object-contain transition-all duration-300"
-                  onError={(e) => (e.currentTarget.src = "https://placehold.co/400x200/png?text=Lubox")}
+                  fill
+                  className="object-contain transition-all duration-300 p-4"
                 />
               </a>
             ))}

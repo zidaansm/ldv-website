@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import toast from "react-hot-toast";
 import { confirmDelete } from "@/components/shared";
+import Image from "next/image";
 
 type Event = {
   id: string;
@@ -223,8 +224,8 @@ export default function ManageRegistrantsPage() {
                       <td key={i} className={i === 0 ? "p-4 font-bold text-primary" : "p-4 font-medium"}>
                         {isImage && value ? (
                           <a href={value} target="_blank" rel="noreferrer" className="text-primary hover:underline flex items-center gap-2">
-                            <span className="w-8 h-8 rounded bg-muted/50 overflow-hidden flex items-center justify-center neo-border">
-                              <img src={value} alt="Upload" className="w-full h-full object-cover" />
+                            <span className="w-8 h-8 rounded bg-muted/50 overflow-hidden flex items-center justify-center neo-border relative">
+                              <Image src={value} alt="Upload" fill className="object-cover" />
                             </span>
                             View Image
                           </a>

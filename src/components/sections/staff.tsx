@@ -105,11 +105,12 @@ export function Staff() {
                          />
 
                          {/* Avatar */}
-                         <img
+                         <Image
                            src={member.avatar_url}
                            alt={`${member.name}`}
+                           width={192}
+                           height={192}
                            className="w-48 h-48 object-cover filter drop-shadow-xl relative z-10 group-hover/card:scale-110 group-hover/card:-translate-y-2 transition-all duration-300"
-                           loading="lazy"
                            draggable="false"
                          />
                       </div>

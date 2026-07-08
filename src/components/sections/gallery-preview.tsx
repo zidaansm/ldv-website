@@ -8,6 +8,7 @@ import { Section } from "@/components/layout";
 import { SectionHeading } from "@/components/shared";
 import { fadeInUp } from "@/lib/animations";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight, Image as ImageIcon } from "lucide-react";
 import { GalleryLightbox } from "@/components/shared/gallery-lightbox";
 import { useTranslation } from "@/lib/i18n/LanguageContext";
@@ -168,15 +169,12 @@ export function GalleryPreview() {
                               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                             />
                           ) : (
-                            <img
+                            <Image
                               src={img.image_url}
                               alt={img.title}
-                              loading="lazy"
-                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                              onError={(e) =>
-                                (e.currentTarget.src =
-                                  "https://placehold.co/400x530/png?text=Broken+Link")
-                              }
+                              fill
+                              sizes="(max-width: 768px) 50vw, 25vw"
+                              className="object-cover group-hover:scale-110 transition-transform duration-500"
                             />
                           )}
                         </div>

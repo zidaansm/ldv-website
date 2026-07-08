@@ -7,6 +7,7 @@ import { Container } from "@/components/layout";
 import { SectionHeading } from "@/components/shared";
 import { Users, ArrowLeft, ChevronLeft, ChevronRight, Search, X } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 type Member = {
   id: string;
@@ -202,11 +203,12 @@ export default function MembersPage() {
                         {/* Avatar Overlay */}
                         <div className="absolute top-6 left-1/2 -translate-x-1/2 z-20">
                           <div className="w-40 h-40 rounded-2xl border-[3px] border-[var(--neo-border)] bg-card overflow-hidden flex items-center justify-center relative" style={{ boxShadow: `4px 4px 0 var(--neo-border)` }}>
-                            <img
+                            <Image
                               src={member.avatar_url}
                               alt={`${member.name} Roblox Avatar`}
-                              className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300 drop-shadow-md"
-                              loading="lazy"
+                              fill
+                              sizes="(max-width: 768px) 100vw, 160px"
+                              className="object-contain group-hover:scale-110 transition-transform duration-300 drop-shadow-md"
                               draggable="false"
                             />
                           </div>

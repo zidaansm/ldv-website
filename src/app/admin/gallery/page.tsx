@@ -9,6 +9,7 @@ import {
 import Link from "next/link";
 import toast from "react-hot-toast";
 import { confirmDelete } from "@/components/shared";
+import Image from "next/image";
 
 type GalleryImage = {
   id: string;
@@ -464,11 +465,12 @@ export default function GalleryAdminPage() {
                 {isVideo(image.image_url) ? (
                   <video src={image.image_url} autoPlay loop muted playsInline className="w-full h-auto object-cover" />
                 ) : (
-                  <img
+                  <Image
                     src={image.image_url}
                     alt={image.title}
+                    width={600}
+                    height={400}
                     className="w-full h-auto object-cover"
-                    onError={(e) => (e.currentTarget.src = "https://placehold.co/600x400/png?text=Broken+Link")}
                   />
                 )}
               </div>

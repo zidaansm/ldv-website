@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
+import Image from "next/image";
 
 type GalleryItem = {
   id: string;
@@ -151,7 +152,7 @@ export function GalleryLightbox({ items, activeIndex, onClose, onPrev, onNext }:
               )}
 
               {/* Media area */}
-              <div className="relative bg-muted flex items-center justify-center" style={{ minHeight: 300 }}>
+              <div className="relative bg-muted flex items-center justify-center w-full h-[60vh]">
                 {isVideo(item.image_url) ? (
                   <video
                     ref={videoRef}
@@ -164,11 +165,13 @@ export function GalleryLightbox({ items, activeIndex, onClose, onPrev, onNext }:
                     onClick={(e) => e.stopPropagation()}
                   />
                 ) : (
-                  <img
+                  <Image
                     key={item.id}
                     src={item.image_url}
                     alt={item.title}
-                    className="w-full max-h-[60vh] object-contain"
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 800px"
+                    className="object-contain"
                   />
                 )}
 
