@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { Trash2, Plus, ArrowLeft, Edit2, Users } from "lucide-react";
+import { Trash2, Plus, ArrowLeft, Edit2, Users, Search } from "lucide-react";
 import Link from "next/link";
 import { logAdminAction } from "@/lib/admin-logger";
 import toast from "react-hot-toast";
@@ -22,6 +22,7 @@ export default function memberAdminPage() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
   const supabase = createClient();
 
   // Form State
@@ -105,9 +106,14 @@ export default function memberAdminPage() {
 
   if (loading) return <div className="p-8 font-bold text-center">Loading member...</div>;
 
+  const filteredMembers = memberList.filter(m => 
+    m.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    m.motto.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <div className="max-w-6xl mx-auto p-4 md:p-8 space-y-8">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
           <Link href="/admin" className="p-2 rounded-xl neo-border bg-card hover:bg-muted transition-colors">
             <ArrowLeft className="w-5 h-5" />
@@ -123,6 +129,19 @@ export default function memberAdminPage() {
           <Plus className={`w-5 h-5 transition-transform ${isFormOpen ? "rotate-45" : ""}`} />
           {isFormOpen ? "Cancel" : "Add member"}
         </button>
+      </div>
+
+      <div className="relative">
+        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <Search className="h-5 w-5 text-muted-foreground" />
+        </div>
+        <input
+          type="text"
+          placeholder="Search members by name or motto..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full neo-border rounded-xl pl-10 pr-4 py-3 bg-card focus:outline-none focus:ring-2 focus:ring-primary transition-shadow"
+        />
       </div>
 
       {isFormOpen && (
@@ -178,7 +197,7 @@ export default function memberAdminPage() {
         </form>
       )}
 
-      {memberList.length === 0 ? (
+      {filteredMembers.length === 0 ? (
         <div className="neo-border rounded-2xl p-12 bg-card text-center flex flex-col items-center justify-center text-muted-foreground">
           <Users className="w-12 h-12 mb-4 opacity-50" />
           <p className="font-bold text-lg">No member members found</p>
@@ -186,7 +205,7 @@ export default function memberAdminPage() {
         </div>
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {memberList.map((member) => {
+          {filteredMembers.map((member) => {
             const colorMap: Record<string, string> = {
               purple: "#6b2157",
               pink: "#db2777",

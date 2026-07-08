@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { Trash2, Plus, ArrowLeft, Edit2, CalendarX2, Users } from "lucide-react";
+import { Trash2, Plus, ArrowLeft, Edit2, CalendarX2, Users, Search } from "lucide-react";
 import Link from "next/link";
 import { logAdminAction } from "@/lib/admin-logger";
 import toast from "react-hot-toast";
@@ -31,6 +31,7 @@ export default function EventsAdminPage() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
   const supabase = createClient();
 
   // Form State
@@ -138,9 +139,15 @@ export default function EventsAdminPage() {
 
   if (loading) return <div className="p-8 font-bold text-center">Loading events...</div>;
 
+  const filteredEvents = events.filter(e => 
+    e.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    e.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    e.type.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <div className="max-w-6xl mx-auto p-4 md:p-8 space-y-8">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
           <Link href="/admin" className="p-2 rounded-xl neo-border bg-card hover:bg-muted transition-colors">
             <ArrowLeft className="w-5 h-5" />
@@ -156,6 +163,19 @@ export default function EventsAdminPage() {
           <Plus className={`w-5 h-5 transition-transform ${isFormOpen ? "rotate-45" : ""}`} />
           {isFormOpen ? "Cancel" : "New Event"}
         </button>
+      </div>
+
+      <div className="relative">
+        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <Search className="h-5 w-5 text-muted-foreground" />
+        </div>
+        <input
+          type="text"
+          placeholder="Search events by title, category, or type..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full neo-border rounded-xl pl-10 pr-4 py-3 bg-card focus:outline-none focus:ring-2 focus:ring-primary transition-shadow"
+        />
       </div>
 
       {isFormOpen && (
@@ -282,7 +302,7 @@ export default function EventsAdminPage() {
               </tr>
             </thead>
             <tbody>
-              {events.map((event) => (
+              {filteredEvents.map((event) => (
                 <tr key={event.id} className="border-b-2 border-[var(--border)] last:border-0 hover:bg-muted/50 transition-colors">
                   <td className="p-4 font-bold">{event.title}</td>
                   <td className="p-4 font-medium text-muted-foreground">{event.date} | {event.time}</td>
@@ -309,7 +329,7 @@ export default function EventsAdminPage() {
                   </td>
                 </tr>
               ))}
-              {events.length === 0 && (
+              {filteredEvents.length === 0 && (
                 <tr>
                   <td colSpan={5} className="p-12 text-center">
                     <div className="flex flex-col items-center justify-center text-muted-foreground">
