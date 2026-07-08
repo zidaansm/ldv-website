@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Trash2, Plus, ArrowLeft, Edit2, ShieldAlert } from "lucide-react";
 import Link from "next/link";
+import { logAdminAction } from "@/lib/admin-logger";
 import toast from "react-hot-toast";
 import { confirmDelete } from "@/components/shared";
 
@@ -65,11 +66,13 @@ export default function BanListAdminPage() {
   const handleDelete = async (id: string) => {
     confirmDelete("ban record", async () => {
       const loadingToast = toast.loading("Removing record...");
+      const recordToDelete = banList.find(r => r.id === id);
       const { error } = await supabase.from("banlist").delete().eq("id", id);
       
       if (error) {
         toast.error("Failed to remove record", { id: loadingToast });
       } else {
+        logAdminAction("Removed Ban", `Unbanned/Removed record: ${recordToDelete?.username || id}`);
         toast.success("Record removed successfully!", { id: loadingToast });
         fetchBanList();
       }
@@ -99,6 +102,7 @@ export default function BanListAdminPage() {
       console.error("Supabase Error Details:", error.details, error.hint);
       toast.error(`Failed to ${editingId ? "update" : "add"} record`, { id: loadingToast });
     } else {
+      logAdminAction(editingId ? "Updated Ban Record" : "Banned User", `User: ${username}, Reason: ${reason}`);
       toast.success(`Record ${editingId ? "updated" : "added"} successfully!`, { id: loadingToast });
       resetForm();
       fetchBanList();

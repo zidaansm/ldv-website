@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Trash2, Plus, ArrowLeft, Edit2, Users } from "lucide-react";
 import Link from "next/link";
+import { logAdminAction } from "@/lib/admin-logger";
 import toast from "react-hot-toast";
 import { confirmDelete } from "@/components/shared";
 
@@ -61,11 +62,13 @@ export default function memberAdminPage() {
   const handleDelete = async (id: string) => {
     confirmDelete("member", async () => {
       const loadingToast = toast.loading("Removing member...");
+      const memberToDelete = memberList.find(m => m.id === id);
       const { error } = await supabase.from("members").delete().eq("id", id);
       
       if (error) {
         toast.error("Failed to remove member", { id: loadingToast });
       } else {
+        logAdminAction("Removed Member", `Removed: ${memberToDelete?.name || id}`);
         toast.success("Member removed successfully!", { id: loadingToast });
         fetchmember();
       }
@@ -93,6 +96,7 @@ export default function memberAdminPage() {
     if (error) {
       toast.error(`Failed to ${editingId ? "update" : "add"} member`, { id: loadingToast });
     } else {
+      logAdminAction(editingId ? "Updated Member" : "Added Member", `Member: ${name}`);
       toast.success(`member ${editingId ? "updated" : "added"} successfully!`, { id: loadingToast });
       resetForm();
       fetchmember();

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Trash2, Plus, ArrowLeft, Edit2, Users } from "lucide-react";
 import Link from "next/link";
+import { logAdminAction } from "@/lib/admin-logger";
 import toast from "react-hot-toast";
 import { confirmDelete } from "@/components/shared";
 
@@ -61,11 +62,13 @@ export default function TeamAdminPage() {
   const handleDelete = async (id: string) => {
     confirmDelete("Team member", async () => {
       const loadingToast = toast.loading("Removing team member...");
+      const memberToDelete = TeamList.find(t => t.id === id);
       const { error } = await supabase.from("staff").delete().eq("id", id);
       
       if (error) {
         toast.error("Failed to remove member", { id: loadingToast });
       } else {
+        logAdminAction("Removed Team Member", `Removed: ${memberToDelete?.name || id}`);
         toast.success("Team member removed successfully!", { id: loadingToast });
         fetchTeam();
       }
@@ -93,6 +96,7 @@ export default function TeamAdminPage() {
     if (error) {
       toast.error(`Failed to ${editingId ? "update" : "add"} Team`, { id: loadingToast });
     } else {
+      logAdminAction(editingId ? "Updated Team Member" : "Added Team Member", `Member: ${name}`);
       toast.success(`Team ${editingId ? "updated" : "added"} successfully!`, { id: loadingToast });
       resetForm();
       fetchTeam();

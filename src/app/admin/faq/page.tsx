@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Trash2, Plus, ArrowLeft, Edit2, HelpCircle } from "lucide-react";
 import Link from "next/link";
+import { logAdminAction } from "@/lib/admin-logger";
 import toast from "react-hot-toast";
 import { confirmDelete } from "@/components/shared";
 
@@ -53,11 +54,13 @@ export default function FAQAdminPage() {
   const handleDelete = async (id: string) => {
     confirmDelete("FAQ", async () => {
       const loadingToast = toast.loading("Deleting FAQ...");
+      const faqToDelete = faqs.find(f => f.id === id);
       const { error } = await supabase.from("faqs").delete().eq("id", id);
       
       if (error) {
         toast.error("Failed to delete FAQ", { id: loadingToast });
       } else {
+        logAdminAction("Deleted FAQ", `FAQ: ${faqToDelete?.question || id}`);
         toast.success("FAQ deleted successfully!", { id: loadingToast });
         fetchFaqs();
       }
@@ -85,6 +88,7 @@ export default function FAQAdminPage() {
     if (error) {
       toast.error(`Failed to ${editingId ? "update" : "create"} FAQ`, { id: loadingToast });
     } else {
+      logAdminAction(editingId ? "Updated FAQ" : "Created FAQ", `FAQ: ${question}`);
       toast.success(`FAQ ${editingId ? "updated" : "created"} successfully!`, { id: loadingToast });
       resetForm();
       fetchFaqs();

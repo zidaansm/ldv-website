@@ -13,8 +13,7 @@ export default function AdminDashboard() {
 
   const [counts, setCounts] = useState<Record<string, number>>({});
   const [onlineVisitors, setOnlineVisitors] = useState(0);
-  const [recentEvents, setRecentEvents] = useState<any[]>([]);
-  const [recentMenfess, setRecentMenfess] = useState<any[]>([]);
+  const [adminLogs, setAdminLogs] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const safeFormatDate = (dateStr: string) => {
@@ -42,12 +41,9 @@ export default function AdminDashboard() {
       });
       setCounts(newCounts);
 
-      // Fetch recent activities
-      const { data: events } = await supabase.from("events").select("*").order("created_at", { ascending: false }).limit(3);
-      if (events) setRecentEvents(events);
-
-      const { data: menfess } = await supabase.from("menfess").select("*").order("created_at", { ascending: false }).limit(3);
-      if (menfess) setRecentMenfess(menfess);
+      // Fetch admin logs
+      const { data: logs } = await supabase.from("admin_logs").select("*").order("created_at", { ascending: false }).limit(6);
+      if (logs) setAdminLogs(logs);
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
     } finally {
@@ -254,61 +250,35 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            {/* Recent Activity */}
+            {/* Admin Activity Logs */}
             <div className="neo-border rounded-2xl p-6 bg-card">
               <h2 className="text-xl font-bold flex items-center gap-2 mb-6">
                 <Activity className="w-5 h-5 text-primary" />
-                Recent Activity
+                Admin Activity Logs
               </h2>
               
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-sm font-bold text-muted-foreground mb-3 uppercase tracking-wider">Latest Events</h3>
-                  <div className="space-y-3">
-                    {isLoading ? (
-                      <div className="text-sm">Loading...</div>
-                    ) : recentEvents.length === 0 ? (
-                      <div className="text-sm text-muted-foreground">No events found.</div>
-                    ) : (
-                      recentEvents.map(event => (
-                        <div key={event.id} className="flex items-start gap-3 p-3 rounded-xl bg-background neo-border">
-                          <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${event.type === 'ongoing' ? 'bg-danger animate-pulse' : event.type === 'upcoming' ? 'bg-secondary' : 'bg-muted-foreground'}`}></div>
-                          <div>
-                            <div className="font-bold text-sm line-clamp-1">{event.title}</div>
-                            <div className="text-xs text-muted-foreground">
-                              {safeFormatDate(event.created_at)}
-                            </div>
-                          </div>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="text-sm font-bold text-muted-foreground mb-3 uppercase tracking-wider">Latest Menfess</h3>
-                  <div className="space-y-3">
-                    {isLoading ? (
-                      <div className="text-sm">Loading...</div>
-                    ) : recentMenfess.length === 0 ? (
-                      <div className="text-sm text-muted-foreground">No menfess found.</div>
-                    ) : (
-                      recentMenfess.map(msg => (
-                        <div key={msg.id} className="p-3 rounded-xl bg-background neo-border space-y-1">
-                          <div className="font-bold text-xs flex justify-between items-center text-primary">
-                            <span>{msg.is_anonymous ? 'Anonymous' : msg.sender_name}</span>
-                            <span className="text-[10px] text-muted-foreground font-medium">
-                              {safeFormatDate(msg.created_at)}
-                            </span>
-                          </div>
-                          <div className="text-sm font-medium line-clamp-2">{msg.content}</div>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </div>
+              <div className="space-y-3">
+                {isLoading ? (
+                  <div className="text-sm">Loading logs...</div>
+                ) : adminLogs.length === 0 ? (
+                  <div className="text-sm text-muted-foreground">No recent activity.</div>
+                ) : (
+                  adminLogs.map(log => (
+                    <div key={log.id} className="p-3 rounded-xl bg-background neo-border space-y-1">
+                      <div className="font-bold text-xs flex justify-between items-center text-primary">
+                        <span>{log.action}</span>
+                        <span className="text-[10px] text-muted-foreground font-medium">
+                          {safeFormatDate(log.created_at)}
+                        </span>
+                      </div>
+                      <div className="text-sm font-medium line-clamp-2">{log.details}</div>
+                      <div className="text-xs font-medium text-muted-foreground mt-1 flex items-center gap-1">
+                        <Users className="w-3 h-3" /> {log.admin_email || "Admin"}
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
-
             </div>
 
           </div>

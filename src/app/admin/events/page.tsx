@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Trash2, Plus, ArrowLeft, Edit2, CalendarX2, Users } from "lucide-react";
 import Link from "next/link";
+import { logAdminAction } from "@/lib/admin-logger";
 import toast from "react-hot-toast";
 import { confirmDelete } from "@/components/shared";
 
@@ -88,11 +89,13 @@ export default function EventsAdminPage() {
   const handleDelete = async (id: string) => {
     confirmDelete("event", async () => {
       const loadingToast = toast.loading("Deleting event...");
+      const eventToDelete = events.find(e => e.id === id);
       const { error } = await supabase.from("events").delete().eq("id", id);
       
       if (error) {
         toast.error("Failed to delete event", { id: loadingToast });
       } else {
+        logAdminAction("Deleted Event", `Deleted event: ${eventToDelete?.title || id}`);
         toast.success("Event deleted successfully!", { id: loadingToast });
         fetchEvents();
       }
@@ -120,6 +123,7 @@ export default function EventsAdminPage() {
     if (error) {
       toast.error(`Failed to ${editingId ? "update" : "create"} event`, { id: loadingToast });
     } else {
+      logAdminAction(editingId ? "Updated Event" : "Created Event", `Event title: ${title}`);
       toast.success(`Event ${editingId ? "updated" : "created"} successfully!`, { id: loadingToast });
       resetForm();
       fetchEvents();

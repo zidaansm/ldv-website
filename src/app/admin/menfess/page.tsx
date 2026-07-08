@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import { Trash2, MessageSquare, Loader2, AlertCircle } from "lucide-react";
 import toast from "react-hot-toast";
 import { format } from "date-fns";
+import { logAdminAction } from "@/lib/admin-logger";
 
 type Menfess = {
   id: string;
@@ -69,12 +70,14 @@ export default function AdminMenfessPage() {
     if (!window.confirm("Are you sure you want to delete this menfess? All comments will also be deleted.")) return;
     
     setDeletingId(id);
+    const postToDelete = posts.find(p => p.id === id);
     const { error } = await supabase.from("menfess").delete().eq("id", id);
     setDeletingId(null);
 
     if (error) {
       toast.error("Failed to delete post");
     } else {
+      logAdminAction("Deleted Menfess", `Menfess content: ${postToDelete?.content.substring(0, 50)}...`);
       toast.success("Post deleted");
       fetchPosts();
     }
@@ -90,6 +93,7 @@ export default function AdminMenfessPage() {
     if (error) {
       toast.error("Failed to delete comment");
     } else {
+      logAdminAction("Deleted Comment", `Comment ID: ${id}`);
       toast.success("Comment deleted");
       fetchPosts();
     }
