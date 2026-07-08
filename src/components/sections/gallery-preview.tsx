@@ -16,6 +16,7 @@ type GalleryImage = {
   id: string;
   title: string;
   image_url: string;
+  description?: string;
 };
 
 export function GalleryPreview() {
@@ -110,83 +111,103 @@ export function GalleryPreview() {
         ) : (
           <>
             {/* Cards Container */}
-            <div className="relative overflow-hidden rounded-2xl neo-border bg-foreground p-4 md:p-6">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+            <div className="relative py-4 md:py-8 px-2 md:px-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
                 <AnimatePresence initial={false} mode="popLayout">
-                  {visibleImages.map(({ image: img, originalIndex }) => (
-                    <motion.div
-                      key={img.id}
-                      layout
-                      initial={{
-                        x: direction > 0 ? 100 : -100,
-                        opacity: 0,
-                      }}
-                      animate={{
-                        x: 0,
-                        opacity: 1,
-                        transition: { type: "spring", stiffness: 400, damping: 30 },
-                      }}
-                      exit={{
-                        x: direction > 0 ? -100 : 100,
-                        opacity: 0,
-                        transition: { duration: 0.2 },
-                      }}
-                      className="group relative aspect-[3/4] overflow-hidden rounded-xl border-2 border-primary/30 hover:border-primary transition-colors duration-300 cursor-pointer"
-                      onClick={() => {
-                        // Find the actual index in the full images array
-                        const realIdx = images.indexOf(img);
-                        setActiveIndex(realIdx);
-                      }}
-                    >
-                      {!!(img.image_url.match(/\.(mp4|webm|ogg|mov)$/i) || img.image_url.includes("mp4")) ? (
-                        <video
-                          src={img.image_url}
-                          autoPlay
-                          loop
-                          muted
-                          playsInline
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                      ) : (
-                        <img
-                          src={img.image_url}
-                          alt={img.title}
-                          loading="lazy"
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                          onError={(e) =>
-                            (e.currentTarget.src =
-                              "https://placehold.co/400x530/png?text=Broken+Link")
-                          }
-                        />
-                      )}
+                  {visibleImages.map(({ image: img, originalIndex }) => {
+                    const rotations = [-3, 2, -2, 3];
+                    const rot = rotations[originalIndex % 4];
+                    return (
+                      <motion.div
+                        key={img.id}
+                        layout
+                        initial={{
+                          y: direction > 0 ? -40 : 40,
+                          x: direction > 0 ? 40 : -40,
+                          opacity: 0,
+                          rotate: rot * 3,
+                          scale: 1.1,
+                        }}
+                        animate={{
+                          y: 0,
+                          x: 0,
+                          opacity: 1,
+                          rotate: rot,
+                          scale: 1,
+                          transition: { type: "spring", stiffness: 600, damping: 25 },
+                        }}
+                        exit={{
+                          y: direction > 0 ? 40 : -40,
+                          x: direction > 0 ? -40 : 40,
+                          opacity: 0,
+                          scale: 0.9,
+                          transition: { duration: 0.15 },
+                        }}
+                        whileHover={{
+                          scale: 1.05,
+                          rotate: 0,
+                          zIndex: 10,
+                          boxShadow: "8px 8px 0 var(--neo-border)",
+                          transition: { type: "spring", stiffness: 400, damping: 15 }
+                        }}
+                        className="group relative bg-card p-3 md:p-4 pb-10 md:pb-14 flex flex-col aspect-[3/4] rounded-2xl border-[3px] border-[var(--neo-border)] cursor-pointer"
+                        style={{ boxShadow: "4px 4px 0 var(--neo-border)" }}
+                        onClick={() => {
+                          const realIdx = images.indexOf(img);
+                          setActiveIndex(realIdx);
+                        }}
+                      >
+                        <div className="w-full flex-1 relative overflow-hidden rounded-xl border-2 border-[var(--neo-border)] bg-muted">
+                          {!!(img.image_url.match(/\.(mp4|webm|ogg|mov)$/i) || img.image_url.includes("mp4")) ? (
+                            <video
+                              src={img.image_url}
+                              autoPlay
+                              loop
+                              muted
+                              playsInline
+                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                            />
+                          ) : (
+                            <img
+                              src={img.image_url}
+                              alt={img.title}
+                              loading="lazy"
+                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                              onError={(e) =>
+                                (e.currentTarget.src =
+                                  "https://placehold.co/400x530/png?text=Broken+Link")
+                              }
+                            />
+                          )}
+                        </div>
 
-                      {/* Title Overlay */}
-                      <div className="absolute top-0 left-0 right-0 p-3 md:p-4">
-                        <p className="text-white/80 text-xs md:text-sm font-semibold truncate drop-shadow-lg">
-                          {img.title}
-                        </p>
-                      </div>
-
-                      {/* Gradient */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/30 opacity-60 group-hover:opacity-40 transition-opacity duration-300" />
-                    </motion.div>
-                  ))}
+                        {/* Title Below Image (Polaroid style) */}
+                        <div className="absolute bottom-2 md:bottom-4 left-0 right-0 text-center px-4">
+                          <p className="text-foreground font-black text-sm md:text-base truncate" style={{ fontFamily: "var(--font-space-grotesk)" }}>
+                            {img.title}
+                          </p>
+                        </div>
+                      </motion.div>
+                    );
+                  })}
                 </AnimatePresence>
               </div>
             </div>
 
             {/* Navigation Buttons */}
             {images.length > VISIBLE && (
-              <div className="flex items-center justify-center gap-4 mt-8">
+              <div className="flex items-center justify-center gap-6 mt-8">
                 <button
                   onClick={prev}
-                  className="px-6 py-2.5 rounded-full neo-border neo-shadow-sm neo-press bg-card text-foreground font-semibold text-sm hover:bg-muted transition-colors"
+                  className="px-6 py-3 rounded-xl border-[3px] border-[var(--neo-border)] bg-card text-foreground font-black text-sm uppercase tracking-wider hover:bg-muted hover:-translate-y-1 transition-all active:translate-y-0"
+                  style={{ boxShadow: "4px 4px 0 var(--neo-border)" }}
                 >
                   Previous
                 </button>
                 <button
                   onClick={next}
-                  className="px-6 py-2.5 rounded-full neo-border neo-shadow-sm neo-press bg-primary text-primary-foreground font-semibold text-sm"
+                  className="px-6 py-3 rounded-xl border-[3px] border-[var(--neo-border)] bg-primary text-primary-foreground font-black text-sm uppercase tracking-wider hover:-translate-y-1 transition-all active:translate-y-0"
+                  style={{ boxShadow: "4px 4px 0 var(--neo-border)" }}
                 >
                   Next
                 </button>

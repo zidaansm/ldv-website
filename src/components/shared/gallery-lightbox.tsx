@@ -8,6 +8,7 @@ type GalleryItem = {
   id: string;
   title: string;
   image_url: string;
+  description?: string;
 };
 
 type Props = {
@@ -187,6 +188,18 @@ export function GalleryLightbox({ items, activeIndex, onClose, onPrev, onNext }:
                   </>
                 )}
               </div>
+
+              {/* Description area */}
+              {item.description && (
+                <div
+                  className="px-5 py-4 bg-card"
+                  style={{ borderTop: "3px solid var(--foreground)" }}
+                >
+                  <p className="text-sm md:text-base font-medium text-foreground whitespace-pre-wrap">
+                    {item.description}
+                  </p>
+                </div>
+              )}
 
               {/* Bottom strip — hint text */}
               <div

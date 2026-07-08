@@ -15,6 +15,7 @@ type GalleryImage = {
   id: string;
   title: string;
   image_url: string;
+  description?: string;
 };
 
 function isVideo(url: string) {

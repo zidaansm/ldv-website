@@ -14,6 +14,7 @@ type GalleryImage = {
   id: string;
   title: string;
   image_url: string;
+  description?: string;
   created_at: string;
 };
 
@@ -48,6 +49,7 @@ export default function GalleryAdminPage() {
 
   // Form State
   const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [linkUrl, setLinkUrl] = useState("");
   const [existingUrl, setExistingUrl] = useState("");
@@ -90,6 +92,7 @@ export default function GalleryAdminPage() {
   const handleEditClick = (image: GalleryImage) => {
     setEditingId(image.id);
     setTitle(image.title);
+    setDescription(image.description || "");
     setExistingUrl(image.image_url);
     setSelectedFile(null);
     setLinkUrl(image.image_url);
@@ -102,6 +105,7 @@ export default function GalleryAdminPage() {
   const resetForm = () => {
     setEditingId(null);
     setTitle("");
+    setDescription("");
     setSelectedFile(null);
     setLinkUrl("");
     setExistingUrl("");
@@ -162,12 +166,12 @@ export default function GalleryAdminPage() {
     }
 
     toast.loading(editingId ? "Saving changes..." : "Adding to gallery...", { id: loadingToast });
-    const imageData = { title: title.trim(), image_url: finalUrl };
+    const payload = { title: title.trim(), image_url: finalUrl, description: description.trim() };
     let error;
     if (editingId) {
-      ({ error } = await supabase.from("gallery").update(imageData).eq("id", editingId));
+      ({ error } = await supabase.from("gallery").update(payload).eq("id", editingId));
     } else {
-      ({ error } = await supabase.from("gallery").insert([imageData]));
+      ({ error } = await supabase.from("gallery").insert([payload]));
     }
 
     setIsSubmitting(false);
@@ -210,16 +214,27 @@ export default function GalleryAdminPage() {
         <form onSubmit={handleSubmit} className="neo-border rounded-2xl p-6 bg-card space-y-5 animate-in fade-in slide-in-from-top-4 duration-300">
           <h2 className="text-xl font-bold">{editingId ? "Edit Media" : "Add New Media"}</h2>
 
-          {/* Title */}
-          <div>
-            <label className="block text-sm font-bold mb-1">Title / Caption</label>
-            <input
-              required
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="e.g. Winner of Tournament 2026"
-              className="w-full neo-border rounded-lg px-3 py-2 bg-background"
-            />
+          {/* Title & Description */}
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-bold mb-1">Title</label>
+              <input
+                required
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="e.g. Winner of Tournament 2026"
+                className="w-full neo-border rounded-lg px-3 py-2 bg-background"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-bold mb-1">Description (Optional)</label>
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Add a short caption or description..."
+                className="w-full neo-border rounded-lg px-3 py-2 bg-background min-h-[80px]"
+              />
+            </div>
           </div>
 
           {/* Mode Toggle */}
