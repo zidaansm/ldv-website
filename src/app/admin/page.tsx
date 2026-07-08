@@ -17,6 +17,15 @@ export default function AdminDashboard() {
   const [recentMenfess, setRecentMenfess] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  const safeFormatDate = (dateStr: string) => {
+    try {
+      if (!dateStr) return "Unknown";
+      return formatDistanceToNow(new Date(dateStr), { addSuffix: true });
+    } catch (e) {
+      return "Unknown";
+    }
+  };
+
   const fetchData = async () => {
     setIsLoading(true);
     try {
@@ -29,7 +38,7 @@ export default function AdminDashboard() {
       const countResults = await Promise.all(countPromises);
       const newCounts: Record<string, number> = {};
       tables.forEach((table, idx) => {
-        newCounts[table] = countResults[idx].count || 0;
+        newCounts[table] = countResults[idx]?.count || 0;
       });
       setCounts(newCounts);
 
@@ -55,7 +64,7 @@ export default function AdminDashboard() {
       const state = channel.presenceState();
       let total = 0;
       for (const id in state) {
-        total += state[id].length;
+        total += state[id]?.length || 0;
       }
       setOnlineVisitors(total);
     }).subscribe();
@@ -267,7 +276,7 @@ export default function AdminDashboard() {
                           <div>
                             <div className="font-bold text-sm line-clamp-1">{event.title}</div>
                             <div className="text-xs text-muted-foreground">
-                              {formatDistanceToNow(new Date(event.created_at), { addSuffix: true })}
+                              {safeFormatDate(event.created_at)}
                             </div>
                           </div>
                         </div>
@@ -289,7 +298,7 @@ export default function AdminDashboard() {
                           <div className="font-bold text-xs flex justify-between items-center text-primary">
                             <span>{msg.is_anonymous ? 'Anonymous' : msg.sender_name}</span>
                             <span className="text-[10px] text-muted-foreground font-medium">
-                              {formatDistanceToNow(new Date(msg.created_at), { addSuffix: true })}
+                              {safeFormatDate(msg.created_at)}
                             </span>
                           </div>
                           <div className="text-sm font-medium line-clamp-2">{msg.content}</div>
