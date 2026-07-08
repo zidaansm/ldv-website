@@ -29,7 +29,7 @@ export default function AdminDashboard() {
     setIsLoading(true);
     try {
       // Fetch exact counts concurrently
-      const tables = ["events", "staff", "members", "faq", "banlist", "menfess"];
+      const tables = ["events", "staff", "members", "faq", "banlist", "menfess", "gallery"];
       const countPromises = tables.map(table => 
         supabase.from(table).select("*", { count: "exact", head: true })
       );
@@ -77,6 +77,7 @@ export default function AdminDashboard() {
 
   const adminModules = [
     { name: "Events", icon: Calendar, path: "/admin/events", color: "primary", count: counts["events"] || 0 },
+    { name: "Gallery", icon: ImageIcon, path: "/admin/gallery", color: "pink", count: counts["gallery"] || 0 },
     { name: "Team", icon: Users, path: "/admin/team", color: "secondary", count: counts["staff"] || 0 },
     { name: "Members", icon: Users, path: "/admin/members", color: "primary", count: counts["members"] || 0 },
     { name: "FAQ", icon: MessageSquare, path: "/admin/faq", color: "accent", count: counts["faq"] || 0 },
