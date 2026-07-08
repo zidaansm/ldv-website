@@ -18,11 +18,18 @@ const supabase = createClient(
 export function Staff() {
   const { t } = useTranslation();
   const [staffList, setStaffList] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function fetchStaff() {
-      const { data } = await supabase.from("staff").select("*").order("created_at", { ascending: true });
-      if (data) setStaffList(data);
+      try {
+        const { data } = await supabase.from("staff").select("*").order("created_at", { ascending: true });
+        if (data) setStaffList(data);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsLoading(false);
+      }
     }
     fetchStaff();
   }, []);
@@ -37,7 +44,20 @@ export function Staff() {
         />
 
         <div className="relative overflow-hidden py-8 -mx-4 px-4 sm:mx-0 sm:px-0">
-          <div className="flex">
+          {isLoading ? (
+            <div className="flex gap-8 overflow-hidden">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="w-[280px] h-[360px] shrink-0 bg-muted animate-pulse border-4 border-foreground" />
+              ))}
+            </div>
+          ) : staffList.length === 0 ? (
+            <div className="text-center py-20 neo-border rounded-2xl bg-card border-dashed">
+              <p className="text-muted-foreground font-bold text-lg">
+                No staff members found.
+              </p>
+            </div>
+          ) : (
+            <div className="flex">
             {/* We render two identical blocks that slide to the left */}
             {[1, 2].map((blockIdx) => (
               <motion.div
@@ -127,6 +147,7 @@ export function Staff() {
               </motion.div>
             ))}
           </div>
+          )}
         </div>
       </div>
     </Section>

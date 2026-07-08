@@ -19,11 +19,18 @@ export function FAQ() {
   const { t } = useTranslation();
   const [openIndex, setOpenIndex] = useState<number | null>(0);
   const [faqItems, setFaqItems] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function fetchFaqs() {
-      const { data } = await supabase.from("faq").select("*").order("created_at", { ascending: true });
-      if (data) setFaqItems(data);
+      try {
+        const { data } = await supabase.from("faq").select("*").order("created_at", { ascending: true });
+        if (data) setFaqItems(data);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsLoading(false);
+      }
     }
     fetchFaqs();
   }, []);
@@ -44,8 +51,21 @@ export function FAQ() {
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
         >
-          {faqItems.map((faq, idx) => {
-            const isOpen = openIndex === idx;
+          {isLoading ? (
+            <>
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="h-20 neo-border rounded-xl bg-muted animate-pulse" />
+              ))}
+            </>
+          ) : faqItems.length === 0 ? (
+            <div className="text-center py-12 neo-border rounded-2xl bg-card border-dashed">
+              <p className="text-muted-foreground font-bold text-lg">
+                No FAQ available at the moment.
+              </p>
+            </div>
+          ) : (
+            faqItems.map((faq, idx) => {
+              const isOpen = openIndex === idx;
 
             return (
               <motion.div
@@ -91,8 +111,9 @@ export function FAQ() {
                   )}
                 </AnimatePresence>
               </motion.div>
-            );
-          })}
+              );
+            })
+          )}
         </motion.div>
       </div>
     </Section>

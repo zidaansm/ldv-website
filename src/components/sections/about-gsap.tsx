@@ -62,23 +62,27 @@ export function AboutGSAP() {
     if (!section || !scrollContainer || !icon || !heading) return;
 
     let ctx = gsap.context(() => {
+      const isReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
       // 1. Split Text Animation for Heading
       const text = new SplitType(heading, { types: "chars,words" });
       
-      gsap.from(text.chars, {
-        scrollTrigger: {
-          trigger: heading,
-          start: "top 80%",
-          end: "bottom 20%",
-          toggleActions: "play none none reverse",
-        },
-        y: 50,
-        opacity: 0,
-        rotationX: -90,
-        stagger: 0.02,
-        duration: 0.8,
-        ease: "back.out(1.7)",
-      });
+      if (!isReduced) {
+        gsap.from(text.chars, {
+          scrollTrigger: {
+            trigger: heading,
+            start: "top 80%",
+            end: "bottom 20%",
+            toggleActions: "play none none reverse",
+          },
+          y: 50,
+          opacity: 0,
+          rotationX: -90,
+          stagger: 0.02,
+          duration: 0.8,
+          ease: "back.out(1.7)",
+        });
+      }
 
       // 2. Horizontal Scroll Setup
       // Calculate how far to scroll based on the total width of the container minus viewport width
@@ -113,6 +117,12 @@ export function AboutGSAP() {
       const cards = gsap.utils.toArray<HTMLElement>(".feature-card");
       
       cards.forEach((card) => {
+        if (isReduced) {
+          // If reduced motion, just ensure they are fully opaque
+          gsap.set(card, { opacity: 1 });
+          return;
+        }
+
         // We use containerAnimation to trigger animations based on the horizontal tween!
         const cardTitle = card.querySelector(".card-title") as HTMLElement;
         const cardDesc = card.querySelector(".card-desc") as HTMLElement;

@@ -1,4 +1,7 @@
+"use client";
+
 import { cn } from "@/lib/utils";
+import { useFocusTrap } from "@/hooks/use-focus-trap";
 
 interface EventRegistrationModalProps {
   isOpen: boolean;
@@ -21,20 +24,29 @@ export function EventRegistrationModal({
   onSubmit,
   isSubmitting,
 }: EventRegistrationModalProps) {
+  const modalRef = useFocusTrap(isOpen, onClose);
+
   if (!isOpen || !selectedEvent) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div className="bg-card neo-border neo-shadow-sm rounded-2xl p-6 md:p-8 max-w-md w-full animate-in zoom-in-95 duration-200">
-        <h2 className="text-2xl font-bold mb-2">Register for {selectedEvent.title}</h2>
+      <div 
+        ref={modalRef as React.RefObject<HTMLDivElement>}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-title"
+        className="bg-card neo-border neo-shadow-sm rounded-2xl p-6 md:p-8 max-w-md w-full animate-in zoom-in-95 duration-200"
+      >
+        <h2 id="modal-title" className="text-2xl font-bold mb-2">Register for {selectedEvent.title}</h2>
         <p className="text-muted-foreground text-sm mb-6">Please complete the following required information to register.</p>
         
         <form onSubmit={onSubmit} className="space-y-4">
           <div>
-            <label className="block font-bold text-sm mb-1">
+            <label htmlFor="email" className="block font-bold text-sm mb-1">
               Email Address <span className="text-danger">*</span>
             </label>
             <input 
+              id="email"
               required
               type="email"
               value={formData["email"] || ""}
@@ -49,11 +61,12 @@ export function EventRegistrationModal({
           </div>
           {(selectedEvent.form_schema?.length ? selectedEvent.form_schema : [{ id: "discord_username", label: "Discord Username", type: "text", required: true }]).map((field: any) => (
             <div key={field.id}>
-              <label className="block font-bold text-sm mb-1">
+              <label htmlFor={field.id} className="block font-bold text-sm mb-1">
                 {field.label} {field.required && <span className="text-danger">*</span>}
               </label>
               {field.type === "image" ? (
                 <input 
+                  id={field.id}
                   required={field.required}
                   type="file"
                   accept="image/*"
@@ -62,6 +75,7 @@ export function EventRegistrationModal({
                 />
               ) : (
                 <input 
+                  id={field.id}
                   required={field.required}
                   type={field.type || "text"}
                   value={formData[field.label] || ""}

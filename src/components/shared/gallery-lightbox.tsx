@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
+import { useFocusTrap } from "@/hooks/use-focus-trap";
 
 type GalleryItem = {
   id: string;
@@ -29,11 +30,12 @@ export function GalleryLightbox({ items, activeIndex, onClose, onPrev, onNext }:
   const isOpen = activeIndex !== null;
   const item = activeIndex !== null ? items[activeIndex] : null;
 
+  const modalRef = useFocusTrap(isOpen, onClose);
+
   // Keyboard navigation
   useEffect(() => {
     if (!isOpen) return;
     const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
       if (e.key === "ArrowLeft") onPrev();
       if (e.key === "ArrowRight") onNext();
     };
@@ -78,12 +80,17 @@ export function GalleryLightbox({ items, activeIndex, onClose, onPrev, onNext }:
 
           {/* Main Card — neobrutalism style */}
           <motion.div
+            ref={modalRef as React.RefObject<HTMLDivElement>}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Image gallery fullscreen view"
             initial={{ scale: 0.92, opacity: 0, y: 16 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.92, opacity: 0, y: 16 }}
             transition={{ type: "spring", stiffness: 380, damping: 32 }}
-            className="relative z-10 w-full max-w-3xl"
+            className="relative z-10 w-full max-w-3xl outline-none"
             onClick={(e) => e.stopPropagation()}
+            tabIndex={-1}
           >
             {/* Neo card container */}
             <div
@@ -127,6 +134,7 @@ export function GalleryLightbox({ items, activeIndex, onClose, onPrev, onNext }:
                   )}
                   <button
                     onClick={onClose}
+                    aria-label="Close gallery"
                     className="p-1.5 rounded-xl font-bold transition-all hover:scale-95"
                     style={{
                       background: "var(--primary)",
@@ -161,6 +169,7 @@ export function GalleryLightbox({ items, activeIndex, onClose, onPrev, onNext }:
                     controls
                     autoPlay
                     loop
+                    aria-label={item.title || "Gallery video"}
                     className="w-full max-h-[60vh] object-contain"
                     onClick={(e) => e.stopPropagation()}
                   />
@@ -180,6 +189,7 @@ export function GalleryLightbox({ items, activeIndex, onClose, onPrev, onNext }:
                   <>
                     <button
                       onClick={(e) => { e.stopPropagation(); onPrev(); }}
+                      aria-label="Previous media"
                       className="absolute left-3 top-1/2 -translate-y-1/2 p-2 rounded-xl font-extrabold transition-all hover:-translate-x-0.5 hover:translate-y-[-52%] active:translate-x-0"
                       style={{
                         background: "var(--background)",
@@ -191,6 +201,7 @@ export function GalleryLightbox({ items, activeIndex, onClose, onPrev, onNext }:
                     </button>
                     <button
                       onClick={(e) => { e.stopPropagation(); onNext(); }}
+                      aria-label="Next media"
                       className="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-xl font-extrabold transition-all hover:translate-x-0.5 hover:translate-y-[-52%] active:translate-x-0"
                       style={{
                         background: "var(--background)",

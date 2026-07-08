@@ -20,6 +20,7 @@ const supabase = createClient(
 export default function EventsGalleryPage() {
   const { t, language } = useTranslation();
   const [events, setEvents] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "ongoing" | "upcoming" | "past">("all");
 
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
@@ -30,8 +31,14 @@ export default function EventsGalleryPage() {
 
   useEffect(() => {
     async function fetchEvents() {
-      const { data } = await supabase.from("events").select("*").order("date", { ascending: false });
-      if (data) setEvents(data);
+      try {
+        const { data } = await supabase.from("events").select("*").order("date", { ascending: false });
+        if (data) setEvents(data);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsLoading(false);
+      }
     }
     fetchEvents();
   }, []);
@@ -168,7 +175,15 @@ export default function EventsGalleryPage() {
           </div>
 
           <div className="space-y-16">
-            {(filter === "all" || filter === "ongoing") && ongoingEvents.length > 0 && (
+            {isLoading ? (
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="animate-pulse bg-muted rounded-2xl h-[400px] border-4 border-foreground shadow-[8px_8px_0px_0px_var(--foreground)]" />
+                ))}
+              </div>
+            ) : (
+              <>
+                {(filter === "all" || filter === "ongoing") && ongoingEvents.length > 0 && (
               <div className="space-y-6">
                 <h3 className="font-extrabold text-3xl flex items-center gap-3 text-foreground" style={{ fontFamily: "var(--font-space-grotesk)" }}>
                   <span className="w-4 h-4 rounded-full bg-danger animate-pulse"></span>
@@ -228,12 +243,14 @@ export default function EventsGalleryPage() {
               </div>
             )}
 
-            {filteredEvents.length === 0 && (
-              <div className="text-center py-20 neo-border rounded-2xl bg-card border-dashed">
-                <p className="text-muted-foreground font-bold text-lg">
-                  {language === "id" ? "Belum ada acara di kategori ini." : "No events found in this category."}
-                </p>
-              </div>
+                {filteredEvents.length === 0 && (
+                  <div className="text-center py-20 neo-border rounded-2xl bg-card border-dashed">
+                    <p className="text-muted-foreground font-bold text-lg">
+                      {language === "id" ? "Belum ada acara di kategori ini." : "No events found in this category."}
+                    </p>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>

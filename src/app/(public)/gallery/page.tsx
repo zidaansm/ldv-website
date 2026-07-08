@@ -30,10 +30,17 @@ export default function GalleryPage() {
 
   useEffect(() => {
     const fetchImages = async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("gallery")
         .select("*")
         .order("created_at", { ascending: false });
+      if (error) {
+        console.error("Supabase Error Gallery:", error);
+        if (error.message.includes("JWT") || error.code === "PGRST301") {
+          await supabase.auth.signOut();
+          window.location.reload();
+        }
+      }
       if (data) setImages(data);
       setLoading(false);
     };

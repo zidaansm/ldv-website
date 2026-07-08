@@ -6,6 +6,7 @@ import { ChatWidget } from "@/components/shared/chat-widget";
 import "./globals.css";
 import { ToastProvider } from "@/components/providers/ToastProvider";
 import { MenfessLiveToaster } from "@/components/sections/menfess-live-toaster";
+import { MotionProvider } from "@/components/providers/motion-provider";
 
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
@@ -74,19 +75,21 @@ export default function RootLayout({
       className={`${spaceGrotesk.variable} h-full antialiased`}
     >
       <body
-        className="font-sans bg-background text-foreground antialiased selection:bg-primary/30 selection:text-primary-foreground min-h-screen flex flex-col"
+        className="font-sans bg-background text-foreground antialiased selection:bg-primary/30 selection:text-primary-foreground min-h-screen flex flex-col overflow-x-hidden"
         style={{ fontFamily: "var(--font-space-grotesk)" }}
         suppressHydrationWarning
       >
         <CustomCursor />
-        <LanguageProvider>
-          <ToastProvider />
-          <MenfessLiveToaster />
-          <main className="flex-grow">
-            {children}
-          </main>
-          <ChatWidget />
-        </LanguageProvider>
+        <MotionProvider>
+          <LanguageProvider>
+            <ToastProvider />
+            <MenfessLiveToaster />
+            <main className="flex-grow">
+              {children}
+            </main>
+            <ChatWidget />
+          </LanguageProvider>
+        </MotionProvider>
       </body>
     </html>
   );

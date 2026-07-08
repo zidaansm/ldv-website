@@ -17,11 +17,18 @@ const supabase = createClient(
 export function BanList() {
   const { t } = useTranslation();
   const [banList, setBanList] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function fetchBanList() {
-      const { data } = await supabase.from("banlist").select("*").order("banned_at", { ascending: false });
-      if (data) setBanList(data);
+      try {
+        const { data } = await supabase.from("banlist").select("*").order("banned_at", { ascending: false });
+        if (data) setBanList(data);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsLoading(false);
+      }
     }
     fetchBanList();
   }, []);
@@ -44,7 +51,21 @@ export function BanList() {
           </p>
         </div>
 
-        <motion.div
+        {isLoading ? (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="neo-border neo-shadow-sm rounded-2xl bg-muted animate-pulse h-[200px]" />
+            ))}
+          </div>
+        ) : banList.length === 0 ? (
+          <div className="text-center py-20 neo-border rounded-2xl bg-success/10 border-dashed border-success">
+            <ShieldAlert className="w-12 h-12 text-success mx-auto mb-4" />
+            <p className="text-success font-bold text-lg">
+              Server aman, belum ada pelanggar!
+            </p>
+          </div>
+        ) : (
+          <motion.div
           className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
           variants={staggerContainer}
           initial="hidden"
@@ -93,7 +114,8 @@ export function BanList() {
               </div>
             </motion.div>
           ))}
-        </motion.div>
+          </motion.div>
+        )}
       </div>
     </Section>
   );

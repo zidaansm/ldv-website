@@ -79,6 +79,13 @@ function MenfessContent() {
       .from("menfess")
       .select("*, menfess_comments(id), menfess_likes(id)")
       .order("created_at", { ascending: false });
+    if (error) {
+      console.error("Supabase Error Menfess:", error);
+      if (error.message.includes("JWT") || error.code === "PGRST301") {
+        await supabase.auth.signOut();
+        window.location.reload();
+      }
+    }
     
     if (data) setPosts(data);
     setLoading(false);

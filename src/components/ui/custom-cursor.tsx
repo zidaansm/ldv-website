@@ -22,8 +22,9 @@ export function CustomCursor() {
   const [particles, setParticles] = useState<Particle[]>([]);
   const particleIdCounter = useRef(0);
   
-  // Disable on touch devices
+  // Disable on touch devices and reduced motion
   const [isDesktop, setIsDesktop] = useState(false);
+  const [isReducedMotion, setIsReducedMotion] = useState(false);
 
   useEffect(() => {
     // Check if device has a fine pointer (mouse)
@@ -32,7 +33,18 @@ export function CustomCursor() {
     
     const updateMedia = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
     mediaQuery.addEventListener("change", updateMedia);
-    return () => mediaQuery.removeEventListener("change", updateMedia);
+
+    // Check reduced motion
+    const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setIsReducedMotion(motionQuery.matches);
+
+    const updateMotionMedia = (e: MediaQueryListEvent) => setIsReducedMotion(e.matches);
+    motionQuery.addEventListener("change", updateMotionMedia);
+
+    return () => {
+      mediaQuery.removeEventListener("change", updateMedia);
+      motionQuery.removeEventListener("change", updateMotionMedia);
+    };
   }, []);
 
   useEffect(() => {
@@ -92,7 +104,7 @@ export function CustomCursor() {
     }
   }, [particles]);
 
-  if (!isDesktop) return null;
+  if (!isDesktop || isReducedMotion) return null;
 
   return (
     <>

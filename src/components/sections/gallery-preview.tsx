@@ -34,11 +34,19 @@ export function GalleryPreview() {
 
   useEffect(() => {
     const fetchImages = async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("gallery")
         .select("*")
         .order("created_at", { ascending: false })
         .limit(20);
+
+      if (error) {
+        console.error("Supabase Error Gallery:", error);
+        if (error.message.includes("JWT") || error.code === "PGRST301") {
+          await supabase.auth.signOut();
+          window.location.reload();
+        }
+      }
 
       if (data) {
         setImages(data);
@@ -112,7 +120,7 @@ export function GalleryPreview() {
         ) : (
           <>
             {/* Cards Container */}
-            <div className="relative py-4 md:py-8 px-2 md:px-4">
+            <div className="relative py-4 md:py-8 px-2 md:px-4 overflow-hidden">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
                 <AnimatePresence initial={false} mode="popLayout">
                   {visibleImages.map(({ image: img, originalIndex }) => {

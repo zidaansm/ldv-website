@@ -32,17 +32,30 @@ function getAvatarStyle(color: string) {
 export function MenfessPreview() {
   const [posts, setPosts] = useState<Menfess[]>([]);
   const [likedPosts, setLikedPosts] = useState<Record<string, boolean>>({});
+  const [isLoading, setIsLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const supabase = createClient();
   const { t } = useTranslation();
   const router = useRouter();
 
   useEffect(() => {
     const fetchPosts = async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("menfess")
         .select("*, menfess_comments(id), menfess_likes(id)")
         .order("created_at", { ascending: false })
         .limit(50);
+      
+      if (error) {
+        console.error("Supabase Error Menfess:", error);
+        setErrorMsg(error.message);
+        
+        // Auto-fix expired JWT by clearing session
+        if (error.message.includes("JWT") || error.code === "PGRST301") {
+          await supabase.auth.signOut();
+          window.location.reload();
+        }
+      }
       
       if (data) {
         // Sort by (likes + comments)
@@ -56,6 +69,7 @@ export function MenfessPreview() {
         // Take the top 3 most commented posts
         setPosts(sortedData.slice(0, 3));
       }
+      setIsLoading(false);
     };
     
     fetchPosts();
@@ -90,7 +104,18 @@ export function MenfessPreview() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
-        {posts.length === 0 ? (
+        {errorMsg && (
+          <div className="col-span-3 neo-border rounded-2xl p-12 bg-danger/10 text-center text-danger border-dashed">
+            <p className="font-bold">Error: {errorMsg}</p>
+          </div>
+        )}
+        {isLoading ? (
+          <>
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="bg-muted animate-pulse neo-border neo-shadow rounded-2xl h-48" />
+            ))}
+          </>
+        ) : posts.length === 0 ? (
           <div className="col-span-3 neo-border rounded-2xl p-12 bg-card text-center text-muted-foreground border-dashed">
             <MessageSquare className="w-12 h-12 mx-auto mb-4 opacity-50" />
             <p className="font-bold">No secrets yet</p>
