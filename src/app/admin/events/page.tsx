@@ -50,8 +50,14 @@ export default function EventsAdminPage() {
   }, []);
 
   const fetchEvents = async () => {
-    const { data } = await supabase.from("events").select("*").order("date", { ascending: false });
-    if (data) setEvents(data);
+    const { data } = await supabase.from("events").select("*");
+    if (data) {
+      const ongoing = data.filter(e => e.type === "ongoing").sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+      const upcoming = data.filter(e => e.type === "upcoming").sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+      const past = data.filter(e => e.type === "past").sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      
+      setEvents([...ongoing, ...upcoming, ...past]);
+    }
     setLoading(false);
   };
 
