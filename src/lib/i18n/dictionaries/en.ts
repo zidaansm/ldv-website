@@ -56,6 +56,7 @@ export const en = {
     title: "Community Events",
     subtitle: "Join our weekly game nights, competitive tournaments, and special community gatherings.",
     upcoming: "Upcoming",
+    past: "Past",
     pastHighlights: "Past Highlights",
     rsvp: "RSVP Now",
     registered: "Registered",

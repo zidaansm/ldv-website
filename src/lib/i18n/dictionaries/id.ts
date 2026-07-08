@@ -56,6 +56,7 @@ export const id = {
     title: "Acara Komunitas",
     subtitle: "Ikuti malam permainan mingguan, turnamen kompetitif, dan kumpul-kumpul komunitas yang spesial.",
     upcoming: "Akan Datang",
+    past: "Sudah Berlalu",
     pastHighlights: "Sorotan Lalu",
     rsvp: "Daftar Sekarang",
     registered: "Terdaftar",
