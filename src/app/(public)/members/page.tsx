@@ -188,30 +188,40 @@ export default function MembersPage() {
                     return (
                       <motion.div
                         key={member.id}
-                        className="w-full max-w-[280px] shrink-0 rounded-3xl p-6 bg-card flex flex-col items-center text-center cursor-pointer"
-                        style={{ border: `3px solid ${color}`, boxShadow: `4px 4px 0 ${color}` }}
+                        className="w-full max-w-[280px] shrink-0 rounded-2xl flex flex-col relative overflow-hidden group cursor-pointer"
+                        style={{ border: `3px solid var(--neo-border)`, boxShadow: `6px 6px 0 ${color}` }}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.3, delay: 0.05 * (members.indexOf(member) % 8) }}
-                        whileHover={{ x: -4, y: -4, boxShadow: "10px 10px 0 0 var(--neo-border)" }}
+                        whileHover={{ y: -8, boxShadow: `10px 10px 0 ${color}` }}
                       >
-                        <div className="w-40 h-40 mb-6 flex items-center justify-center relative drop-shadow-lg">
-                          <img
-                            src={member.avatar_url}
-                            alt={`${member.name} Roblox Avatar`}
-                            className="w-full h-full object-cover"
-                            loading="lazy"
-                            draggable="false"
-                          />
+                        {/* Top Banner section */}
+                        <div className="h-32 w-full border-b-[3px] border-[var(--neo-border)]" style={{ backgroundColor: color }}>
                         </div>
-                        <div className="space-y-1">
+
+                        {/* Avatar Overlay */}
+                        <div className="absolute top-6 left-1/2 -translate-x-1/2 z-20">
+                          <div className="w-40 h-40 rounded-2xl border-[3px] border-[var(--neo-border)] bg-card overflow-hidden flex items-center justify-center relative" style={{ boxShadow: `4px 4px 0 var(--neo-border)` }}>
+                            <img
+                              src={member.avatar_url}
+                              alt={`${member.name} Roblox Avatar`}
+                              className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300 drop-shadow-md"
+                              loading="lazy"
+                              draggable="false"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Bottom Information section */}
+                        <div className="pt-20 pb-6 px-6 text-center bg-card flex-1 flex flex-col items-center justify-center relative z-10">
                           <h3
-                            className="font-bold text-xl text-foreground break-all line-clamp-1"
+                            className="font-bold text-2xl text-foreground break-all line-clamp-1 mb-2 group-hover:text-primary transition-colors"
                             style={{ fontFamily: "var(--font-space-grotesk)" }}
                           >
                             {member.name}
                           </h3>
-                          <p className="text-sm font-semibold italic text-muted-foreground line-clamp-2">
+                          <div className="w-12 h-1 mb-3 rounded-full" style={{ backgroundColor: color }} />
+                          <p className="text-sm font-semibold italic text-muted-foreground line-clamp-3">
                             &quot;{member.motto}&quot;
                           </p>
                         </div>

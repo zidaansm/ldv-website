@@ -62,30 +62,53 @@ export function MembersPreview({ direction = "left", speed = 40 }: MembersPrevie
           }}
           className="flex gap-6 items-center px-3"
         >
-          {members.map((member, i) => (
-            <div 
-              key={`${member.id}-${i}`}
-              className="flex items-center gap-3 bg-card neo-border rounded-xl p-3 shrink-0"
-              style={{ minWidth: "250px" }}
-            >
+          {members.map((member, i) => {
+            const colorMap: Record<string, string> = {
+              purple: "#6b2157",
+              pink: "#db2777",
+              cyan: "#0891b2",
+              danger: "#e53e3e",
+              success: "#38a169",
+              warning: "#d69e2e",
+              "neo-red": "#FF2B2B",
+              "neo-yellow": "#FFD600",
+              "neo-blue": "#0047FF",
+              "neo-purple": "#7B00FF",
+              "neo-pink": "#FF006E",
+              "neo-orange": "#FF5C00",
+              "neo-green": "#00C44F",
+              "neo-dark": "#1A1A2E",
+            };
+            const color = colorMap[member.accent_color] || colorMap.purple;
+
+            return (
               <div 
-                className="w-12 h-12 rounded-lg border-2 border-black shrink-0 overflow-hidden"
-                style={{ backgroundColor: `var(--${member.accent_color})` }}
+                key={`${member.id}-${i}`}
+                className="flex items-center gap-4 bg-card rounded-2xl p-3 shrink-0 border-[3px] border-[var(--neo-border)] cursor-pointer group hover:-translate-y-1 transition-transform"
+                style={{ 
+                  minWidth: "280px", 
+                  boxShadow: `4px 4px 0 ${color}` 
+                }}
+              >
+                <div 
+                className="w-14 h-14 rounded-full border-2 border-[var(--neo-border)] shrink-0 overflow-hidden shadow-[2px_2px_0_var(--neo-border)] flex items-center justify-center relative z-10"
+                style={{ backgroundColor: color }}
               >
                 {member.avatar_url ? (
-                  <img src={member.avatar_url} alt={member.name} className="w-full h-full object-cover" />
+                  <img src={member.avatar_url} alt={member.name} className="w-full h-full object-contain group-hover:scale-110 transition-transform" draggable="false" />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center font-bold text-white">
+                  <div className="w-full h-full flex items-center justify-center font-black text-white text-xl">
                     {member.name.charAt(0).toUpperCase()}
                   </div>
                 )}
               </div>
-              <div className="flex flex-col overflow-hidden">
-                <span className="font-bold text-foreground truncate">{member.name}</span>
-                <span className="text-xs text-muted-foreground font-semibold truncate">{member.motto}</span>
+                <div className="flex flex-col overflow-hidden">
+                  <span className="font-bold text-foreground text-lg truncate group-hover:text-primary transition-colors">{member.name}</span>
+                  <span className="text-xs text-muted-foreground font-semibold truncate italic">&quot;{member.motto}&quot;</span>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </motion.div>
       </div>
     </section>
