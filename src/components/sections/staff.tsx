@@ -37,7 +37,7 @@ export function Staff() {
         />
 
         <div className="relative overflow-hidden py-8 -mx-4 px-4 sm:mx-0 sm:px-0">
-          <div className="flex group">
+          <div className="flex">
             {/* We render two identical blocks that slide to the left */}
             {[1, 2].map((blockIdx) => (
               <motion.div
@@ -50,78 +50,75 @@ export function Staff() {
                   repeat: Infinity,
                 }}
               >
-                {staffList.map((member) => {
+                {staffList.map((member, index) => {
                   const colorMap: Record<string, string> = {
-                    purple: "#E9D5FF", // pastel purple
-                    pink: "#FBCFE8",   // pastel pink
-                    cyan: "#CFFAFE",   // pastel cyan
-                    danger: "#FECACA", // pastel red
-                    success: "#BBF7D0",// pastel green
-                    warning: "#FEF08A",// pastel yellow
-                    "neo-red": "#FF2B2B",
-                    "neo-yellow": "#FFD600",
-                    "neo-blue": "#0047FF",
-                    "neo-purple": "#7B00FF",
-                    "neo-pink": "#FF006E",
-                    "neo-orange": "#FF5C00",
-                    "neo-green": "#00C44F",
-                    "neo-dark": "#1A1A2E",
+                    purple: "#E9D5FF", pink: "#FBCFE8", cyan: "#CFFAFE",
+                    danger: "#FECACA", success: "#BBF7D0", warning: "#FEF08A",
+                    "neo-red": "#FF2B2B", "neo-yellow": "#FFD600", "neo-blue": "#0047FF",
+                    "neo-purple": "#7B00FF", "neo-pink": "#FF006E", "neo-orange": "#FF5C00",
+                    "neo-green": "#00C44F", "neo-dark": "#1A1A2E",
                   };
                   
-                  // Use a solid contrasting background based on their accent color, defaulting to white
-                  const bgColor = colorMap[member.accent_color] || "#ffffff";
-                  // The text color for the badge (black for light backgrounds, white for dark)
-                  const isDarkBg = member.accent_color?.startsWith('neo-') && !member.accent_color.includes('yellow');
-
+                  const bgColor = colorMap[member.accent_color] || "#CFFAFE";
+                  const rotationDirection = index % 2 === 0 ? -2 : 2;
                   return (
                     <motion.div
                       key={`${blockIdx}-${member.id}`}
-                      className="w-[280px] shrink-0 rounded-none p-6 flex flex-col items-center text-center cursor-pointer relative"
+                      className="w-[280px] shrink-0 flex flex-col cursor-pointer relative bg-card border-4 border-foreground group/card"
                       style={{
-                        backgroundColor: "#ffffff",
-                        border: `4px solid #000000`,
-                        boxShadow: `8px 8px 0px 0px #000000`,
+                        boxShadow: `8px 8px 0px 0px var(--foreground)`,
                       }}
                       whileHover={{
-                        x: 4,
-                        y: 4,
-                        boxShadow: "0px 0px 0px 0px #000000",
+                        y: -8,
+                        x: -4,
+                        boxShadow: `12px 16px 0px 0px var(--foreground)`,
+                        rotate: rotationDirection === 2 ? 1 : -1
                       }}
-                      transition={{ duration: 0.1 }}
+                      transition={{ type: "spring", stiffness: 300, damping: 20 }}
                     >
-                      {/* Roblox Avatar from Supabase */}
-                      <div className="w-40 h-40 mb-6 flex items-center justify-center relative">
-                        <img
-                          src={member.avatar_url}
-                          alt={`${member.name} Roblox Avatar`}
-                          className="w-full h-full object-cover filter drop-shadow-md"
-                          loading="lazy"
-                          draggable="false"
-                        />
-                      </div>
-
-                      <div className="space-y-4 w-full flex flex-col items-center">
-                        <h3
-                          className="font-black text-2xl text-black tracking-tight"
-                          style={{ fontFamily: "var(--font-space-grotesk)" }}
-                        >
-                          {member.name}
-                        </h3>
-                        
-                        {/* Neobrutalism Role Badge */}
-                        <div 
-                          className="px-4 py-2 font-bold text-xs uppercase tracking-widest text-black"
-                          style={{ 
-                            backgroundColor: bgColor,
-                            border: "3px solid #000000",
-                            boxShadow: "3px 3px 0px 0px #000000"
-                          }}
-                        >
+                      {/* OS Title Bar */}
+                      <div className="h-10 border-b-4 border-foreground px-3 flex items-center justify-between" style={{ backgroundColor: bgColor }}>
+                        {/* Fake buttons */}
+                        <div className="flex gap-2">
+                           <div className="w-3.5 h-3.5 rounded-full border-2 border-foreground bg-background"></div>
+                           <div className="w-3.5 h-3.5 rounded-full border-2 border-foreground bg-background"></div>
+                           <div className="w-3.5 h-3.5 rounded-full border-2 border-foreground bg-background"></div>
+                        </div>
+                        {/* Role Text */}
+                        <span className="text-[10px] font-black uppercase tracking-widest text-foreground opacity-80">
                           {member.role === "Owner / Founder" ? t("team.role.owner") : 
                            member.role === "Server Admin" ? t("team.role.admin") :
                            member.role === "Moderator" ? t("team.role.mod") :
                            member.role === "Event Manager" ? t("team.role.event") : member.role}
-                        </div>
+                        </span>
+                      </div>
+
+                      {/* Main Content Area */}
+                      <div className="p-6 flex flex-col items-center justify-center bg-card relative overflow-hidden h-[240px]">
+                         {/* Subtle grid pattern */}
+                         <div className="absolute inset-0 opacity-10 pointer-events-none" 
+                              style={{ 
+                                backgroundImage: "linear-gradient(var(--foreground) 1px, transparent 1px), linear-gradient(90deg, var(--foreground) 1px, transparent 1px)", 
+                                backgroundSize: "20px 20px",
+                                backgroundPosition: "center center"
+                              }} 
+                         />
+
+                         {/* Avatar */}
+                         <img
+                           src={member.avatar_url}
+                           alt={`${member.name}`}
+                           className="w-48 h-48 object-cover filter drop-shadow-xl relative z-10 group-hover/card:scale-110 group-hover/card:-translate-y-2 transition-all duration-300"
+                           loading="lazy"
+                           draggable="false"
+                         />
+                      </div>
+
+                      {/* Bottom Name Bar */}
+                      <div className="border-t-4 border-foreground p-4 bg-background z-20 flex justify-center items-center">
+                         <h3 className="font-black text-2xl text-foreground tracking-tight uppercase" style={{ fontFamily: "var(--font-space-grotesk)" }}>
+                            {member.name}
+                         </h3>
                       </div>
                     </motion.div>
                   );

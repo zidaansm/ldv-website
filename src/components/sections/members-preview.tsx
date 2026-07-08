@@ -10,7 +10,7 @@ import { ArrowRight } from "lucide-react";
 type Member = {
   id: string;
   name: string;
-  motto: string;
+  bio: string;
   avatar_url: string;
   accent_color: string;
 };
@@ -104,7 +104,7 @@ export function MembersPreview({ direction = "left", speed = 40 }: MembersPrevie
               </div>
                 <div className="flex flex-col overflow-hidden">
                   <span className="font-bold text-foreground text-lg truncate group-hover:text-primary transition-colors">{member.name}</span>
-                  <span className="text-xs text-muted-foreground font-semibold truncate italic">&quot;{member.motto}&quot;</span>
+                  <span className="text-xs text-muted-foreground font-semibold truncate italic">&quot;{member.bio}&quot;</span>
                 </div>
               </div>
             );

@@ -63,7 +63,7 @@ export async function POST(req: Request) {
       ] = await Promise.all([
         supabase.from("faq").select("*"),
         supabase.from("events").select("*").eq("type", "upcoming"),
-        supabase.from("members").select("name, motto"),
+        supabase.from("members").select("name, bio"),
         supabase.from("staff").select("name, role"),
         supabase.from("banlist").select("name, reason, is_permanent, unban_date"),
         supabase.from("menfess").select("content, sender_name, is_anonymous").order("created_at", { ascending: false }).limit(10)
@@ -75,7 +75,7 @@ export async function POST(req: Request) {
       
       contextText += "LDV Staff/Team:\n" + (staff && staff.length > 0 ? staff.map((t: any) => `- ${t.name} (Role: ${t.role})`).join("\n") : "No staff listed.") + "\n\n";
       
-      contextText += "LDV Members List:\n" + (members && members.length > 0 ? members.map((m: any) => `- ${m.name} (Motto: "${m.motto}")`).join("\n") : "No members listed.") + "\n\n";
+      contextText += "LDV Members List:\n" + (members && members.length > 0 ? members.map((m: any) => `- ${m.name} (Bio: "${m.bio}")`).join("\n") : "No members listed.") + "\n\n";
       
       contextText += "Banned Users:\n" + (banlist && banlist.length > 0 ? banlist.map((b: any) => `- ${b.name} (Reason: ${b.reason}. Permanent: ${b.is_permanent ? 'Yes' : 'No'})`).join("\n") : "No banned users.") + "\n\n";
       

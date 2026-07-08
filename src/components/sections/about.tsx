@@ -64,54 +64,57 @@ export function About() {
         >
           {features.map((feature, idx) => {
             const Icon = feature.icon;
-            const borderClass =
-              feature.color === "primary"
-                ? "neo-border-primary"
-                : feature.color === "secondary"
-                ? "neo-border-secondary"
-                : "neo-border-accent";
-            
-            const shadowClass =
-              feature.color === "primary"
-                ? "neo-shadow-primary"
-                : feature.color === "secondary"
-                ? "neo-shadow-secondary"
-                : "neo-shadow-accent";
-
             return (
               <motion.div
                 key={feature.title}
                 variants={fadeInUp}
-                className={`neo-hover ${borderClass} ${shadowClass} rounded-2xl p-8 bg-card flex flex-col h-full`}
+                className="group cursor-pointer relative p-6 flex flex-col h-full overflow-hidden transition-all duration-300"
+                style={{
+                  backgroundColor: `var(--${feature.color})`,
+                  color: `var(--${feature.color}-foreground)`,
+                  border: "4px solid var(--foreground)",
+                  boxShadow: "8px 8px 0px 0px var(--foreground)"
+                }}
+                whileHover={{
+                  y: -8,
+                  x: -4,
+                  boxShadow: "12px 12px 0px 0px var(--foreground)"
+                }}
               >
-                <div
-                  className="w-14 h-14 rounded-xl mb-6 flex items-center justify-center neo-border"
-                  style={{
-                    backgroundColor: `var(--${feature.color})`,
-                    color: `var(--${feature.color}-foreground)`,
-                  }}
-                >
-                  <Icon className="w-7 h-7" />
+                {/* Background Giant Number */}
+                <div className="absolute -bottom-6 -right-2 text-[140px] font-black opacity-10 pointer-events-none mix-blend-overlay leading-none">
+                  0{idx + 1}
+                </div>
+
+                {/* Top header with Icon */}
+                <div className="flex justify-between items-start mb-8 relative z-10">
+                  <div className="bg-background border-4 border-foreground p-3 group-hover:rotate-6 transition-transform duration-300"
+                       style={{ boxShadow: "4px 4px 0px 0px var(--foreground)" }}>
+                     <Icon className="w-8 h-8 text-foreground" />
+                  </div>
+                  {/* Decorative tag */}
+                  <div className="px-3 py-1 bg-foreground text-background text-[10px] font-black uppercase tracking-widest border-2 border-foreground">
+                     LDV // {idx + 1}
+                  </div>
                 </div>
                 
                 <h3
-                  className="font-bold text-xl mb-3 text-foreground"
+                  className="font-black text-2xl mb-4 uppercase tracking-tight relative z-10"
                   style={{ fontFamily: "var(--font-space-grotesk)" }}
                 >
                   {feature.title}
                 </h3>
                 
-                <p className="text-muted-foreground leading-relaxed flex-1">
+                <p className="font-bold leading-relaxed flex-1 relative z-10 text-sm opacity-90">
                   {feature.description}
                 </p>
 
-                {/* Dummy Image Placeholder */}
-                <div className="mt-6 w-full h-32 rounded-lg neo-border bg-muted overflow-hidden relative">
-                  <div className="absolute inset-0 flex items-center justify-center opacity-50">
-                    <span className="text-sm font-bold tracking-widest text-muted-foreground uppercase">
-                      Image Placeholder
-                    </span>
-                  </div>
+                {/* Brutalist Divider */}
+                <div className="mt-8 pt-5 border-t-4 border-current/20 flex justify-between items-center relative z-10">
+                   <span className="font-black text-[10px] uppercase tracking-widest">Learn More</span>
+                   <div className="w-8 h-8 border-4 border-current flex items-center justify-center group-hover:bg-foreground group-hover:text-background transition-colors duration-300">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="square" strokeLinejoin="miter"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+                   </div>
                 </div>
               </motion.div>
             );

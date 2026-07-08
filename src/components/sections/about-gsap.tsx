@@ -187,46 +187,44 @@ export function AboutGSAP() {
       {/* Horizontal Scroll Container */}
       <div ref={scrollContainerRef} className="flex h-full items-center pl-6 md:pl-16 pr-[15vw] flex-nowrap w-max">
         <div className="flex gap-6 md:gap-16 mt-16 md:mt-20 flex-nowrap">
-          {featureData.map((feature) => {
+          {featureData.map((feature, idx) => {
             const Icon = feature.icon;
-            const borderClass =
-              feature.color === "primary"
-                ? "neo-border-primary"
-                : feature.color === "secondary"
-                ? "neo-border-secondary"
-                : "neo-border";
-            
-            const shadowClass =
-              feature.color === "primary"
-                ? "neo-shadow-primary"
-                : feature.color === "secondary"
-                ? "neo-shadow-secondary"
-                : "neo-shadow";
 
             return (
               <div
                 key={feature.key}
-                className={`feature-card w-[85vw] md:w-[450px] shrink-0 ${borderClass} ${shadowClass} rounded-3xl p-6 md:p-10 bg-card flex flex-col justify-between`}
+                className={`feature-card group w-[85vw] md:w-[450px] shrink-0 border-4 border-foreground relative overflow-hidden flex flex-col justify-between p-6 md:p-8 transition-transform duration-300 hover:-translate-y-2`}
+                style={{
+                  backgroundColor: `var(--${feature.color})`,
+                  color: feature.color === "foreground" ? "var(--background)" : `var(--${feature.color}-foreground)`,
+                  boxShadow: `12px 12px 0px 0px var(--foreground)`
+                }}
               >
-                <div
-                  className="w-16 h-16 md:w-20 md:h-20 rounded-2xl mb-6 md:mb-12 flex items-center justify-center neo-border"
-                  style={{
-                    backgroundColor: `var(--${feature.color})`,
-                    color: feature.color === "foreground" ? "var(--background)" : `var(--${feature.color}-foreground)`,
-                  }}
-                >
-                  <Icon className="w-8 h-8 md:w-10 md:h-10" />
+                {/* Giant watermark number */}
+                <div className="absolute -bottom-8 -right-4 text-[160px] md:text-[200px] font-black opacity-10 pointer-events-none mix-blend-overlay leading-none select-none">
+                  0{idx + 1}
+                </div>
+
+                {/* Top: Icon + Label */}
+                <div className="flex justify-between items-start mb-16 relative z-10">
+                   <div className="bg-background border-4 border-foreground p-3 shadow-[4px_4px_0px_0px_var(--foreground)] group-hover:rotate-6 transition-transform duration-300">
+                     <Icon className="w-8 h-8 md:w-10 md:h-10 text-foreground" />
+                   </div>
+                   <div className="px-3 py-1 bg-foreground text-background text-[10px] md:text-xs font-black uppercase tracking-widest border-2 border-foreground shadow-[2px_2px_0px_0px_var(--foreground)]">
+                     LDV // 0{idx + 1}
+                   </div>
                 </div>
                 
-                <div>
+                {/* Bottom: Text Content Block */}
+                <div className="relative z-10 bg-background/95 p-5 md:p-6 border-4 border-foreground shadow-[6px_6px_0px_0px_var(--foreground)] group-hover:-translate-y-1 transition-transform duration-300">
                     <h3
-                        className="card-title font-black text-2xl md:text-3xl mb-3 md:mb-4 text-foreground uppercase tracking-tight"
+                        className="card-title font-black text-2xl md:text-3xl mb-2 md:mb-3 text-foreground uppercase tracking-tight"
                         style={{ fontFamily: "var(--font-space-grotesk)" }}
                     >
                     {t(`about.features.${feature.key}.title`)}
                     </h3>
                     
-                    <p className="card-desc text-muted-foreground text-base md:text-lg leading-relaxed font-medium">
+                    <p className="card-desc text-foreground/80 text-sm md:text-base leading-relaxed font-bold">
                     {t(`about.features.${feature.key}.description`)}
                     </p>
                 </div>

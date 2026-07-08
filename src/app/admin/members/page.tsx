@@ -11,7 +11,7 @@ import { confirmDelete } from "@/components/shared";
 type Member = {
   id: string;
   name: string;
-  motto: string;
+  bio: string;
   avatar_url: string;
   accent_color: string;
 };
@@ -27,7 +27,7 @@ export default function memberAdminPage() {
 
   // Form State
   const [name, setName] = useState("");
-  const [motto, setMotto] = useState("");
+  const [bio, setBio] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("https://tr.rbxcdn.com/38c6edcb50633730ff4cf3945bf13655/150/150/AvatarHeadshot/Png");
   const [accentColor, setAccentColor] = useState("purple");
 
@@ -44,7 +44,7 @@ export default function memberAdminPage() {
   const handleEditClick = (member: Member) => {
     setEditingId(member.id);
     setName(member.name);
-    setMotto(member.motto);
+    setBio(member.bio);
     setAvatarUrl(member.avatar_url);
     setAccentColor(member.accent_color);
     setIsFormOpen(true);
@@ -54,7 +54,7 @@ export default function memberAdminPage() {
   const resetForm = () => {
     setEditingId(null);
     setName("");
-    setMotto("");
+    setBio("");
     setAvatarUrl("https://tr.rbxcdn.com/38c6edcb50633730ff4cf3945bf13655/150/150/AvatarHeadshot/Png");
     setAccentColor("purple");
     setIsFormOpen(false);
@@ -81,7 +81,7 @@ export default function memberAdminPage() {
     setIsSubmitting(true);
     const loadingToast = toast.loading(editingId ? "Updating member..." : "Adding member...");
     
-    const memberData = { name, motto, avatar_url: avatarUrl, accent_color: accentColor };
+    const memberData = { name, bio, avatar_url: avatarUrl, accent_color: accentColor };
     
     let error;
     if (editingId) {
@@ -108,7 +108,7 @@ export default function memberAdminPage() {
 
   const filteredMembers = memberList.filter(m => 
     m.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    m.motto.toLowerCase().includes(searchQuery.toLowerCase())
+    m.bio.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -137,7 +137,7 @@ export default function memberAdminPage() {
         </div>
         <input
           type="text"
-          placeholder="Search members by name or motto..."
+          placeholder="Search members by name or bio..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="w-full neo-border rounded-xl pl-10 pr-4 py-3 bg-card focus:outline-none focus:ring-2 focus:ring-primary transition-shadow"
@@ -153,8 +153,13 @@ export default function memberAdminPage() {
               <input required value={name} onChange={e => setName(e.target.value)} className="w-full neo-border rounded-lg px-3 py-2 bg-background" />
             </div>
             <div>
-              <label className="block text-sm font-bold mb-1">Motto</label>
-              <input required value={motto} onChange={e => setMotto(e.target.value)} className="w-full neo-border rounded-lg px-3 py-2 bg-background" />
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-sm font-bold">Bio</label>
+                <span className={`text-xs font-semibold ${bio.length >= 80 ? 'text-danger' : 'text-muted-foreground'}`}>
+                  {bio.length}/80
+                </span>
+              </div>
+              <input required maxLength={80} value={bio} onChange={e => setBio(e.target.value)} className="w-full neo-border rounded-lg px-3 py-2 bg-background" />
             </div>
             <div>
               <label className="block text-sm font-bold mb-1">Roblox Avatar URL</label>
@@ -204,54 +209,59 @@ export default function memberAdminPage() {
           <p className="text-sm">Click "Add member" to start building your team.</p>
         </div>
       ) : (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredMembers.map((member) => {
-            const colorMap: Record<string, string> = {
-              purple: "#6b2157",
-              pink: "#db2777",
-              cyan: "#0891b2",
-              danger: "#e53e3e",
-              success: "#38a169",
-              warning: "#d69e2e",
-              "neo-red": "#FF2B2B",
-              "neo-yellow": "#FFD600",
-              "neo-blue": "#0047FF",
-              "neo-purple": "#7B00FF",
-              "neo-pink": "#FF006E",
-              "neo-orange": "#FF5C00",
-              "neo-green": "#00C44F",
-              "neo-dark": "#1A1A2E",
-            };
-            const color = colorMap[member.accent_color] || colorMap.purple;
+        <div className="neo-border rounded-2xl overflow-hidden bg-card">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b-2 border-[var(--neo-border)] bg-muted/50">
+                  <th className="p-4 font-bold text-muted-foreground w-16">Avatar</th>
+                  <th className="p-4 font-bold text-muted-foreground">Name</th>
+                  <th className="p-4 font-bold text-muted-foreground">Bio</th>
+                  <th className="p-4 font-bold text-muted-foreground w-32">Theme</th>
+                  <th className="p-4 font-bold text-muted-foreground w-32 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredMembers.map((member) => {
+                  const colorMap: Record<string, string> = {
+                    purple: "#6b2157", pink: "#db2777", cyan: "#0891b2", danger: "#e53e3e",
+                    success: "#38a169", warning: "#d69e2e", "neo-red": "#FF2B2B", "neo-yellow": "#FFD600",
+                    "neo-blue": "#0047FF", "neo-purple": "#7B00FF", "neo-pink": "#FF006E",
+                    "neo-orange": "#FF5C00", "neo-green": "#00C44F", "neo-dark": "#1A1A2E",
+                  };
+                  const color = colorMap[member.accent_color] || colorMap.purple;
 
-            return (
-              <div
-                key={member.id}
-                className="rounded-2xl bg-card p-6 flex flex-col items-center relative group"
-                style={{
-                  border: `3px solid ${color}`,
-                  boxShadow: `4px 4px 0 ${color}`,
-                }}
-              >
-                <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button onClick={() => handleEditClick(member)} className="p-2 bg-background neo-border hover:bg-muted rounded-lg transition-colors">
-                    <Edit2 className="w-4 h-4" />
-                  </button>
-                  <button onClick={() => handleDelete(member.id)} className="p-2 bg-background neo-border text-danger hover:bg-danger/10 rounded-lg transition-colors">
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-                <div
-                  className="w-24 h-24 rounded-full mb-4 overflow-hidden flex items-center justify-center"
-                  style={{ border: `3px solid ${color}` }}
-                >
-                  <img src={member.avatar_url} alt={member.name} className="w-full h-full object-cover" onError={(e) => (e.currentTarget.src = "https://tr.rbxcdn.com/38c6edcb50633730ff4cf3945bf13655/150/150/AvatarHeadshot/Png")} />
-                </div>
-                <h3 className="text-xl font-bold">{member.name}</h3>
-                <p className="font-semibold" style={{ color }}>{member.motto}</p>
-              </div>
-            );
-          })}
+                  return (
+                    <tr key={member.id} className="border-b last:border-0 border-[var(--neo-border)]/20 hover:bg-muted/30 transition-colors">
+                      <td className="p-4">
+                        <div className="w-12 h-12 rounded-xl overflow-hidden bg-muted flex items-center justify-center border-2 border-[var(--neo-border)]" style={{ borderColor: color }}>
+                          <img src={member.avatar_url} alt={member.name} className="w-full h-full object-cover" onError={(e) => (e.currentTarget.src = "https://tr.rbxcdn.com/38c6edcb50633730ff4cf3945bf13655/150/150/AvatarHeadshot/Png")} />
+                        </div>
+                      </td>
+                      <td className="p-4 font-bold">{member.name}</td>
+                      <td className="p-4 text-muted-foreground">{member.bio}</td>
+                      <td className="p-4">
+                        <div className="flex items-center gap-2">
+                          <span className="w-4 h-4 rounded-full border-2 border-black" style={{ backgroundColor: color }} />
+                          <span className="text-sm font-medium">{member.accent_color.replace('neo-', '').toUpperCase()}</span>
+                        </div>
+                      </td>
+                      <td className="p-4 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <button onClick={() => handleEditClick(member)} className="p-2 bg-background border-2 border-[var(--neo-border)] hover:bg-muted rounded-lg transition-all hover:-translate-y-0.5" title="Edit Member">
+                            <Edit2 className="w-4 h-4" />
+                          </button>
+                          <button onClick={() => handleDelete(member.id)} className="p-2 bg-background border-2 border-danger text-danger hover:bg-danger hover:text-white rounded-lg transition-all hover:-translate-y-0.5" title="Delete Member">
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>

@@ -11,7 +11,7 @@ import Link from "next/link";
 type Member = {
   id: string;
   name: string;
-  motto: string;
+  bio: string;
   avatar_url: string;
   accent_color: string;
 };
@@ -222,7 +222,7 @@ export default function MembersPage() {
                           </h3>
                           <div className="w-12 h-1 mb-3 rounded-full" style={{ backgroundColor: color }} />
                           <p className="text-sm font-semibold italic text-muted-foreground line-clamp-3">
-                            &quot;{member.motto}&quot;
+                            &quot;{member.bio}&quot;
                           </p>
                         </div>
                       </motion.div>
