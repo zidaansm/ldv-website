@@ -138,6 +138,18 @@ export function GalleryLightbox({ items, activeIndex, onClose, onPrev, onNext }:
                 </div>
               </div>
 
+              {/* Description area */}
+              {item.description && (
+                <div
+                  className="px-5 py-3 bg-background"
+                  style={{ borderBottom: "3px solid var(--foreground)" }}
+                >
+                  <p className="text-sm font-medium text-foreground whitespace-pre-wrap">
+                    {item.description}
+                  </p>
+                </div>
+              )}
+
               {/* Media area */}
               <div className="relative bg-muted flex items-center justify-center" style={{ minHeight: 300 }}>
                 {isVideo(item.image_url) ? (
@@ -148,7 +160,7 @@ export function GalleryLightbox({ items, activeIndex, onClose, onPrev, onNext }:
                     controls
                     autoPlay
                     loop
-                    className="w-full max-h-[72vh] object-contain"
+                    className="w-full max-h-[60vh] object-contain"
                     onClick={(e) => e.stopPropagation()}
                   />
                 ) : (
@@ -156,7 +168,7 @@ export function GalleryLightbox({ items, activeIndex, onClose, onPrev, onNext }:
                     key={item.id}
                     src={item.image_url}
                     alt={item.title}
-                    className="w-full max-h-[72vh] object-contain"
+                    className="w-full max-h-[60vh] object-contain"
                   />
                 )}
 
@@ -188,18 +200,6 @@ export function GalleryLightbox({ items, activeIndex, onClose, onPrev, onNext }:
                   </>
                 )}
               </div>
-
-              {/* Description area */}
-              {item.description && (
-                <div
-                  className="px-5 py-4 bg-card"
-                  style={{ borderTop: "3px solid var(--foreground)" }}
-                >
-                  <p className="text-sm md:text-base font-medium text-foreground whitespace-pre-wrap">
-                    {item.description}
-                  </p>
-                </div>
-              )}
 
               {/* Bottom strip — hint text */}
               <div
