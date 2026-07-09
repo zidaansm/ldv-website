@@ -1,36 +1,77 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<div align="center">
+  <h1>🍷 La Dolce Vita (LDV) 🍷</h1>
+  <p><strong>A Premium Discord Community Hub</strong></p>
+  <p>
+    <a href="https://ldvarch.com">View Live Website</a> •
+    <a href="#">Join Discord</a>
+  </p>
+</div>
 
-## Getting Started
+---
 
-First, run the development server:
+## 🌟 About The Project
 
+**La Dolce Vita (LDV)** is a vibrant Discord community built for socializing, gaming, and late-night grinds. This repository contains the source code for our official website. 
+
+Designed with a **Neo-Brutalist** aesthetic combined with retro OS window motifs, the website acts as a hub for members to view events, share anonymous messages (Menfess), and view community gallery memories.
+
+### ✨ Key Features
+
+- **🎨 Premium Neo-Brutalist UI**: Bold borders, striking shadows, and smooth micro-interactions powered by Framer Motion.
+- **🤫 Secret Board (Menfess)**: Real-time anonymous message board with live comments and likes.
+- **📸 Hall of Memories (Gallery)**: A grid of community highlights, supporting both images and looping videos.
+- **📅 Events Hub**: Showcase upcoming server events with countdowns and quick registration.
+- **🌐 Bilingual Support**: Full English and Indonesian language switching without page reloads.
+
+## 🛠️ Tech Stack
+
+- **Framework**: [Next.js 15](https://nextjs.org/) (App Router)
+- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
+- **Animations**: [Framer Motion](https://www.framer.com/motion/) & [GSAP](https://gsap.com/)
+- **Backend/Database**: [Supabase](https://supabase.com/) (PostgreSQL & Realtime Subscriptions)
+- **Icons**: [Lucide React](https://lucide.dev/)
+
+## 🚀 Getting Started
+
+To run this project locally, follow these steps:
+
+### 1. Clone the repository
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/zidaansm/ldv-website.git
+cd ldv-website
 ```
 
+### 2. Install dependencies
+```bash
+npm install
+```
+
+### 3. Setup Environment Variables
+Create a `.env.local` file in the root directory and add your Supabase credentials:
+```env
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+### 4. Run the Development Server
+```bash
+npm run dev
+```
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🗄️ Database Schema
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+This project relies on two main Supabase tables:
+1. `gallery`: Stores image URLs and metadata for the Hall of Memories.
+2. `menfess`, `menfess_comments`, `menfess_likes`: Relational tables for the secret board features.
 
-## Learn More
+*(You can use the schema provided in Supabase to quickly set up the backend).*
 
-To learn more about Next.js, take a look at the following resources:
+## 📄 License
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Distributed under the MIT License.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+<div align="center">
+  <i>Made with ❤️ by the LDV Team.</i>
+</div>
