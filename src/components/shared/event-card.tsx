@@ -12,6 +12,30 @@ interface EventCardProps {
   onCheckStatusClick: (event: any) => void;
 }
 
+const renderDescriptionWithLinks = (text: string) => {
+  if (!text) return text;
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+  const parts = text.split(urlRegex);
+
+  return parts.map((part, i) => {
+    if (part.match(urlRegex)) {
+      return (
+        <a
+          key={i}
+          href={part}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-primary underline hover:text-primary/80 break-all"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {part}
+        </a>
+      );
+    }
+    return <span key={i}>{part}</span>;
+  });
+};
+
 export function EventCard({ event, type, language, t, onRegisterClick, onCheckStatusClick }: EventCardProps) {
   const isUpcoming = type === "upcoming";
   const isOngoing = type === "ongoing";
@@ -70,8 +94,8 @@ export function EventCard({ event, type, language, t, onRegisterClick, onCheckSt
       >
         {event.title}
       </h3>
-      <p className="text-muted-foreground text-sm mb-6 flex-1">
-        {event.description}
+      <p className="text-muted-foreground text-sm mb-6 flex-1 break-words whitespace-pre-line">
+        {renderDescriptionWithLinks(event.description)}
       </p>
 
       {/* Event Metadata (Date, Time, Participants) */}
