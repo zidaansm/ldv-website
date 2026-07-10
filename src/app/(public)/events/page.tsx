@@ -21,6 +21,7 @@ export default function EventsGalleryPage() {
   const { t, language } = useTranslation();
   const [events, setEvents] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | "ongoing" | "upcoming" | "past">("all");
 
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
@@ -30,17 +31,33 @@ export default function EventsGalleryPage() {
   const [fileData, setFileData] = useState<Record<string, File>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    async function fetchEvents() {
-      try {
-        const { data } = await supabase.from("events").select("*").order("date", { ascending: false });
-        if (data) setEvents(data);
-      } catch (error) {
-        console.error(error);
-      } finally {
+  const fetchEvents = async (retryCount = 0) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const { data, error: fetchError } = await supabase.from("events").select("*").order("date", { ascending: false });
+      
+      if (fetchError) {
+        throw fetchError;
+      }
+      
+      if (data) {
+        setEvents(data);
         setIsLoading(false);
       }
+    } catch (err: any) {
+      console.error(`Error fetching events (attempt ${retryCount + 1}):`, err);
+      if (retryCount < 2) {
+        // Automatic retry after 1 second
+        setTimeout(() => fetchEvents(retryCount + 1), 1000);
+        return;
+      }
+      setError(err.message || "Failed to load events");
+      setIsLoading(false);
     }
+  };
+
+  useEffect(() => {
     fetchEvents();
   }, []);
 
@@ -187,6 +204,17 @@ export default function EventsGalleryPage() {
                 {[1, 2, 3].map((i) => (
                   <div key={i} className="animate-pulse bg-muted rounded-2xl h-[400px] border-4 border-foreground shadow-[8px_8px_0px_0px_var(--foreground)]" />
                 ))}
+              </div>
+            ) : error ? (
+              <div className="py-20 flex flex-col items-center justify-center bg-danger/10 border-2 border-danger border-dashed rounded-2xl p-8 text-center">
+                <p className="text-danger font-bold text-xl mb-4">{language === "id" ? "Gagal memuat acara" : "Failed to load events"}</p>
+                <p className="text-foreground/80 mb-6 font-medium">{error}</p>
+                <button 
+                  onClick={() => fetchEvents(0)}
+                  className="px-6 py-2 bg-background border-2 border-black rounded-lg font-bold neo-shadow-sm neo-press hover:bg-muted transition-colors"
+                >
+                  {language === "id" ? "Coba Lagi" : "Try Again"}
+                </button>
               </div>
             ) : (
               <>

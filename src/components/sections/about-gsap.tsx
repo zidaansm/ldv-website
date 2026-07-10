@@ -198,7 +198,7 @@ export function AboutGSAP() {
            style={{ backgroundImage: "radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)", backgroundSize: "32px 32px" }}>
       </div>
 
-      <div className="md:absolute md:top-20 left-0 w-full px-6 md:px-16 z-10 mb-8 md:mb-0">
+      <div className="w-full px-6 md:px-16 z-10 mb-8 md:mb-16 shrink-0">
         <h2 
             ref={headingRef}
             className="text-5xl md:text-7xl font-extrabold uppercase mb-2 md:mb-4"
@@ -213,8 +213,8 @@ export function AboutGSAP() {
       </div>
 
       {/* Container - Stacked vertically on mobile, horizontal scroll on desktop */}
-      <div ref={scrollContainerRef} className="flex flex-col md:flex-row h-full md:items-center px-6 md:pl-16 md:pr-[15vw] w-full md:w-max">
-        <div className="flex flex-col md:flex-row gap-6 md:gap-16 md:mt-12 md:mb-8 flex-nowrap w-full">
+      <div ref={scrollContainerRef} className="flex flex-col md:flex-row md:items-center px-6 md:pl-16 md:pr-[15vw] w-full md:w-max">
+        <div className="flex flex-col md:flex-row gap-6 md:gap-16 md:pb-12 flex-nowrap w-full">
           {featureData.map((feature, idx) => {
             const Icon = feature.icon;
 
