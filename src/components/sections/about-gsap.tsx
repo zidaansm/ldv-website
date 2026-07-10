@@ -107,6 +107,12 @@ export function AboutGSAP() {
             if (progressLineRef.current && icon) {
                 const maxMovement = progressLineRef.current.offsetWidth - icon.offsetWidth;
                 gsap.set(icon, { x: self.progress * maxMovement });
+                
+                // Spin the icon to simulate a rolling wheel (starts at 90deg)
+                const rocketIcon = icon.querySelector('svg');
+                if (rocketIcon) {
+                   gsap.set(rocketIcon, { rotation: 90 + (self.progress * 720) });
+                }
             }
           }
         },
@@ -197,14 +203,14 @@ export function AboutGSAP() {
     <section 
         ref={sectionRef} 
         id="about" 
-        className="relative overflow-hidden bg-background min-h-screen md:h-screen flex flex-col justify-center py-20 md:pt-32 md:pb-4"
+        className="relative overflow-hidden bg-background min-h-screen md:h-screen flex flex-col justify-center py-20 md:pt-24 md:pb-8"
     >
       {/* Neo-brutalist pattern background */}
       <div className="absolute inset-0 opacity-[0.03] pointer-events-none" 
            style={{ backgroundImage: "radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)", backgroundSize: "32px 32px" }}>
       </div>
 
-      <div className="w-full px-6 md:px-16 z-10 mb-8 md:mb-16 shrink-0">
+      <div className="w-full px-6 md:px-16 z-10 mb-6 md:mb-10 shrink-0">
         <h2 
             ref={headingRef}
             className="text-5xl md:text-7xl font-extrabold uppercase mb-2 md:mb-4"
@@ -220,14 +226,14 @@ export function AboutGSAP() {
 
       {/* Container - Stacked vertically on mobile, horizontal scroll on desktop */}
       <div ref={scrollContainerRef} className="flex flex-col md:flex-row md:items-center px-6 md:pl-16 md:pr-[15vw] w-full md:w-max">
-        <div className="flex flex-col md:flex-row gap-6 md:gap-16 md:pb-12 flex-nowrap w-full">
+        <div className="flex flex-col md:flex-row gap-6 md:gap-16 flex-nowrap w-full">
           {featureData.map((feature, idx) => {
             const Icon = feature.icon;
 
             return (
               <div
                 key={feature.key}
-                className={`feature-card group w-full md:w-[450px] shrink-0 border-4 border-foreground relative overflow-hidden flex flex-col justify-between p-5 md:p-8 transition-transform duration-300 hover:-translate-y-2`}
+                className={`feature-card group w-full md:w-[450px] shrink-0 border-4 border-foreground relative overflow-hidden flex flex-col justify-between p-5 md:p-6 transition-transform duration-300 hover:-translate-y-2`}
                 style={{
                   backgroundColor: `var(--${feature.color})`,
                   color: feature.color === "foreground" ? "var(--background)" : `var(--${feature.color}-foreground)`,
@@ -240,7 +246,7 @@ export function AboutGSAP() {
                 </div>
 
                 {/* Top: Icon + Label */}
-                <div className="flex justify-between items-start mb-8 md:mb-16 relative z-10">
+                <div className="flex justify-between items-start mb-6 md:mb-8 relative z-10">
                    <div className="bg-background border-[3px] md:border-4 border-foreground p-2 md:p-3 shadow-[4px_4px_0px_0px_var(--foreground)] group-hover:rotate-6 transition-transform duration-300">
                      <Icon className="w-6 h-6 md:w-10 md:h-10 text-foreground" />
                    </div>
@@ -269,11 +275,11 @@ export function AboutGSAP() {
       </div>
 
       {/* Scroll Progress Tracker (Desktop Only) */}
-      <div className="hidden md:flex absolute bottom-8 left-16 right-16 h-12 items-center">
+      <div className="hidden md:flex w-full px-6 md:px-16 mt-6 md:mt-8 mb-4 md:mb-8 shrink-0 h-12 items-center">
          <div ref={progressLineRef} className="w-full h-2 bg-muted rounded-full neo-border relative overflow-visible">
             <div 
                 ref={iconRef}
-                className="absolute top-1/2 -translate-y-1/2 left-0 w-10 h-10 bg-primary rounded-xl neo-border flex items-center justify-center z-10 text-primary-foreground neo-shadow-sm"
+                className="absolute top-1/2 -translate-y-1/2 left-0 w-10 h-10 bg-primary rounded-full neo-border flex items-center justify-center z-10 text-primary-foreground neo-shadow-sm"
             >
                 <Rocket className="w-5 h-5 rotate-90" />
             </div>
