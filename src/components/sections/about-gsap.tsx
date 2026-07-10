@@ -182,7 +182,13 @@ export function AboutGSAP() {
       }
     });
 
+    // Ensure ScrollTrigger recalculates after all DOM rendering and layout shifts
+    const timer = setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 200);
+
     return () => {
+        clearTimeout(timer);
         mm.revert(); // Cleanup matchMedia
     };
   }, []);
@@ -191,7 +197,7 @@ export function AboutGSAP() {
     <section 
         ref={sectionRef} 
         id="about" 
-        className="relative overflow-hidden bg-background min-h-screen md:h-screen flex flex-col justify-center py-20 md:py-0"
+        className="relative overflow-hidden bg-background min-h-screen md:h-screen flex flex-col justify-center py-20 md:pt-32 md:pb-4"
     >
       {/* Neo-brutalist pattern background */}
       <div className="absolute inset-0 opacity-[0.03] pointer-events-none" 
