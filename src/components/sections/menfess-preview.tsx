@@ -191,11 +191,11 @@ export function MenfessPreview() {
                   return (
                     <div
                       key={idx}
-                      className="absolute w-36 h-36 -z-10 pointer-events-none opacity-90"
+                      className="absolute w-36 h-36 -z-10 pointer-events-none opacity-100"
                       style={{ 
                         left: config.left,
                         top: config.top,
-                        transform: `translateX(-50%) translateZ(-20px) rotate(${config.rotate})`
+                        transform: `translateX(-50%) rotate(${config.rotate})`
                       }}
                     >
                       <img
