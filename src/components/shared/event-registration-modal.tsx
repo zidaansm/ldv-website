@@ -41,24 +41,6 @@ export function EventRegistrationModal({
         <p className="text-muted-foreground text-sm mb-6">Please complete the following required information to register.</p>
         
         <form onSubmit={onSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="email" className="block font-bold text-sm mb-1">
-              Email Address <span className="text-danger">*</span>
-            </label>
-            <input 
-              id="email"
-              required
-              type="email"
-              value={formData["email"] || ""}
-              onChange={(e) => {
-                const newData = { ...formData };
-                newData["email"] = e.target.value;
-                setFormData(newData);
-              }}
-              className="w-full neo-border rounded-lg px-3 py-2 bg-background focus:ring-2 focus:ring-primary outline-none"
-              placeholder="your@email.com"
-            />
-          </div>
           {(selectedEvent.form_schema?.length ? selectedEvent.form_schema : [{ id: "discord_username", label: "Discord Username", type: "text", required: true }]).map((field: any) => (
             <div key={field.id}>
               <label htmlFor={field.id} className="block font-bold text-sm mb-1">

@@ -217,7 +217,7 @@ export default function MembersPage() {
                         {/* Bottom Information section */}
                         <div className="pt-20 pb-6 px-6 text-center bg-card flex-1 flex flex-col items-center justify-center relative z-10">
                           <h3
-                            className="font-bold text-2xl text-foreground break-all line-clamp-1 mb-2 group-hover:text-primary transition-colors"
+                            className="font-bold text-2xl text-foreground break-all line-clamp-1 mb-2"
                             style={{ fontFamily: "var(--font-space-grotesk)" }}
                           >
                             {member.name}
@@ -236,7 +236,10 @@ export default function MembersPage() {
               {totalPages > 1 && (
                 <div className="flex items-center justify-center gap-4 mt-16">
                   <button
-                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    onClick={() => {
+                      setPage((p) => Math.max(1, p - 1));
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
                     disabled={page === 1}
                     className="p-3 rounded-xl neo-border bg-card text-foreground disabled:opacity-50 hover:bg-muted neo-press transition-colors disabled:pointer-events-none"
                   >
@@ -246,7 +249,10 @@ export default function MembersPage() {
                     Page {page} of {totalPages}
                   </span>
                   <button
-                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                    onClick={() => {
+                      setPage((p) => Math.min(totalPages, p + 1));
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
                     disabled={page === totalPages}
                     className="p-3 rounded-xl neo-border bg-card text-foreground disabled:opacity-50 hover:bg-muted neo-press transition-colors disabled:pointer-events-none"
                   >

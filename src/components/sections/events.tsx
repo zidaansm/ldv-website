@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { useTranslation } from "@/lib/i18n/LanguageContext";
 import toast from "react-hot-toast";
-import { EventCard, EventRegistrationModal } from "@/components/shared";
+import { EventCard, EventRegistrationModal, ParticipantListModal } from "@/components/shared";
 import Link from "next/link";
 
 const supabase = createClient(
@@ -24,6 +24,7 @@ export function Events() {
 
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
   const [formData, setFormData] = useState<Record<string, string>>({});
   const [fileData, setFileData] = useState<Record<string, File>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -81,15 +82,22 @@ export function Events() {
         }
       ]);
 
-      if (error) throw error;
+      if (error) {
+        if (error.code === '23505') {
+          throw new Error("You have already registered for this event.");
+        }
+        throw error;
+      }
 
       toast.success(language === "id" ? "Berhasil mendaftar! Menunggu persetujuan admin." : "Registration submitted! Waiting for admin approval.", { id: loadingToast });
       setIsModalOpen(false);
       setFormData({});
       setFileData({});
-    } catch (error) {
-      console.error(error);
-      toast.error(language === "id" ? "Registrasi gagal, coba lagi." : "Registration failed. Please try again.", { id: loadingToast });
+    } catch (error: any) {
+      if (error.code !== '23505' && error.message !== "You have already registered for this event.") {
+        console.error("Registration error:", error);
+      }
+      toast.error(error.message || (language === "id" ? "Registrasi gagal, coba lagi." : "Registration failed. Please try again."), { id: loadingToast });
     } finally {
       setIsSubmitting(false);
     }
@@ -98,6 +106,11 @@ export function Events() {
   const handleRegisterClick = (event: any) => {
     setSelectedEvent(event);
     setIsModalOpen(true);
+  };
+
+  const handleCheckStatusClick = (event: any) => {
+    setSelectedEvent(event);
+    setIsStatusModalOpen(true);
   };
 
   // Limit and sort events for homepage
@@ -143,7 +156,7 @@ export function Events() {
                     viewport={{ once: true, margin: "-100px" }}
                   >
                     {ongoingEvents.map(event => (
-                      <EventCard key={event.id} event={event} type="ongoing" language={language} t={t} onRegisterClick={handleRegisterClick} />
+                      <EventCard key={event.id} event={event} type="ongoing" language={language} t={t} onRegisterClick={handleRegisterClick} onCheckStatusClick={handleCheckStatusClick} />
                     ))}
                   </motion.div>
                 </div>
@@ -161,7 +174,7 @@ export function Events() {
                 viewport={{ once: true, margin: "-100px" }}
               >
                 {upcomingEvents.map(event => (
-                  <EventCard key={event.id} event={event} type="upcoming" language={language} t={t} onRegisterClick={handleRegisterClick} />
+                  <EventCard key={event.id} event={event} type="upcoming" language={language} t={t} onRegisterClick={handleRegisterClick} onCheckStatusClick={handleCheckStatusClick} />
                 ))}
               </motion.div>
               
@@ -187,7 +200,7 @@ export function Events() {
                 viewport={{ once: true, margin: "-100px" }}
               >
                 {pastEvents.map(event => (
-                  <EventCard key={event.id} event={event} type="past" language={language} t={t} onRegisterClick={handleRegisterClick} />
+                  <EventCard key={event.id} event={event} type="past" language={language} t={t} onRegisterClick={handleRegisterClick} onCheckStatusClick={handleCheckStatusClick} />
                 ))}
               </motion.div>
             </div>
@@ -205,6 +218,13 @@ export function Events() {
         handleFileChange={handleFileChange}
         onSubmit={handleRegister}
         isSubmitting={isSubmitting}
+      />
+
+      <ParticipantListModal 
+        isOpen={isStatusModalOpen}
+        onClose={() => setIsStatusModalOpen(false)}
+        selectedEvent={selectedEvent}
+        language={language}
       />
     </>
   );

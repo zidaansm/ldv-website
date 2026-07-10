@@ -61,7 +61,10 @@ export function AboutGSAP() {
 
     if (!section || !scrollContainer || !icon || !heading) return;
 
-    let ctx = gsap.context(() => {
+    let mm = gsap.matchMedia();
+
+    // Desktop Animation (Horizontal Scroll)
+    mm.add("(min-width: 768px)", () => {
       const isReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
       // 1. Split Text Animation for Heading
@@ -85,7 +88,6 @@ export function AboutGSAP() {
       }
 
       // 2. Horizontal Scroll Setup
-      // Calculate how far to scroll based on the total width of the container minus viewport width
       const getScrollAmount = () => -(scrollContainer.scrollWidth - window.innerWidth);
       
       const horizontalTween = gsap.to(scrollContainer, {
@@ -94,17 +96,14 @@ export function AboutGSAP() {
         scrollTrigger: {
           trigger: section,
           start: "top top",
-          end: () => `+=${scrollContainer.scrollWidth}`, // scroll distance equals total width
+          end: () => `+=${scrollContainer.scrollWidth - window.innerWidth}`, // Scroll distance exactly matches horizontal travel
           pin: true,
           scrub: 1, // smooth scrubbing
           invalidateOnRefresh: true, // Recalculate values on resize
           onUpdate: (self) => {
-            // Variable Font Animation based on global horizontal progress
-            // Interpolate font weight between 400 and 800 based on progress
             const weight = 400 + (self.progress * 400);
             heading.style.fontVariationSettings = `"wght" ${weight}`;
             
-            // Icon Movement along progress line
             if (progressLineRef.current && icon) {
                 const maxMovement = progressLineRef.current.offsetWidth - icon.offsetWidth;
                 gsap.set(icon, { x: self.progress * maxMovement });
@@ -118,12 +117,10 @@ export function AboutGSAP() {
       
       cards.forEach((card) => {
         if (isReduced) {
-          // If reduced motion, just ensure they are fully opaque
           gsap.set(card, { opacity: 1 });
           return;
         }
 
-        // We use containerAnimation to trigger animations based on the horizontal tween!
         const cardTitle = card.querySelector(".card-title") as HTMLElement;
         const cardDesc = card.querySelector(".card-desc") as HTMLElement;
         
@@ -162,10 +159,31 @@ export function AboutGSAP() {
             });
         }
       });
-    }, sectionRef); // Scope to the section
+    });
+
+    // Mobile Animation (Vertical Fade In)
+    mm.add("(max-width: 767px)", () => {
+      const isReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (!isReduced) {
+        const cards = gsap.utils.toArray<HTMLElement>(".feature-card");
+        cards.forEach((card) => {
+          gsap.from(card, {
+            scrollTrigger: {
+              trigger: card,
+              start: "top 85%",
+              toggleActions: "play none none reverse",
+            },
+            y: 30,
+            opacity: 0,
+            duration: 0.6,
+            ease: "power2.out",
+          });
+        });
+      }
+    });
 
     return () => {
-        ctx.revert(); // Cleanup GSAP animations and ScrollTrigger
+        mm.revert(); // Cleanup matchMedia
     };
   }, []);
 
@@ -173,14 +191,14 @@ export function AboutGSAP() {
     <section 
         ref={sectionRef} 
         id="about" 
-        className="relative overflow-hidden bg-background h-screen flex flex-col justify-center"
+        className="relative overflow-hidden bg-background min-h-screen md:h-screen flex flex-col justify-center py-20 md:py-0"
     >
       {/* Neo-brutalist pattern background */}
       <div className="absolute inset-0 opacity-[0.03] pointer-events-none" 
            style={{ backgroundImage: "radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)", backgroundSize: "32px 32px" }}>
       </div>
 
-      <div className="absolute top-6 md:top-20 left-0 w-full px-6 md:px-16 z-10">
+      <div className="md:absolute md:top-20 left-0 w-full px-6 md:px-16 z-10 mb-8 md:mb-0">
         <h2 
             ref={headingRef}
             className="text-5xl md:text-7xl font-extrabold uppercase mb-2 md:mb-4"
@@ -194,16 +212,16 @@ export function AboutGSAP() {
         </h2>
       </div>
 
-      {/* Horizontal Scroll Container */}
-      <div ref={scrollContainerRef} className="flex h-full items-center pl-6 md:pl-16 pr-[15vw] flex-nowrap w-max">
-        <div className="flex gap-6 md:gap-16 mt-16 md:mt-20 flex-nowrap">
+      {/* Container - Stacked vertically on mobile, horizontal scroll on desktop */}
+      <div ref={scrollContainerRef} className="flex flex-col md:flex-row h-full md:items-center px-6 md:pl-16 md:pr-[15vw] w-full md:w-max">
+        <div className="flex flex-col md:flex-row gap-6 md:gap-16 md:mt-20 flex-nowrap w-full">
           {featureData.map((feature, idx) => {
             const Icon = feature.icon;
 
             return (
               <div
                 key={feature.key}
-                className={`feature-card group w-[85vw] md:w-[450px] shrink-0 border-4 border-foreground relative overflow-hidden flex flex-col justify-between p-6 md:p-8 transition-transform duration-300 hover:-translate-y-2`}
+                className={`feature-card group w-full md:w-[450px] shrink-0 border-4 border-foreground relative overflow-hidden flex flex-col justify-between p-5 md:p-8 transition-transform duration-300 hover:-translate-y-2`}
                 style={{
                   backgroundColor: `var(--${feature.color})`,
                   color: feature.color === "foreground" ? "var(--background)" : `var(--${feature.color}-foreground)`,
@@ -211,24 +229,24 @@ export function AboutGSAP() {
                 }}
               >
                 {/* Giant watermark number */}
-                <div className="absolute -bottom-8 -right-4 text-[160px] md:text-[200px] font-black opacity-10 pointer-events-none mix-blend-overlay leading-none select-none">
+                <div className="absolute -bottom-4 md:-bottom-8 -right-2 md:-right-4 text-[120px] md:text-[200px] font-black opacity-10 pointer-events-none mix-blend-overlay leading-none select-none">
                   0{idx + 1}
                 </div>
 
                 {/* Top: Icon + Label */}
-                <div className="flex justify-between items-start mb-16 relative z-10">
-                   <div className="bg-background border-4 border-foreground p-3 shadow-[4px_4px_0px_0px_var(--foreground)] group-hover:rotate-6 transition-transform duration-300">
-                     <Icon className="w-8 h-8 md:w-10 md:h-10 text-foreground" />
+                <div className="flex justify-between items-start mb-8 md:mb-16 relative z-10">
+                   <div className="bg-background border-[3px] md:border-4 border-foreground p-2 md:p-3 shadow-[4px_4px_0px_0px_var(--foreground)] group-hover:rotate-6 transition-transform duration-300">
+                     <Icon className="w-6 h-6 md:w-10 md:h-10 text-foreground" />
                    </div>
-                   <div className="px-3 py-1 bg-foreground text-background text-[10px] md:text-xs font-black uppercase tracking-widest border-2 border-foreground shadow-[2px_2px_0px_0px_var(--foreground)]">
+                   <div className="px-2 md:px-3 py-1 bg-foreground text-background text-[10px] md:text-xs font-black uppercase tracking-widest border-2 border-foreground shadow-[2px_2px_0px_0px_var(--foreground)]">
                      LDV // 0{idx + 1}
                    </div>
                 </div>
                 
                 {/* Bottom: Text Content Block */}
-                <div className="relative z-10 bg-background/95 p-5 md:p-6 border-4 border-foreground shadow-[6px_6px_0px_0px_var(--foreground)] group-hover:-translate-y-1 transition-transform duration-300">
+                <div className="relative z-10 bg-background/95 p-4 md:p-6 border-[3px] md:border-4 border-foreground shadow-[4px_4px_0px_0px_var(--foreground)] md:shadow-[6px_6px_0px_0px_var(--foreground)] group-hover:-translate-y-1 transition-transform duration-300">
                     <h3
-                        className="card-title font-black text-2xl md:text-3xl mb-2 md:mb-3 text-foreground uppercase tracking-tight"
+                        className="card-title font-black text-xl md:text-3xl mb-2 md:mb-3 text-foreground uppercase tracking-tight"
                         style={{ fontFamily: "var(--font-space-grotesk)" }}
                     >
                     {t(`about.features.${feature.key}.title`)}
@@ -244,8 +262,8 @@ export function AboutGSAP() {
         </div>
       </div>
 
-      {/* Scroll Progress Tracker */}
-      <div className="absolute bottom-6 md:bottom-10 left-6 md:left-16 right-6 md:right-16 h-12 flex items-center">
+      {/* Scroll Progress Tracker (Desktop Only) */}
+      <div className="hidden md:flex absolute bottom-10 left-16 right-16 h-12 items-center">
          <div ref={progressLineRef} className="w-full h-2 bg-muted rounded-full neo-border relative overflow-visible">
             <div 
                 ref={iconRef}

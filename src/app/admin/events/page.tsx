@@ -18,6 +18,7 @@ type Event = {
   type: "upcoming" | "ongoing" | "past";
   participants: number;
   link?: string;
+  announcement?: string;
   form_schema?: any[];
   is_closed?: boolean;
 };
@@ -41,6 +42,7 @@ export default function EventsAdminPage() {
   const [time, setTime] = useState("");
   const [category, setCategory] = useState("");
   const [link, setLink] = useState("");
+  const [announcement, setAnnouncement] = useState("");
   const [type, setType] = useState<"upcoming" | "ongoing" | "past">("upcoming");
   const [participants, setParticipants] = useState<number>(0);
   const [isClosed, setIsClosed] = useState(false);
@@ -70,6 +72,7 @@ export default function EventsAdminPage() {
     setTime(event.time);
     setCategory(event.category);
     setLink(event.link || "");
+    setAnnouncement(event.announcement || "");
     setType(event.type);
     setParticipants(event.participants || 0);
     setIsClosed(event.is_closed || false);
@@ -86,6 +89,7 @@ export default function EventsAdminPage() {
     setTime("");
     setCategory("");
     setLink("");
+    setAnnouncement("");
     setType("upcoming");
     setParticipants(0);
     setIsClosed(false);
@@ -114,7 +118,7 @@ export default function EventsAdminPage() {
     setIsSubmitting(true);
     const loadingToast = toast.loading(editingId ? "Updating event..." : "Creating event...");
     
-    const eventData = { title, description, date, time, category, type, link, participants, form_schema: formSchema, is_closed: isClosed };
+    const eventData = { title, description, date, time, category, type, link, announcement, participants, form_schema: formSchema, is_closed: isClosed };
     
     let error;
     if (editingId) {
@@ -217,6 +221,10 @@ export default function EventsAdminPage() {
             <div className="md:col-span-2">
               <label className="block text-sm font-bold mb-1">Description</label>
               <textarea required value={description} onChange={e => setDescription(e.target.value)} className="w-full neo-border rounded-lg px-3 py-2 bg-background h-24" />
+            </div>
+            <div className="md:col-span-2">
+              <label className="block text-sm font-bold mb-1 text-danger">Event Announcement (Optional)</label>
+              <textarea placeholder="e.g. Bracket is up! Check discord..." value={announcement} onChange={e => setAnnouncement(e.target.value)} className="w-full neo-border border-danger rounded-lg px-3 py-2 bg-danger/10 text-foreground h-20 placeholder:text-danger/50" />
             </div>
             <div className="md:col-span-2 flex items-center gap-3 p-4 bg-danger/10 neo-border rounded-xl">
               <input 

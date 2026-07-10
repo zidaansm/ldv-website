@@ -4,3 +4,4 @@ export { VisitorBadge } from "./visitor-badge";
 export { PresenceTracker } from "./presence-tracker";
 export { EventCard } from "./event-card";
 export { EventRegistrationModal } from "./event-registration-modal";
+export { ParticipantListModal } from "./participant-list-modal";

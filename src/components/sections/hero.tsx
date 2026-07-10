@@ -22,7 +22,7 @@ export function Hero() {
   useEffect(() => {
     const fetchDiscordStats = async () => {
       try {
-        const res = await fetch("https://discord.com/api/v9/invites/ladolcevita?with_counts=true");
+        const res = await fetch("/api/discord");
         if (res.ok) {
           const data = await res.json();
           if (data.approximate_member_count && data.approximate_presence_count) {
@@ -33,7 +33,7 @@ export function Hero() {
           }
         }
       } catch (error) {
-        console.error("Failed to fetch Discord stats", error);
+        console.warn("Failed to fetch Discord stats", error);
       }
     };
     

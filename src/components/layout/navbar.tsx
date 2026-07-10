@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, MessageCircle, Globe } from "lucide-react";
 import { NAV_LINKS, SITE_CONFIG } from "@/lib/constants";
@@ -16,7 +16,33 @@ export function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeHash, setActiveHash] = useState("");
   const pathname = usePathname();
+  const router = useRouter();
   const { language, setLanguage, t } = useTranslation();
+
+  const scrollToElement = (id: string) => {
+    const element = document.getElementById(id);
+    if (element) {
+      const doScroll = () => {
+        const el = document.getElementById(id);
+        if (el) {
+          // Calculate absolute Y position.
+          // By not subtracting the navbar height (offset 0), the top of the section
+          // will slide UNDER the sticky navbar. Since sections have thick padding,
+          // this perfectly hides the excess padding and brings the heading closer.
+          const y = el.getBoundingClientRect().top + window.scrollY;
+          window.scrollTo({ top: y, behavior: "smooth" });
+        }
+      };
+
+      doScroll();
+      
+      // Double check position after components have fetched their data and expanded
+      setTimeout(doScroll, 800);
+      
+      return true;
+    }
+    return false;
+  };
 
   useEffect(() => {
     // When pathname changes, reset or update activeHash
@@ -24,7 +50,27 @@ export function Navbar() {
       // Only care about hashes if we are on the homepage, 
       // or if the current URL actually has a hash
       if (pathname === "/") {
-        setActiveHash(window.location.hash);
+        const hash = window.location.hash;
+        setActiveHash(hash);
+        
+        // If we just navigated to the homepage from another page and there's a hash,
+        // we need to manually scroll to it because Next.js sometimes fails to do so.
+        if (hash) {
+          let attempts = 0;
+          const tryScroll = () => {
+            // In case of a malformed hash like #gallery#team, take the last one
+            const hashes = hash.split('#').filter(Boolean);
+            const id = hashes[hashes.length - 1];
+            
+            const success = scrollToElement(id);
+            if (!success && attempts < 10) {
+              attempts++;
+              setTimeout(tryScroll, 100);
+            }
+          };
+          // Start trying
+          setTimeout(tryScroll, 100);
+        }
       } else {
         setActiveHash(""); // Reset on other pages
       }
@@ -81,13 +127,11 @@ export function Navbar() {
     // Only intercept if it's a hash link and we are on the homepage
     if (href.startsWith("/#") && pathname === "/") {
       e.preventDefault();
+      e.stopPropagation();
       const id = href.split("#")[1];
-      const element = document.getElementById(id);
-      if (element) {
-        element.scrollIntoView({ behavior: "smooth" });
-        window.history.pushState(null, "", href);
-        setActiveHash(`#${id}`);
-      }
+      scrollToElement(id);
+      window.history.replaceState(null, "", href);
+      setActiveHash(`#${id}`);
     }
   };
 
@@ -126,7 +170,7 @@ export function Navbar() {
                 if (pathname === "/") {
                   e.preventDefault();
                   window.scrollTo({ top: 0, behavior: "smooth" });
-                  window.history.pushState(null, "", "/");
+                  router.push("/", { scroll: false });
                   setActiveHash("");
                 }
               }}

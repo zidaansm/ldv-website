@@ -9,9 +9,10 @@ interface EventCardProps {
   language: "en" | "id";
   t: (key: string) => string;
   onRegisterClick: (event: any) => void;
+  onCheckStatusClick: (event: any) => void;
 }
 
-export function EventCard({ event, type, language, t, onRegisterClick }: EventCardProps) {
+export function EventCard({ event, type, language, t, onRegisterClick, onCheckStatusClick }: EventCardProps) {
   const isUpcoming = type === "upcoming";
   const isOngoing = type === "ongoing";
   const isPast = type === "past";
@@ -91,30 +92,47 @@ export function EventCard({ event, type, language, t, onRegisterClick }: EventCa
       
       {/* Join Button (Upcoming Only) */}
       {isUpcoming && (
-        <button 
-          disabled={event.is_closed}
-          onClick={() => onRegisterClick(event)}
-          className={cn(
-            "block text-center w-full mt-6 neo-border neo-shadow-sm rounded-xl py-2.5 font-bold text-sm transition-colors",
-            event.is_closed 
-              ? "bg-muted text-muted-foreground cursor-not-allowed opacity-70"
-              : "bg-primary text-primary-foreground hover:bg-primary/90 neo-press"
-          )}
-        >
-          {event.is_closed ? (language === "id" ? "Pendaftaran Ditutup" : "Registration Closed") : "Register Now"}
-        </button>
+        <div className="flex flex-col gap-2 mt-6">
+          <button 
+            disabled={event.is_closed}
+            onClick={() => onRegisterClick(event)}
+            className={cn(
+              "block text-center w-full neo-border neo-shadow-sm rounded-xl py-2.5 font-bold text-sm transition-colors",
+              event.is_closed 
+                ? "bg-muted text-muted-foreground cursor-not-allowed opacity-70"
+                : "bg-primary text-primary-foreground hover:bg-primary/90 neo-press"
+            )}
+          >
+            {event.is_closed ? (language === "id" ? "Pendaftaran Ditutup" : "Registration Closed") : "Register Now"}
+          </button>
+          
+          <button 
+            onClick={() => onCheckStatusClick(event)}
+            className="block text-center w-full neo-border rounded-xl py-2 font-bold text-xs bg-background text-foreground hover:bg-muted transition-colors"
+          >
+            {language === "id" ? "Cek Status Peserta" : "Check Participant Status"}
+          </button>
+        </div>
       )}
 
       {/* Live Button (Ongoing Only) */}
       {isOngoing && (
-        <a 
-          href={event.link || "#"}
-          target="_blank"
-          rel="noreferrer"
-          className="block text-center w-full mt-6 neo-border neo-shadow-sm neo-press rounded-xl py-2.5 font-bold text-sm bg-danger text-danger-foreground hover:bg-danger/90 transition-colors"
-        >
-          {language === "id" ? "Gabung Live" : "Join Live"}
-        </a>
+        <div className="flex flex-col gap-2 mt-6">
+          <a 
+            href={event.link || "#"}
+            target="_blank"
+            rel="noreferrer"
+            className="block text-center w-full neo-border neo-shadow-sm neo-press rounded-xl py-2.5 font-bold text-sm bg-danger text-danger-foreground hover:bg-danger/90 transition-colors"
+          >
+            {language === "id" ? "Gabung Live" : "Join Live"}
+          </a>
+          <button 
+            onClick={() => onCheckStatusClick(event)}
+            className="block text-center w-full neo-border rounded-xl py-2 font-bold text-xs bg-background text-foreground hover:bg-muted transition-colors"
+          >
+            {language === "id" ? "Cek Status Peserta" : "Check Participant Status"}
+          </button>
+        </div>
       )}
     </motion.div>
   );

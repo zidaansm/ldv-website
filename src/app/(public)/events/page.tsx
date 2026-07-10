@@ -6,7 +6,7 @@ import { createClient } from "@supabase/supabase-js";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
 import { staggerContainer } from "@/lib/animations";
-import { EventCard, EventRegistrationModal, SectionHeading } from "@/components/shared";
+import { EventCard, EventRegistrationModal, SectionHeading, ParticipantListModal } from "@/components/shared";
 import { cn } from "@/lib/utils";
 import { Section } from "@/components/layout";
 import Link from "next/link";
@@ -25,6 +25,7 @@ export default function EventsGalleryPage() {
 
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
   const [formData, setFormData] = useState<Record<string, string>>({});
   const [fileData, setFileData] = useState<Record<string, File>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -63,6 +64,11 @@ export default function EventsGalleryPage() {
     setIsModalOpen(true);
   };
 
+  const handleCheckStatusClick = (event: any) => {
+    setSelectedEvent(event);
+    setIsStatusModalOpen(true);
+  };
+
   const handleFileChange = (fieldLabel: string, file: File | null) => {
     if (file) {
       setFileData((prev) => ({ ...prev, [fieldLabel]: file }));
@@ -97,14 +103,13 @@ export default function EventsGalleryPage() {
 
       const { error: insertError } = await supabase.from("event_registrations").insert([{
         event_id: selectedEvent.id,
-        email: formData.email,
         form_data: finalFormData,
         status: "pending"
       }]);
 
       if (insertError) {
         if (insertError.code === '23505') {
-          throw new Error("You have already registered for this event with this email.");
+          throw new Error("You have already registered for this event.");
         }
         throw insertError;
       }
@@ -114,7 +119,7 @@ export default function EventsGalleryPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           type: "registration_received",
-          email: formData.email,
+          username: formData["Discord Username"] || "A member",
           eventTitle: selectedEvent.title
         })
       });
@@ -124,7 +129,9 @@ export default function EventsGalleryPage() {
       setFormData({});
       setFileData({});
     } catch (error: any) {
-      console.error(error);
+      if (error.code !== '23505' && error.message !== "You have already registered for this event.") {
+        console.error("Registration error:", error);
+      }
       toast.error(error.message || "Failed to register.", { id: loadingToast });
     } finally {
       setIsSubmitting(false);
@@ -197,7 +204,7 @@ export default function EventsGalleryPage() {
                   viewport={{ once: true, margin: "-100px" }}
                 >
                   {ongoingEvents.map(event => (
-                    <EventCard key={event.id} event={event} type="ongoing" language={language} t={t} onRegisterClick={handleRegisterClick} />
+                    <EventCard key={event.id} event={event} type="ongoing" language={language} t={t} onRegisterClick={handleRegisterClick} onCheckStatusClick={handleCheckStatusClick} />
                   ))}
                 </motion.div>
               </div>
@@ -217,7 +224,7 @@ export default function EventsGalleryPage() {
                   viewport={{ once: true, margin: "-100px" }}
                 >
                   {upcomingEvents.map(event => (
-                    <EventCard key={event.id} event={event} type="upcoming" language={language} t={t} onRegisterClick={handleRegisterClick} />
+                    <EventCard key={event.id} event={event} type="upcoming" language={language} t={t} onRegisterClick={handleRegisterClick} onCheckStatusClick={handleCheckStatusClick} />
                   ))}
                 </motion.div>
               </div>
@@ -237,7 +244,7 @@ export default function EventsGalleryPage() {
                   viewport={{ once: true, margin: "-100px" }}
                 >
                   {pastEvents.map(event => (
-                    <EventCard key={event.id} event={event} type="past" language={language} t={t} onRegisterClick={handleRegisterClick} />
+                    <EventCard key={event.id} event={event} type="past" language={language} t={t} onRegisterClick={handleRegisterClick} onCheckStatusClick={handleCheckStatusClick} />
                   ))}
                 </motion.div>
               </div>
@@ -265,6 +272,13 @@ export default function EventsGalleryPage() {
         handleFileChange={handleFileChange}
         onSubmit={handleRegister}
         isSubmitting={isSubmitting}
+      />
+
+      <ParticipantListModal 
+        isOpen={isStatusModalOpen}
+        onClose={() => setIsStatusModalOpen(false)}
+        selectedEvent={selectedEvent}
+        language={language}
       />
     </main>
   );
