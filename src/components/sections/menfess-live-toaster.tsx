@@ -1,11 +1,54 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import toast from "react-hot-toast";
 import { createBrowserClient } from '@supabase/ssr';
 import { Mail, MessageCircle, Heart } from "lucide-react";
+import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { playDing } from "@/lib/sounds";
+
+const ToastItem = ({ t, icon: Icon, iconBg, titleNode, content, onClick }: any) => {
+  const [exitX, setExitX] = useState<number | "default">("default");
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: 32 }}
+      animate={{ 
+        opacity: t.visible ? 1 : 0, 
+        x: t.visible ? 0 : (exitX === "default" ? 32 : exitX) 
+      }}
+      transition={
+        exitX === "default" 
+          ? { duration: 0.3, type: "spring", bounce: 0.2 } 
+          : { type: "tween", duration: 0.2 }
+      }
+      drag="x"
+      dragConstraints={{ left: 0, right: 0 }}
+      dragElastic={0.7}
+      onDragEnd={(e, info) => {
+        if (Math.abs(info.offset.x) > 50) {
+          setExitX(info.offset.x > 0 ? window.innerWidth : -window.innerWidth);
+          toast.dismiss(t.id);
+        }
+      }}
+      className={`max-w-sm w-full bg-[var(--background)] border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] rounded-xl pointer-events-auto flex items-center p-3 gap-3 cursor-pointer`}
+      onClick={onClick}
+    >
+      <div className={`w-10 h-10 shrink-0 rounded-full border-2 border-black flex items-center justify-center`} style={{ backgroundColor: iconBg }}>
+         <Icon className="w-5 h-5 text-black" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-bold text-[var(--foreground)] truncate">
+          {titleNode}
+        </p>
+        <p className="text-sm font-semibold text-[var(--foreground)] mt-0.5 line-clamp-2">
+          "{content}"
+        </p>
+      </div>
+    </motion.div>
+  );
+};
 
 export function MenfessLiveToaster() {
   const toastedIds = useRef<Set<string>>(new Set());
@@ -38,28 +81,22 @@ export function MenfessLiveToaster() {
         playDing(); // Notification sound
 
         toast.custom((t) => (
-          <div
-            className={`max-w-sm w-full bg-[var(--background)] border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] rounded-xl pointer-events-auto flex items-center p-3 gap-3 cursor-pointer transition-all duration-300 ${
-              t.visible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'
-            }`}
+          <ToastItem
+            t={t}
+            icon={Mail}
+            iconBg={`var(--${newMenfess.avatar_color})`}
+            titleNode={
+              <>
+                <span className="text-[var(--primary)]">{newMenfess.sender_name}</span>
+                <span className="text-xs text-[var(--muted-foreground)] ml-1 font-normal">dropped a menfess 💌</span>
+              </>
+            }
+            content={newMenfess.content}
             onClick={() => {
               toast.dismiss(t.id);
               router.push(`/menfess?post=${newMenfess.id}`);
             }}
-          >
-            <div className={`w-10 h-10 shrink-0 rounded-full border-2 border-black flex items-center justify-center`} style={{ backgroundColor: `var(--${newMenfess.avatar_color})` }}>
-               <Mail className="w-5 h-5 text-black" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-[var(--foreground)] truncate">
-                <span className="text-[var(--primary)]">{newMenfess.sender_name}</span>
-                <span className="text-xs text-[var(--muted-foreground)] ml-1 font-normal">dropped a menfess 💌</span>
-              </p>
-              <p className="text-sm font-semibold text-[var(--foreground)] mt-0.5 line-clamp-2">
-                "{newMenfess.content}"
-              </p>
-            </div>
-          </div>
+          />
         ), { duration: 5000, id: newMenfess.id });
       })
       .subscribe();
@@ -91,28 +128,22 @@ export function MenfessLiveToaster() {
         playDing(); // Notification sound
 
         toast.custom((t) => (
-          <div
-            className={`max-w-sm w-full bg-[var(--background)] border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] rounded-xl pointer-events-auto flex items-center p-3 gap-3 cursor-pointer transition-all duration-300 ${
-              t.visible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'
-            }`}
+          <ToastItem
+            t={t}
+            icon={MessageCircle}
+            iconBg={`var(--${newComment.avatar_color})`}
+            titleNode={
+              <>
+                <span className="text-[var(--primary)]">{newComment.sender_name}</span>
+                <span className="text-xs text-[var(--muted-foreground)] ml-1 font-normal">replied to {repliedTo} 💬</span>
+              </>
+            }
+            content={newComment.content}
             onClick={() => {
               toast.dismiss(t.id);
               router.push(`/menfess?post=${newComment.menfess_id}`);
             }}
-          >
-            <div className={`w-10 h-10 shrink-0 rounded-full border-2 border-black flex items-center justify-center`} style={{ backgroundColor: `var(--${newComment.avatar_color})` }}>
-               <MessageCircle className="w-5 h-5 text-black" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-[var(--foreground)] truncate">
-                <span className="text-[var(--primary)]">{newComment.sender_name}</span>
-                <span className="text-xs text-[var(--muted-foreground)] ml-1 font-normal">replied to {repliedTo} 💬</span>
-              </p>
-              <p className="text-sm font-semibold text-[var(--foreground)] mt-0.5 line-clamp-2">
-                "{newComment.content}"
-              </p>
-            </div>
-          </div>
+          />
         ), { duration: 5000, id: newComment.id });
       })
       .subscribe();
@@ -144,28 +175,22 @@ export function MenfessLiveToaster() {
         playDing(); // Notification sound
 
         toast.custom((t) => (
-          <div
-            className={`max-w-sm w-full bg-[var(--background)] border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] rounded-xl pointer-events-auto flex items-center p-3 gap-3 cursor-pointer transition-all duration-300 ${
-              t.visible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'
-            }`}
+          <ToastItem
+            t={t}
+            icon={Heart}
+            iconBg={`var(--${originalMenfess.avatar_color})`}
+            titleNode={
+              <>
+                <span className="text-[var(--danger)]">Someone</span>
+                <span className="text-xs text-[var(--muted-foreground)] ml-1 font-normal">liked a menfess ❤️</span>
+              </>
+            }
+            content={originalMenfess.content}
             onClick={() => {
               toast.dismiss(t.id);
               router.push(`/menfess?post=${newLike.menfess_id}`);
             }}
-          >
-            <div className={`w-10 h-10 shrink-0 rounded-full border-2 border-black flex items-center justify-center`} style={{ backgroundColor: `var(--${originalMenfess.avatar_color})` }}>
-               <Heart className="w-5 h-5 text-black" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-[var(--foreground)] truncate">
-                <span className="text-[var(--danger)]">Someone</span>
-                <span className="text-xs text-[var(--muted-foreground)] ml-1 font-normal">liked a menfess ❤️</span>
-              </p>
-              <p className="text-sm font-semibold text-[var(--foreground)] mt-0.5 line-clamp-2">
-                "{originalMenfess.content}"
-              </p>
-            </div>
-          </div>
+          />
         ), { duration: 5000, id: newLike.id });
       })
       .subscribe();
