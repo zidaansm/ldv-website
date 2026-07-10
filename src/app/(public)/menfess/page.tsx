@@ -79,6 +79,7 @@ function MenfessContent() {
       .from("menfess")
       .select("*, menfess_comments(id), menfess_likes(id)")
       .order("created_at", { ascending: false });
+      
     if (error) {
       console.error("Supabase Error Menfess:", error);
       if (error.message.includes("JWT") || error.code === "PGRST301") {
@@ -113,10 +114,12 @@ function MenfessContent() {
     }
     setLikedPosts(likes);
 
+    // Cleanup realtime subscription
     return () => {
       supabase.removeChannel(channel);
     };
   }, []);
+
 
   const fetchComments = async (menfessId: string) => {
     setIsLoadingComments(true);
@@ -282,8 +285,8 @@ function MenfessContent() {
   };
 
   return (
-    <div className="pt-32 pb-24 min-h-screen bg-[var(--background)]">
-      <Container>
+    <div className="pt-32 pb-24 min-h-screen bg-[var(--background)] relative">
+      <Container className="relative z-10">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <SectionHeading
             title="Secret Board"
@@ -317,17 +320,19 @@ function MenfessContent() {
           </div>
         ) : (
           <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
-            {posts.map((post) => (
+            {posts.map((post, i) => (
               <motion.div
                 key={post.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                whileHover={{ y: -4 }}
                 onClick={() => {
                   playClick();
                   setActivePost(post);
                 }}
-                className="break-inside-avoid cursor-pointer bg-card neo-border neo-shadow-sm rounded-2xl p-6 flex flex-col gap-4 relative overflow-hidden group transition-all"
+                className="break-inside-avoid cursor-pointer bg-card neo-border neo-shadow-sm rounded-2xl p-6 flex flex-col gap-4 relative overflow-hidden group hover:scale-[1.02] transition-transform"
+                style={{
+                  animation: `float 6s ease-in-out ${i * 1.5}s infinite`
+                }}
               >
                 <div className="flex items-center gap-3">
                   <div

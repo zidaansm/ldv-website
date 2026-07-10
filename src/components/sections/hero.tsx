@@ -43,7 +43,9 @@ export function Hero() {
   return (
     <section className="relative min-h-screen flex items-center pt-20 overflow-hidden geo-grid">
       {/* Animated Background Shapes */}
-      <GeoShapes />
+      <div className="hidden md:block">
+        <GeoShapes />
+      </div>
 
       {/* Floating 3D Retro TV (Right) */}
       <div className="absolute right-0 lg:right-10 top-1/2 -translate-y-1/2 w-1/3 hidden lg:block z-20 transition-opacity" style={{ pointerEvents: "none" }}>
@@ -148,8 +150,8 @@ export function Hero() {
           </motion.div>
 
           {/* Quick Stats Banner */}
-          <motion.div variants={fadeInUp} className="pt-12 flex justify-center">
-             <div className="inline-flex flex-wrap items-center justify-center gap-6 md:gap-12 neo-border neo-shadow-sm rounded-2xl px-8 py-6 bg-card">
+          <motion.div variants={fadeInUp} className="pt-12 flex justify-center w-full px-2 sm:px-0">
+             <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 md:gap-12 neo-border neo-shadow-sm rounded-2xl p-4 sm:px-8 sm:py-6 bg-card w-full lg:w-auto">
                <div className="flex flex-col items-center">
                  <div className="flex items-center gap-2">
                    <Users className="w-5 h-5 text-brand-purple" />
