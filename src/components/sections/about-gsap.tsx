@@ -214,7 +214,7 @@ export function AboutGSAP() {
 
       {/* Container - Stacked vertically on mobile, horizontal scroll on desktop */}
       <div ref={scrollContainerRef} className="flex flex-col md:flex-row h-full md:items-center px-6 md:pl-16 md:pr-[15vw] w-full md:w-max">
-        <div className="flex flex-col md:flex-row gap-6 md:gap-16 md:mt-20 flex-nowrap w-full">
+        <div className="flex flex-col md:flex-row gap-6 md:gap-16 md:mt-12 md:mb-8 flex-nowrap w-full">
           {featureData.map((feature, idx) => {
             const Icon = feature.icon;
 
@@ -263,7 +263,7 @@ export function AboutGSAP() {
       </div>
 
       {/* Scroll Progress Tracker (Desktop Only) */}
-      <div className="hidden md:flex absolute bottom-10 left-16 right-16 h-12 items-center">
+      <div className="hidden md:flex absolute bottom-8 left-16 right-16 h-12 items-center">
          <div ref={progressLineRef} className="w-full h-2 bg-muted rounded-full neo-border relative overflow-visible">
             <div 
                 ref={iconRef}

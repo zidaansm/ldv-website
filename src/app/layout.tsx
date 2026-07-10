@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Space_Grotesk } from "next/font/google";
 import { LanguageProvider } from "@/lib/i18n/LanguageContext";
-import { CustomCursor } from "@/components/ui/custom-cursor";
 import { ChatWidget } from "@/components/shared/chat-widget";
 import "./globals.css";
 import { ToastProvider } from "@/components/providers/ToastProvider";
@@ -79,7 +78,6 @@ export default function RootLayout({
         style={{ fontFamily: "var(--font-space-grotesk)" }}
         suppressHydrationWarning
       >
-        <CustomCursor />
         <MotionProvider>
           <LanguageProvider>
             <ToastProvider />
