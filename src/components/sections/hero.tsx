@@ -74,7 +74,7 @@ export function Hero() {
             <h1
               className="font-extrabold tracking-tighter leading-[1.1]"
               style={{
-                fontSize: "var(--text-heading-xl)",
+                fontSize: "clamp(2rem, 10vw, 6rem)",
                 fontFamily: "var(--font-space-grotesk)",
               }}
             >
