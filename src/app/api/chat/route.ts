@@ -66,7 +66,7 @@ export async function POST(req: Request) {
         supabase.from("members").select("name, bio"),
         supabase.from("staff").select("name, role"),
         supabase.from("banlist").select("name, reason, is_permanent, unban_date"),
-        supabase.from("menfess").select("content, sender_name, is_anonymous").order("created_at", { ascending: false }).limit(10)
+        supabase.from("menfess").select("content, sender_name, is_anonymous").eq("is_approved", true).order("created_at", { ascending: false }).limit(10)
       ]);
 
       contextText += "FAQ:\n" + (faq && faq.length > 0 ? faq.map((f: any) => `Q: ${f.question}\nA: ${f.answer}`).join("\n\n") : "No FAQ available.") + "\n\n";

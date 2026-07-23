@@ -78,6 +78,7 @@ function MenfessContent() {
     const { data, error } = await supabase
       .from("menfess")
       .select("*, menfess_comments(id), menfess_likes(id)")
+      .eq("is_approved", true)
       .order("created_at", { ascending: false });
       
     if (error) {
@@ -98,7 +99,7 @@ function MenfessContent() {
     // Subscribe to realtime changes
     const channel = supabase
       .channel("public:menfess")
-      .on("postgres_changes", { event: "*", schema: "public", table: "menfess" }, fetchPosts)
+      .on("postgres_changes", { event: "*", schema: "public", table: "menfess", filter: "is_approved=eq.true" }, fetchPosts)
       .on("postgres_changes", { event: "*", schema: "public", table: "menfess_comments" }, fetchPosts)
       .on("postgres_changes", { event: "*", schema: "public", table: "menfess_likes" }, fetchPosts)
       .subscribe();
@@ -185,7 +186,7 @@ function MenfessContent() {
       toast.error("Failed to post menfess.", { id: loadingToast });
     } else {
       playClick();
-      toast.success("Menfess posted!", { id: loadingToast });
+      toast.success("Menfess submitted! Awaiting admin approval.", { id: loadingToast });
       setIsFormOpen(false);
       setContent("");
       setSenderName("");

@@ -11,7 +11,7 @@ export const SITE_CONFIG = {
     "A Discord community for socializing, gaming, and late-night grinds. Enjoy plenty of premium bots for free here. Come join us!",
   url: "https://ldv.gg",
   ogImage: "/og/og-default.png",
-  discordInvite: "https://discord.gg/ladolcevita",
+  discordInvite: "https://discord.gg/y4b33EGaM",
   githubUrl: "https://github.com/ldv-community",
 } as const;
 
@@ -36,17 +36,17 @@ export const NAV_LINKS: NavLink[] = [
 export const SOCIAL_LINKS: SocialLink[] = [
   {
     name: "Discord",
-    href: "https://discord.gg/ladolcevita",
+    href: "https://discord.gg/y4b33EGaM",
     icon: "MessageCircle",
   },
   {
     name: "Twitter",
-    href: "https://twitter.com/ldvcommunity",
+    href: "https://twitter.com/ldvarch",
     icon: "Hash",
   },
   {
     name: "YouTube",
-    href: "https://youtube.com/@ldvcommunity",
+    href: "https://youtube.com/@ldvarch",
     icon: "PlaySquare",
   },
 ];

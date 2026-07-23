@@ -45,6 +45,7 @@ export function MenfessPreview() {
         supabase
           .from("menfess")
           .select("*, menfess_comments(id), menfess_likes(id)")
+          .eq("is_approved", true)
           .order("created_at", { ascending: false })
           .limit(50),
         supabase
