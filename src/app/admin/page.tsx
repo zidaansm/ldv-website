@@ -5,8 +5,9 @@ import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { LogOut, LayoutDashboard, Users, Calendar, MessageSquare, ShieldAlert, Image as ImageIcon, Activity, PlusCircle, ArrowRight, Eye, RefreshCw, Key, X } from "lucide-react";
 import Link from "next/link";
-import { formatDistanceToNow } from "date-fns";
+import { formatDistanceToNow, format } from "date-fns";
 import toast from "react-hot-toast";
+import { CheckSquare, Clock } from "lucide-react";
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -17,6 +18,7 @@ export default function AdminDashboard() {
   const [adminLogs, setAdminLogs] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [currentUserRole, setCurrentUserRole] = useState<string>("");
+  const [myTasks, setMyTasks] = useState<any[]>([]);
 
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [oldPassword, setOldPassword] = useState("");
@@ -56,6 +58,18 @@ export default function AdminDashboard() {
         const { data: roleData } = await supabase.from('user_roles').select('role').eq('id', session.user.id).single();
         if (roleData) {
           setCurrentUserRole(roleData.role);
+        }
+
+        // Fetch user tasks
+        try {
+          const res = await fetch("/api/admin/tasks");
+          if (res.ok) {
+            const taskData = await res.json();
+            const pending = (taskData.tasks || []).filter((t: any) => t.assignee_id === session.user.id && t.status !== 'done');
+            setMyTasks(pending.slice(0, 5));
+          }
+        } catch (e) {
+          console.error("Failed to fetch tasks for dashboard");
         }
       }
 
@@ -347,6 +361,51 @@ export default function AdminDashboard() {
                 <p className="text-sm font-medium text-muted-foreground mt-2">
                   People are currently viewing the website right now.
                 </p>
+              </div>
+            </div>
+
+            {/* My Pending Tasks Widget */}
+            <div className="border border-border/50 shadow-sm rounded-2xl p-6 bg-card/50 backdrop-blur-md">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold flex items-center gap-2">
+                  <CheckSquare className="w-5 h-5 text-warning" />
+                  My Pending Tasks
+                </h2>
+                <Link href="/admin/tasks" className="text-xs font-bold text-primary hover:underline">View All</Link>
+              </div>
+              
+              <div className="space-y-3">
+                {isLoading ? (
+                  <div className="text-sm text-muted-foreground animate-pulse">Loading tasks...</div>
+                ) : myTasks.length === 0 ? (
+                  <div className="text-sm text-muted-foreground bg-background p-4 rounded-xl border border-border/50 text-center">
+                    🎉 You have no pending tasks!
+                  </div>
+                ) : (
+                  myTasks.map(task => {
+                    const isOverdue = task.due_date && new Date(task.due_date) < new Date();
+                    return (
+                      <div key={task.id} className="p-3 rounded-xl bg-background border border-border/50 shadow-sm hover:shadow-md transition-all group">
+                        <div className="flex items-start justify-between gap-2 mb-1">
+                          <h3 className="font-semibold text-sm text-foreground line-clamp-1">{task.title}</h3>
+                          <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border whitespace-nowrap ${
+                            task.priority === 'high' ? 'bg-danger/20 text-danger border-danger/30' : 
+                            task.priority === 'low' ? 'bg-success/20 text-success border-success/30' : 
+                            'bg-warning/20 text-warning border-warning/30'
+                          }`}>
+                            {task.priority || 'medium'}
+                          </span>
+                        </div>
+                        {task.due_date && (
+                          <div className={`flex items-center gap-1 mt-2 text-[10px] font-semibold ${isOverdue ? 'text-danger' : 'text-muted-foreground'}`}>
+                            <Clock className="w-3 h-3" />
+                            {format(new Date(task.due_date), 'MMM d, yyyy')}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })
+                )}
               </div>
             </div>
 

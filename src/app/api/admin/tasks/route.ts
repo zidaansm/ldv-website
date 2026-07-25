@@ -116,6 +116,21 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: "Task ID is required" }, { status: 400 });
     }
 
+    // Security check
+    const { data: existingTask, error: fetchError } = await supabaseAdmin
+      .from("admin_tasks")
+      .select("creator_id, assignee_id")
+      .eq("id", id)
+      .single();
+
+    if (fetchError || !existingTask) {
+      return NextResponse.json({ error: "Task not found" }, { status: 404 });
+    }
+
+    if (auth.role !== 'super_admin' && auth.userId !== existingTask.creator_id && auth.userId !== existingTask.assignee_id) {
+      return NextResponse.json({ error: "You do not have permission to modify this task." }, { status: 403 });
+    }
+
     // Only update provided fields
     const updates: any = { updated_at: new Date().toISOString() };
     if (title !== undefined) updates.title = title;
@@ -152,6 +167,21 @@ export async function DELETE(request: Request) {
 
     if (!id) {
       return NextResponse.json({ error: "Task ID is required" }, { status: 400 });
+    }
+
+    // Security check
+    const { data: existingTask, error: fetchError } = await supabaseAdmin
+      .from("admin_tasks")
+      .select("creator_id, assignee_id")
+      .eq("id", id)
+      .single();
+
+    if (fetchError || !existingTask) {
+      return NextResponse.json({ error: "Task not found" }, { status: 404 });
+    }
+
+    if (auth.role !== 'super_admin' && auth.userId !== existingTask.creator_id && auth.userId !== existingTask.assignee_id) {
+      return NextResponse.json({ error: "You do not have permission to modify this task." }, { status: 403 });
     }
 
     const { error } = await supabaseAdmin
