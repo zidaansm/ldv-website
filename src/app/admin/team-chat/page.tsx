@@ -10,6 +10,8 @@ interface ChatMessage {
   id: string;
   user_id: string;
   user_email: string;
+  user_name?: string;
+  user_avatar?: string;
   user_role: string;
   content: string;
   created_at: string;
@@ -146,11 +148,15 @@ export default function TeamChatPage() {
                 <div key={msg.id} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'} ${showAvatar ? 'mt-6' : 'mt-1'}`}>
                   {showAvatar && (
                     <div className={`flex items-center gap-2 mb-1 ${isMe ? 'flex-row-reverse' : 'flex-row'}`}>
-                      <div className="w-6 h-6 rounded-full bg-primary/20 text-primary flex items-center justify-center text-[10px] font-bold">
-                        {msg.user_email.charAt(0).toUpperCase()}
-                      </div>
+                      {msg.user_avatar ? (
+                        <img src={msg.user_avatar} alt="Avatar" className="w-7 h-7 rounded-full object-cover shadow-sm border border-border/50" />
+                      ) : (
+                        <div className="w-7 h-7 rounded-full bg-primary/20 text-primary flex items-center justify-center text-[10px] font-bold border border-border/50">
+                          {(msg.user_name || msg.user_email).charAt(0).toUpperCase()}
+                        </div>
+                      )}
                       <span className="text-xs font-semibold text-muted-foreground">
-                        {msg.user_email.split('@')[0]}
+                        {msg.user_name ? msg.user_name : msg.user_email.split('@')[0]}
                       </span>
                       <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded uppercase ${getRoleColor(msg.user_role)}`}>
                         {msg.user_role.replace('_', ' ')}

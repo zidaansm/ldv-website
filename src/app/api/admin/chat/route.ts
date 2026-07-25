@@ -45,6 +45,8 @@ export async function GET(request: Request) {
     if (!usersError && usersData?.users) {
       const userMap = new Map();
       const roleMap = new Map();
+      const nameMap = new Map();
+      const avatarMap = new Map();
       
       // Let's also fetch user roles to display in chat
       const { data: rolesData } = await supabaseAdmin.from("user_roles").select("*");
@@ -56,11 +58,17 @@ export async function GET(request: Request) {
         if (u.email) {
           userMap.set(u.id, u.email);
         }
+        if (u.user_metadata) {
+          nameMap.set(u.id, u.user_metadata.full_name);
+          avatarMap.set(u.id, u.user_metadata.avatar_url);
+        }
       });
       
       messagesWithEmails = messages.map(msg => ({
         ...msg,
         user_email: msg.user_id ? userMap.get(msg.user_id) : "Unknown User",
+        user_name: msg.user_id ? nameMap.get(msg.user_id) : undefined,
+        user_avatar: msg.user_id ? avatarMap.get(msg.user_id) : undefined,
         user_role: msg.user_id ? roleMap.get(msg.user_id) : "unknown",
       }));
     }
@@ -97,9 +105,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
     
+    const userRes = await supabaseAdmin.auth.admin.getUserById(auth.userId);
+    const user = userRes.data?.user;
+    
     const messageData = {
       ...data,
       user_email: auth.email,
+      user_name: user?.user_metadata?.full_name,
+      user_avatar: user?.user_metadata?.avatar_url,
       user_role: auth.role
     };
 

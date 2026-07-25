@@ -22,6 +22,8 @@ interface Task {
 interface TaskComment {
   id: string;
   user_email: string;
+  user_name?: string;
+  user_avatar?: string;
   content: string;
   created_at: string;
 }
@@ -479,10 +481,14 @@ export default function TasksPage() {
                     comments.map(c => (
                       <div key={c.id} className="bg-background border border-border/50 rounded-xl p-3 shadow-sm">
                         <div className="flex items-center gap-2 mb-1.5">
-                          <div className="w-5 h-5 rounded-full bg-primary/20 text-primary flex items-center justify-center text-[9px] font-bold">
-                            {c.user_email.charAt(0).toUpperCase()}
-                          </div>
-                          <span className="text-xs font-bold">{c.user_email.split('@')[0]}</span>
+                          {c.user_avatar ? (
+                            <img src={c.user_avatar} alt="Avatar" className="w-6 h-6 rounded-full object-cover shadow-sm border border-border/50" />
+                          ) : (
+                            <div className="w-6 h-6 rounded-full bg-primary/20 text-primary flex items-center justify-center text-[9px] font-bold border border-border/50">
+                              {(c.user_name || c.user_email).charAt(0).toUpperCase()}
+                            </div>
+                          )}
+                          <span className="text-xs font-bold">{c.user_name ? c.user_name : c.user_email.split('@')[0]}</span>
                           <span className="text-[10px] text-muted-foreground ml-auto">{format(new Date(c.created_at), "MMM d, HH:mm")}</span>
                         </div>
                         <p className="text-sm">{c.content}</p>

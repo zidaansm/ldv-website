@@ -53,15 +53,24 @@ export async function GET(request: Request) {
     
     if (!usersError && usersData?.users) {
       const userMap = new Map();
+      const nameMap = new Map();
+      const avatarMap = new Map();
+
       usersData.users.forEach(u => {
         if (u.email) {
           userMap.set(u.id, u.email);
         }
+        if (u.user_metadata) {
+          nameMap.set(u.id, u.user_metadata.full_name);
+          avatarMap.set(u.id, u.user_metadata.avatar_url);
+        }
       });
       
-      commentsWithEmails = comments.map(comment => ({
-        ...comment,
-        user_email: comment.user_id ? userMap.get(comment.user_id) : "Unknown User",
+      commentsWithEmails = comments.map(c => ({
+        ...c,
+        user_email: c.user_id ? userMap.get(c.user_id) : "Unknown User",
+        user_name: c.user_id ? nameMap.get(c.user_id) : undefined,
+        user_avatar: c.user_id ? avatarMap.get(c.user_id) : undefined,
       }));
     }
 
@@ -97,10 +106,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
     
-    // Attach current user email manually for immediate UI response
+    const userRes = await supabaseAdmin.auth.admin.getUserById(auth.userId);
+    const user = userRes.data?.user;
+
     const commentData = {
       ...data,
-      user_email: auth.email
+      user_email: auth.email,
+      user_name: user?.user_metadata?.full_name,
+      user_avatar: user?.user_metadata?.avatar_url
     };
 
     return NextResponse.json({ success: true, comment: commentData });
