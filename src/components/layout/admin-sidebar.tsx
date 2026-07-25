@@ -65,10 +65,16 @@ export function AdminSidebar({ className, onNavigate }: { className?: string; on
   
   let allowedModules = allPossibleModules;
   if (allowedPaths) {
-    allowedModules = allPossibleModules.filter(m => allowedPaths.includes(m.path));
+    // Automatically allow dashboard, team chat, and tasks for everyone
+    const alwaysAllowed = ["/admin", "/admin/team-chat", "/admin/tasks"];
+    allowedModules = allPossibleModules.filter(m => allowedPaths.includes(m.path) || alwaysAllowed.includes(m.path));
   } else {
     // Fallback before permissions load
-    allowedModules = [{ name: "Dashboard", icon: LayoutDashboard, path: "/admin" }];
+    allowedModules = [
+      { name: "Dashboard", icon: LayoutDashboard, path: "/admin" },
+      { name: "Team Chat", icon: MessageCircle, path: "/admin/team-chat" },
+      { name: "Tasks", icon: CheckSquare, path: "/admin/tasks" }
+    ];
   }
 
   if (pathname === "/admin/login") return null;
