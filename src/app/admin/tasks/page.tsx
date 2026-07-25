@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
-import { Plus, CheckSquare, Edit2, Trash2, Calendar, Clock, User } from "lucide-react";
+import { Plus, CheckSquare, Edit2, Trash2, Calendar, Clock, User, Send, MessageSquare } from "lucide-react";
 import { format } from "date-fns";
 
 interface Task {
@@ -16,6 +16,13 @@ interface Task {
   assignee_email: string | null;
   creator_id: string;
   creator_email: string | null;
+  created_at: string;
+}
+
+interface TaskComment {
+  id: string;
+  user_email: string;
+  content: string;
   created_at: string;
 }
 
@@ -36,6 +43,12 @@ export default function TasksPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   
+  // Comments state
+  const [comments, setComments] = useState<TaskComment[]>([]);
+  const [newComment, setNewComment] = useState("");
+  const [isSendingComment, setIsSendingComment] = useState(false);
+  const [isLoadingComments, setIsLoadingComments] = useState(false);
+
   // Form states
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -86,6 +99,48 @@ export default function TasksPage() {
     setPriority(task.priority || "medium");
     setDueDate(task.due_date ? task.due_date.substring(0, 10) : "");
     setIsModalOpen(true);
+    fetchComments(task.id);
+  };
+
+  const fetchComments = async (taskId: string) => {
+    setIsLoadingComments(true);
+    setComments([]);
+    try {
+      const res = await fetch(`/api/admin/tasks/comments?taskId=${taskId}`);
+      if (res.ok) {
+        const data = await res.json();
+        setComments(data.comments || []);
+      }
+    } catch (e) {
+      toast.error("Failed to load comments");
+    } finally {
+      setIsLoadingComments(false);
+    }
+  };
+
+  const handlePostComment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newComment.trim() || !editingTask) return;
+    
+    setIsSendingComment(true);
+    try {
+      const res = await fetch("/api/admin/tasks/comments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ task_id: editingTask.id, content: newComment }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setComments(prev => [...prev, data.comment]);
+        setNewComment("");
+      } else {
+        toast.error("Failed to post comment");
+      }
+    } catch (e) {
+      toast.error("An error occurred");
+    } finally {
+      setIsSendingComment(false);
+    }
   };
 
   const closeModal = () => {
@@ -338,68 +393,124 @@ export default function TasksPage() {
       {/* ADD/EDIT MODAL */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-card border border-border/50 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200">
-            <div className="p-6 border-b border-border/50 bg-muted/20">
-              <h2 className="text-xl font-bold">{editingTask ? "Edit Task" : "Create New Task"}</h2>
-            </div>
+          <div className={`bg-card border border-border/50 rounded-2xl shadow-2xl w-full overflow-hidden flex flex-col md:flex-row max-h-[90vh] ${editingTask ? 'max-w-5xl' : 'max-w-lg'} animate-in zoom-in-95 duration-200`}>
             
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
-              <div>
-                <label className="block text-sm font-semibold mb-1">Title</label>
-                <input required type="text" value={title} onChange={e => setTitle(e.target.value)} className="w-full border border-border/50 rounded-lg px-3 py-2 bg-background focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="E.g. Review ban appeals" />
+            {/* Form Section */}
+            <div className={`flex flex-col ${editingTask ? 'md:w-1/2 border-b md:border-b-0 md:border-r border-border/50' : 'w-full'}`}>
+              <div className="p-6 border-b border-border/50 bg-muted/20">
+                <h2 className="text-xl font-bold">{editingTask ? "Edit Task" : "Create New Task"}</h2>
               </div>
               
-              <div>
-                <label className="block text-sm font-semibold mb-1">Description</label>
-                <textarea rows={3} value={description} onChange={e => setDescription(e.target.value)} className="w-full border border-border/50 rounded-lg px-3 py-2 bg-background focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="Optional details..." />
-              </div>
+              <div className="p-6 overflow-y-auto custom-scrollbar flex-1">
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-semibold mb-1">Title</label>
+                    <input required type="text" value={title} onChange={e => setTitle(e.target.value)} className="w-full border border-border/50 rounded-lg px-3 py-2 bg-background focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="E.g. Review ban appeals" />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-semibold mb-1">Description</label>
+                    <textarea rows={3} value={description} onChange={e => setDescription(e.target.value)} className="w-full border border-border/50 rounded-lg px-3 py-2 bg-background focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="Optional details..." />
+                  </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-semibold mb-1">Assignee</label>
-                  <select value={assigneeId} onChange={e => setAssigneeId(e.target.value)} className="w-full border border-border/50 rounded-lg px-3 py-2 bg-background focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all appearance-none">
-                    <option value="">-- Unassigned --</option>
-                    {users.map(u => (
-                      <option key={u.id} value={u.id}>{u.email}</option>
-                    ))}
-                  </select>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-semibold mb-1">Assignee</label>
+                      <select value={assigneeId} onChange={e => setAssigneeId(e.target.value)} className="w-full border border-border/50 rounded-lg px-3 py-2 bg-background focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all appearance-none">
+                        <option value="">-- Unassigned --</option>
+                        {users.map(u => (
+                          <option key={u.id} value={u.id}>{u.email}</option>
+                        ))}
+                      </select>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-semibold mb-1">Status</label>
+                      <select value={status} onChange={e => setStatus(e.target.value)} className="w-full border border-border/50 rounded-lg px-3 py-2 bg-background focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all appearance-none">
+                        <option value="todo">To Do</option>
+                        <option value="in_progress">In Progress</option>
+                        <option value="done">Done</option>
+                      </select>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-semibold mb-1">Priority</label>
+                      <select value={priority} onChange={e => setPriority(e.target.value)} className="w-full border border-border/50 rounded-lg px-3 py-2 bg-background focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all appearance-none">
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                      </select>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-semibold mb-1">Due Date (Optional)</label>
+                      <input type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} className="w-full border border-border/50 rounded-lg px-3 py-2 bg-background focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" />
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end pt-4 gap-3">
+                    <button type="button" onClick={closeModal} className="px-5 py-2 font-semibold text-muted-foreground hover:bg-muted rounded-xl transition-colors">
+                      Cancel
+                    </button>
+                    <button type="submit" disabled={isSubmitting} className="px-5 py-2 font-semibold bg-primary text-primary-foreground rounded-xl shadow-md disabled:opacity-50 hover:opacity-90 transition-all">
+                      {isSubmitting ? "Saving..." : "Save Task"}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            {/* Comments Section (Only visible when editing) */}
+            {editingTask && (
+              <div className="flex flex-col md:w-1/2 bg-muted/10">
+                <div className="p-4 border-b border-border/50 flex items-center gap-2">
+                  <MessageSquare className="w-5 h-5 text-primary" />
+                  <h3 className="font-bold">Task Discussion</h3>
                 </div>
                 
-                <div>
-                  <label className="block text-sm font-semibold mb-1">Status</label>
-                  <select value={status} onChange={e => setStatus(e.target.value)} className="w-full border border-border/50 rounded-lg px-3 py-2 bg-background focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all appearance-none">
-                    <option value="todo">To Do</option>
-                    <option value="in_progress">In Progress</option>
-                    <option value="done">Done</option>
-                  </select>
+                <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar min-h-[300px]">
+                  {isLoadingComments ? (
+                    <div className="text-center text-sm text-muted-foreground animate-pulse mt-10">Loading comments...</div>
+                  ) : comments.length === 0 ? (
+                    <div className="text-center text-sm text-muted-foreground mt-10">No comments yet. Start the discussion!</div>
+                  ) : (
+                    comments.map(c => (
+                      <div key={c.id} className="bg-background border border-border/50 rounded-xl p-3 shadow-sm">
+                        <div className="flex items-center gap-2 mb-1.5">
+                          <div className="w-5 h-5 rounded-full bg-primary/20 text-primary flex items-center justify-center text-[9px] font-bold">
+                            {c.user_email.charAt(0).toUpperCase()}
+                          </div>
+                          <span className="text-xs font-bold">{c.user_email.split('@')[0]}</span>
+                          <span className="text-[10px] text-muted-foreground ml-auto">{format(new Date(c.created_at), "MMM d, HH:mm")}</span>
+                        </div>
+                        <p className="text-sm">{c.content}</p>
+                      </div>
+                    ))
+                  )}
                 </div>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-semibold mb-1">Priority</label>
-                  <select value={priority} onChange={e => setPriority(e.target.value)} className="w-full border border-border/50 rounded-lg px-3 py-2 bg-background focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all appearance-none">
-                    <option value="low">Low</option>
-                    <option value="medium">Medium</option>
-                    <option value="high">High</option>
-                  </select>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-semibold mb-1">Due Date (Optional)</label>
-                  <input type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} className="w-full border border-border/50 rounded-lg px-3 py-2 bg-background focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" />
-                </div>
-              </div>
 
-              <div className="flex justify-end pt-4 gap-3">
-                <button type="button" onClick={closeModal} className="px-5 py-2 font-semibold text-muted-foreground hover:bg-muted rounded-xl transition-colors">
-                  Cancel
-                </button>
-                <button type="submit" disabled={isSubmitting} className="px-5 py-2 font-semibold bg-primary text-primary-foreground rounded-xl shadow-md disabled:opacity-50 hover:opacity-90 transition-all">
-                  {isSubmitting ? "Saving..." : "Save Task"}
-                </button>
+                <div className="p-4 bg-background border-t border-border/50">
+                  <form onSubmit={handlePostComment} className="flex gap-2">
+                    <input
+                      type="text"
+                      value={newComment}
+                      onChange={e => setNewComment(e.target.value)}
+                      placeholder="Write a comment..."
+                      className="flex-1 bg-muted/50 border border-border/50 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                    />
+                    <button
+                      type="submit"
+                      disabled={isSendingComment || !newComment.trim()}
+                      className="bg-primary text-primary-foreground px-3 py-2 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center"
+                    >
+                      <Send className="w-4 h-4" />
+                    </button>
+                  </form>
+                </div>
               </div>
-            </form>
+            )}
           </div>
         </div>
       )}

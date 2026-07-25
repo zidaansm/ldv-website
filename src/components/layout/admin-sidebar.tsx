@@ -5,13 +5,14 @@ import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { 
   LayoutDashboard, Users, Calendar, MessageSquare, ShieldAlert, 
-  ImageIcon, Activity, Globe, BookOpen, UserPlus, LogOut, ChevronRight, CheckSquare
+  ImageIcon, Activity, Globe, BookOpen, UserPlus, LogOut, ChevronRight, CheckSquare, MessageCircle
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 const allModules = [
   { name: "Dashboard", icon: LayoutDashboard, path: "/admin" },
+  { name: "Team Chat", icon: MessageCircle, path: "/admin/team-chat" },
   { name: "Events", icon: Calendar, path: "/admin/events" },
   { name: "Staff", icon: Users, path: "/admin/team" },
   { name: "Members", icon: UserPlus, path: "/admin/members" },
