@@ -81,7 +81,7 @@ export function MenfessPreview({ initialPosts, initialAvatars }: { initialPosts?
         setPosts(sortedData.slice(0, 3));
       }
       if (membersRes.data) {
-        setMemberAvatars(membersRes.data.map(m => m.avatar_url).filter(Boolean));
+        setMemberAvatars(membersRes.data.map((m: any) => m.avatar_url).filter(Boolean));
       }
       setIsLoading(false);
     };

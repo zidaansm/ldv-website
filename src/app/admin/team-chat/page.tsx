@@ -42,11 +42,11 @@ export default function TeamChatPage() {
     // Subscribe to new messages via Supabase Realtime
     const channel = supabase
       .channel('team_chat_realtime')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'admin_chat_messages' }, payload => {
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'admin_chat_messages' }, (payload: any) => {
         console.log('Realtime message received:', payload);
         fetchMessages();
       })
-      .subscribe((status) => {
+      .subscribe((status: any) => {
         console.log('Realtime subscription status:', status);
       });
 

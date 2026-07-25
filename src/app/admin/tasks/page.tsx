@@ -69,12 +69,12 @@ export default function TasksPage() {
     // Subscribe to task updates and comments
     const channel = supabase
       .channel('tasks_channel')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'task_comments' }, payload => {
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'task_comments' }, (payload: any) => {
         if (isModalOpen && editingTask) {
           fetchComments(editingTask.id);
         }
       })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'tasks' }, payload => {
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'tasks' }, (payload: any) => {
         fetchTasks();
       })
       .subscribe();

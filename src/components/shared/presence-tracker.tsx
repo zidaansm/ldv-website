@@ -16,7 +16,7 @@ export function PresenceTracker() {
 
     channel.on("presence", { event: "sync" }, () => {
       // Just keep the connection alive
-    }).subscribe(async (status) => {
+    }).subscribe(async (status: any) => {
       if (status === "SUBSCRIBED") {
         await channel.track({ online_at: new Date().toISOString() });
       }
