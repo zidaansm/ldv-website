@@ -138,8 +138,8 @@ export default function AdminSocialsPage() {
     <div className="p-6 md:p-10 max-w-6xl mx-auto">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-black uppercase tracking-wider mb-2">Manage Socials</h1>
-          <p className="text-muted-foreground">Add and edit links for the Linktree page.</p>
+          <h1 className="text-3xl font-bold mb-2" style={{ fontFamily: "var(--font-space-grotesk)" }}>Manage Socials</h1>
+          <p className="text-muted-foreground font-medium">Add and edit links for the Linktree page.</p>
         </div>
         {!isEditing && (
           <button
@@ -147,7 +147,7 @@ export default function AdminSocialsPage() {
               resetForm();
               setIsEditing(true);
             }}
-            className="flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground font-bold uppercase tracking-wider neo-border neo-press rounded-xl"
+            className="flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground font-semibold shadow-md shadow-primary/20 hover:-translate-y-0.5 rounded-xl transition-all"
           >
             <Plus className="w-5 h-5" />
             Add Link
@@ -156,14 +156,14 @@ export default function AdminSocialsPage() {
       </div>
 
       {isEditing ? (
-        <div className="bg-card border-4 border-neo-border p-6 rounded-xl neo-shadow-sm mb-8 animate-in fade-in slide-in-from-top-4">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold uppercase">
+        <div className="bg-card/50 backdrop-blur-md border border-border/50 p-6 rounded-xl shadow-sm mb-8 animate-in fade-in slide-in-from-top-4 duration-300">
+          <div className="flex items-center justify-between mb-6 border-b border-border/50 pb-4">
+            <h2 className="text-xl font-bold text-foreground">
               {editingId ? "Edit Link" : "New Link"}
             </h2>
             <button 
               onClick={() => setIsEditing(false)}
-              className="p-2 hover:bg-muted rounded-lg transition-colors"
+              className="p-2 hover:bg-muted rounded-lg transition-colors text-muted-foreground hover:text-foreground"
             >
               <X className="w-5 h-5" />
             </button>
@@ -172,23 +172,23 @@ export default function AdminSocialsPage() {
           <form onSubmit={handleSave} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="text-sm font-bold uppercase">Platform Name</label>
+                <label className="text-sm font-semibold">Platform Name</label>
                 <input
                   type="text"
                   value={platform}
                   onChange={(e) => setPlatform(e.target.value)}
-                  className="w-full px-4 py-3 bg-background border-2 border-neo-border rounded-xl focus:outline-none focus:ring-4 focus:ring-primary/20"
+                  className="w-full px-4 py-3 bg-background border border-border/50 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary transition-all"
                   placeholder="e.g. X / Twitter"
                   required
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-bold uppercase">Target URL</label>
+                <label className="text-sm font-semibold">Target URL</label>
                 <input
                   type="url"
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
-                  className="w-full px-4 py-3 bg-background border-2 border-neo-border rounded-xl focus:outline-none focus:ring-4 focus:ring-primary/20"
+                  className="w-full px-4 py-3 bg-background border border-border/50 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary transition-all"
                   placeholder="https://..."
                   required
                 />
@@ -197,22 +197,22 @@ export default function AdminSocialsPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="space-y-2">
-                <label className="text-sm font-bold uppercase">Username (Optional)</label>
+                <label className="text-sm font-semibold">Username (Optional)</label>
                 <input
                   type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="w-full px-4 py-3 bg-background border-2 border-neo-border rounded-xl focus:outline-none focus:ring-4 focus:ring-primary/20"
+                  className="w-full px-4 py-3 bg-background border border-border/50 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary transition-all"
                   placeholder="e.g. @ldvarch"
                 />
               </div>
               
               <div className="space-y-2">
-                <label className="text-sm font-bold uppercase">Icon</label>
+                <label className="text-sm font-semibold">Icon</label>
                 <select
                   value={iconName}
                   onChange={(e) => setIconName(e.target.value)}
-                  className="w-full px-4 py-3 bg-background border-2 border-neo-border rounded-xl focus:outline-none focus:ring-4 focus:ring-primary/20"
+                  className="w-full px-4 py-3 bg-background border border-border/50 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary transition-all appearance-none"
                 >
                   {ICON_OPTIONS.map(opt => (
                     <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -221,41 +221,41 @@ export default function AdminSocialsPage() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-bold uppercase">Display Order (1 is first)</label>
+                <label className="text-sm font-semibold">Display Order (1 is first)</label>
                 <input
                   type="number"
                   value={orderIndex}
                   onChange={(e) => setOrderIndex(parseInt(e.target.value))}
-                  className="w-full px-4 py-3 bg-background border-2 border-neo-border rounded-xl focus:outline-none focus:ring-4 focus:ring-primary/20"
+                  className="w-full px-4 py-3 bg-background border border-border/50 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary transition-all"
                   min="0"
                 />
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 bg-muted/50 p-4 rounded-xl border border-border/50">
               <input
                 type="checkbox"
                 id="isActive"
                 checked={isActive}
                 onChange={(e) => setIsActive(e.target.checked)}
-                className="w-5 h-5 border-2 border-neo-border rounded text-primary focus:ring-primary/20"
+                className="w-5 h-5 rounded border-border/50 text-primary focus:ring-primary/20"
               />
-              <label htmlFor="isActive" className="text-sm font-bold uppercase cursor-pointer">
+              <label htmlFor="isActive" className="text-sm font-semibold cursor-pointer text-foreground">
                 Link is active (visible to public)
               </label>
             </div>
 
-            <div className="flex justify-end gap-4 pt-4 border-t-2 border-black/10">
+            <div className="flex justify-end gap-4 pt-4 border-t border-border/50">
               <button
                 type="button"
                 onClick={() => setIsEditing(false)}
-                className="px-6 py-3 font-bold uppercase tracking-wider neo-border rounded-xl hover:bg-muted transition-colors"
+                className="px-6 py-3 font-semibold bg-background border border-border/50 text-foreground rounded-xl hover:bg-muted transition-colors shadow-sm"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="px-6 py-3 bg-primary text-primary-foreground font-bold uppercase tracking-wider neo-border neo-press rounded-xl"
+                className="px-6 py-3 bg-primary text-primary-foreground font-semibold shadow-md shadow-primary/20 hover:-translate-y-0.5 rounded-xl transition-all"
               >
                 {editingId ? "Update Link" : "Save Link"}
               </button>
@@ -265,54 +265,54 @@ export default function AdminSocialsPage() {
       ) : (
         <div className="grid grid-cols-1 gap-4">
           {loading ? (
-            <div className="text-center py-20 font-bold animate-pulse">Loading social links...</div>
+            <div className="text-center py-20 font-semibold text-muted-foreground animate-pulse">Loading social links...</div>
           ) : socials.length === 0 ? (
-            <div className="text-center py-20 bg-card border-4 border-neo-border rounded-xl border-dashed">
-              <p className="text-xl font-bold mb-2">No links found</p>
-              <p className="text-muted-foreground">Click the "Add Link" button to create one.</p>
+            <div className="text-center py-20 bg-card/50 backdrop-blur-md border border-border/50 rounded-xl border-dashed shadow-sm">
+              <p className="text-xl font-bold mb-2 text-foreground">No links found</p>
+              <p className="text-muted-foreground font-medium">Click the "Add Link" button to create one.</p>
             </div>
           ) : (
             socials.map((social) => (
-              <div key={social.id} className="bg-card border-4 border-neo-border rounded-xl p-4 flex items-center justify-between gap-4 relative overflow-hidden group hover:neo-shadow-sm transition-shadow">
+              <div key={social.id} className="bg-card/50 backdrop-blur-md border border-border/50 rounded-xl p-4 flex items-center justify-between gap-4 relative overflow-hidden group hover:shadow-md transition-all">
                 
                 <div className="flex items-center gap-4 flex-grow">
-                  <div className="w-12 h-12 bg-muted text-foreground border-2 border-neo-border rounded-xl flex items-center justify-center flex-shrink-0">
+                  <div className="w-12 h-12 bg-muted/50 text-foreground border border-border/50 rounded-xl flex items-center justify-center flex-shrink-0 shadow-inner">
                     {renderIcon(social.icon_name)}
                   </div>
                   
                   <div>
-                    <h3 className="text-lg font-bold flex items-center gap-2">
+                    <h3 className="text-lg font-bold flex items-center gap-2 text-foreground">
                       {social.platform}
                       {!social.is_active && (
-                        <span className="bg-muted px-2 py-0.5 rounded text-[10px] font-bold uppercase flex items-center gap-1 border border-neo-border">
+                        <span className="bg-muted/50 px-2 py-0.5 rounded text-[10px] font-semibold flex items-center gap-1 border border-border/50 text-muted-foreground">
                           <EyeOff className="w-3 h-3" /> Hidden
                         </span>
                       )}
                     </h3>
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 text-sm text-muted-foreground mt-1">
-                      {social.username && <span>{social.username}</span>}
-                      <span className="truncate max-w-[200px] sm:max-w-md text-primary">{social.url}</span>
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 text-sm mt-1">
+                      {social.username && <span className="text-foreground/80 font-medium">{social.username}</span>}
+                      <span className="truncate max-w-[200px] sm:max-w-md text-primary hover:underline"><a href={social.url} target="_blank" rel="noopener noreferrer">{social.url}</a></span>
                     </div>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-4">
-                  <div className="hidden md:flex flex-col items-center justify-center px-4 border-l-2 border-r-2 border-black/10">
-                    <span className="text-xs font-bold uppercase text-muted-foreground">Order</span>
-                    <span className="text-xl font-black">{social.order_index}</span>
+                  <div className="hidden md:flex flex-col items-center justify-center px-4 border-l border-r border-border/50 opacity-50">
+                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Order</span>
+                    <span className="text-xl font-bold text-foreground">{social.order_index}</span>
                   </div>
 
-                  <div className="flex flex-col sm:flex-row gap-2">
+                  <div className="flex flex-col sm:flex-row gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
                       onClick={() => handleEdit(social)}
-                      className="p-2 bg-background border-2 border-neo-border rounded-lg hover:bg-muted transition-colors"
+                      className="p-2 bg-background border border-border/50 text-foreground rounded-lg hover:bg-muted transition-colors shadow-sm"
                       title="Edit"
                     >
                       <Edit2 className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => handleDelete(social.id)}
-                      className="p-2 bg-destructive/10 text-destructive border-2 border-destructive/20 rounded-lg hover:bg-destructive hover:text-destructive-foreground transition-colors"
+                      className="p-2 bg-danger/10 text-danger border border-transparent rounded-lg hover:bg-danger hover:text-danger-foreground transition-colors shadow-sm"
                       title="Delete"
                     >
                       <Trash2 className="w-4 h-4" />

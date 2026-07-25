@@ -101,16 +101,16 @@ export default function FAQAdminPage() {
     <div className="max-w-4xl mx-auto p-4 md:p-8 space-y-8">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Link href="/admin" className="p-2 rounded-xl neo-border bg-card hover:bg-muted transition-colors">
+          <Link href="/admin" className="p-2 rounded-xl bg-background border border-border/50 hover:bg-muted transition-colors shadow-sm">
             <ArrowLeft className="w-5 h-5" />
           </Link>
-          <h1 className="text-3xl font-extrabold" style={{ fontFamily: "var(--font-space-grotesk)" }}>
+          <h1 className="text-3xl font-bold" style={{ fontFamily: "var(--font-space-grotesk)" }}>
             FAQ Management
           </h1>
         </div>
         <button
           onClick={() => isFormOpen ? resetForm() : setIsFormOpen(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground neo-border neo-shadow-sm neo-press rounded-xl font-bold"
+          className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground shadow-md shadow-primary/20 hover:-translate-y-0.5 rounded-xl font-semibold transition-all"
         >
           <Plus className={`w-5 h-5 transition-transform ${isFormOpen ? "rotate-45" : ""}`} />
           {isFormOpen ? "Cancel" : "Add FAQ"}
@@ -118,21 +118,21 @@ export default function FAQAdminPage() {
       </div>
 
       {isFormOpen && (
-        <form onSubmit={handleSubmit} className="neo-border rounded-2xl p-6 bg-card space-y-4 animate-in fade-in slide-in-from-top-4 duration-300">
+        <form onSubmit={handleSubmit} className="border border-border/50 shadow-sm rounded-2xl p-6 bg-card/50 backdrop-blur-md space-y-4 animate-in fade-in slide-in-from-top-4 duration-300">
           <h2 className="text-xl font-bold mb-4">{editingId ? "Edit FAQ" : "Add New FAQ"}</h2>
           <div>
-            <label className="block text-sm font-bold mb-1">Question</label>
-            <input required value={question} onChange={e => setQuestion(e.target.value)} className="w-full neo-border rounded-lg px-3 py-2 bg-background" />
+            <label className="block text-sm font-semibold mb-1">Question</label>
+            <input required value={question} onChange={e => setQuestion(e.target.value)} className="w-full border border-border/50 rounded-lg px-3 py-2 bg-background focus:border-primary focus:ring-1 focus:ring-primary transition-all" />
           </div>
           <div>
-            <label className="block text-sm font-bold mb-1">Answer</label>
-            <textarea required value={answer} onChange={e => setAnswer(e.target.value)} className="w-full neo-border rounded-lg px-3 py-2 bg-background h-32" />
+            <label className="block text-sm font-semibold mb-1">Answer</label>
+            <textarea required value={answer} onChange={e => setAnswer(e.target.value)} className="w-full border border-border/50 rounded-lg px-3 py-2 bg-background h-32 focus:border-primary focus:ring-1 focus:ring-primary transition-all" />
           </div>
           <div className="flex justify-end pt-4">
             <button 
               type="submit" 
               disabled={isSubmitting}
-              className="px-6 py-2 bg-accent text-accent-foreground font-bold neo-border rounded-xl disabled:opacity-50"
+              className="px-6 py-2 bg-accent text-accent-foreground font-semibold shadow-md shadow-accent/20 hover:-translate-y-0.5 rounded-xl disabled:opacity-50 transition-all"
             >
               {isSubmitting ? "Saving..." : "Save FAQ"}
             </button>
@@ -141,25 +141,25 @@ export default function FAQAdminPage() {
       )}
 
       {faqs.length === 0 ? (
-        <div className="neo-border rounded-2xl p-12 bg-card text-center flex flex-col items-center justify-center text-muted-foreground">
+        <div className="border border-border/50 shadow-sm rounded-2xl p-12 bg-card/50 backdrop-blur-md text-center flex flex-col items-center justify-center text-muted-foreground">
           <HelpCircle className="w-12 h-12 mb-4 opacity-50" />
-          <p className="font-bold text-lg">No FAQs found</p>
+          <p className="font-bold text-lg text-foreground">No FAQs found</p>
           <p className="text-sm">Click "Add FAQ" to start answering common questions.</p>
         </div>
       ) : (
         <div className="space-y-4">
           {faqs.map((faq) => (
-            <div key={faq.id} className="neo-border neo-shadow-sm rounded-2xl bg-card p-6 relative group">
+            <div key={faq.id} className="border border-border/50 shadow-sm rounded-2xl bg-card/50 backdrop-blur-md p-6 relative group transition-all hover:shadow-md">
               <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button onClick={() => handleEditClick(faq)} className="p-2 bg-background neo-border hover:bg-muted rounded-lg transition-colors">
+                <button onClick={() => handleEditClick(faq)} className="p-2 bg-background border border-border/50 text-foreground hover:bg-muted rounded-lg transition-colors" title="Edit FAQ">
                   <Edit2 className="w-4 h-4" />
                 </button>
-                <button onClick={() => handleDelete(faq.id)} className="p-2 bg-background neo-border text-danger hover:bg-danger/10 rounded-lg transition-colors">
+                <button onClick={() => handleDelete(faq.id)} className="p-2 bg-danger/10 text-danger hover:bg-danger hover:text-danger-foreground rounded-lg transition-colors" title="Delete FAQ">
                   <Trash2 className="w-4 h-4" />
                 </button>
               </div>
-              <h3 className="text-lg font-bold mb-2 pr-20">{faq.question}</h3>
-              <p className="text-muted-foreground">{faq.answer}</p>
+              <h3 className="text-lg font-bold mb-2 pr-20 text-foreground">{faq.question}</h3>
+              <p className="text-muted-foreground leading-relaxed">{faq.answer}</p>
             </div>
           ))}
         </div>

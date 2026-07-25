@@ -231,7 +231,7 @@ export default function BasesAdminPage() {
         <div className="flex items-center gap-3 w-full sm:w-auto">
           <Link
             href="/admin"
-            className="px-4 py-2 bg-secondary text-foreground font-bold neo-border neo-press rounded-xl flex items-center justify-center gap-2 hover:bg-secondary/80 transition-colors flex-1 sm:flex-none"
+            className="px-4 py-2 bg-background border border-border/50 text-foreground font-semibold rounded-xl flex items-center justify-center gap-2 hover:bg-muted transition-all shadow-sm flex-1 sm:flex-none"
           >
             <ArrowLeft className="w-4 h-4" />
             Back
@@ -241,7 +241,7 @@ export default function BasesAdminPage() {
               resetForm();
               setIsFormOpen(true);
             }}
-            className="px-4 py-2 bg-primary text-primary-foreground font-bold neo-border neo-press rounded-xl flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors flex-1 sm:flex-none"
+            className="px-4 py-2 bg-primary text-primary-foreground font-semibold shadow-md shadow-primary/20 hover:-translate-y-0.5 rounded-xl flex items-center justify-center gap-2 transition-all flex-1 sm:flex-none"
           >
             <Plus className="w-4 h-4" />
             New Base
@@ -250,15 +250,15 @@ export default function BasesAdminPage() {
       </div>
 
       {isFormOpen && (
-        <div className="bg-card neo-border rounded-xl p-6">
-          <div className="flex items-center justify-between mb-6 border-b-2 border-black pb-4">
-            <h2 className="text-xl font-extrabold flex items-center gap-2">
+        <div className="bg-card/50 backdrop-blur-md border border-border/50 shadow-sm rounded-2xl p-6 mb-8">
+          <div className="flex items-center justify-between mb-6 border-b border-border/50 pb-4">
+            <h2 className="text-xl font-bold flex items-center gap-2">
               <Hash className="w-5 h-5 text-primary" />
               {editingBase ? "Edit Base" : "Add New Base"}
             </h2>
             <button
               onClick={resetForm}
-              className="p-2 hover:bg-muted rounded-xl neo-press transition-colors"
+              className="p-2 hover:bg-muted rounded-xl transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -267,31 +267,31 @@ export default function BasesAdminPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-bold mb-2">Handle (e.g. @base)</label>
+                <label className="block text-sm font-semibold mb-2">Handle (e.g. @base)</label>
                 <input
                   type="text"
                   value={handle}
                   onChange={(e) => setHandle(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border-2 border-black bg-background font-bold focus:outline-none focus:ring-4 focus:ring-primary/20 transition-all"
+                  className="w-full px-4 py-3 rounded-xl border border-border/50 bg-background focus:border-primary focus:ring-1 focus:ring-primary transition-all"
                   placeholder="@thegamersbase"
                   required
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-bold mb-2">Base Name</label>
+                <label className="block text-sm font-semibold mb-2">Base Name</label>
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border-2 border-black bg-background font-bold focus:outline-none focus:ring-4 focus:ring-primary/20 transition-all"
+                  className="w-full px-4 py-3 rounded-xl border border-border/50 bg-background focus:border-primary focus:ring-1 focus:ring-primary transition-all"
                   placeholder="The Gamers Base"
                   required
                 />
               </div>
 
               <div className="col-span-1 md:col-span-2">
-                <label className="block text-sm font-bold mb-2">Base Logo</label>
+                <label className="block text-sm font-semibold mb-2">Base Logo</label>
                 <input
                   type="file"
                   ref={fileInputRef}
@@ -300,7 +300,7 @@ export default function BasesAdminPage() {
                   className="hidden"
                 />
                 {previewUrl ? (
-                  <div className="relative inline-block border-2 border-black rounded-xl overflow-hidden bg-white neo-shadow-sm group">
+                  <div className="relative inline-block border border-border/50 rounded-xl overflow-hidden bg-background shadow-sm group">
                     <img src={previewUrl} alt="Preview" className="w-32 h-32 object-cover" />
                     <button
                       type="button"
@@ -312,11 +312,11 @@ export default function BasesAdminPage() {
                       className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity"
                     >
                       <Trash2 className="w-6 h-6 mb-1" />
-                      <span className="text-xs font-bold">Remove</span>
+                      <span className="text-xs font-semibold">Remove</span>
                     </button>
                   </div>
                 ) : logoUrl ? (
-                  <div className="relative inline-block border-2 border-black rounded-xl overflow-hidden bg-white neo-shadow-sm group">
+                  <div className="relative inline-block border border-border/50 rounded-xl overflow-hidden bg-background shadow-sm group">
                     <img src={logoUrl} alt="Preview" className="w-32 h-32 object-cover" />
                     <button
                       type="button"
@@ -328,17 +328,17 @@ export default function BasesAdminPage() {
                       className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity"
                     >
                       <Trash2 className="w-6 h-6 mb-1" />
-                      <span className="text-xs font-bold">Remove</span>
+                      <span className="text-xs font-semibold">Remove</span>
                     </button>
                   </div>
                 ) : (
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="w-full sm:w-64 h-32 flex flex-col items-center justify-center gap-2 border-2 border-dashed border-black rounded-xl bg-muted hover:bg-secondary neo-press transition-colors"
+                    className="w-full sm:w-64 h-32 flex flex-col items-center justify-center gap-2 border border-dashed border-border rounded-xl bg-muted/50 hover:bg-muted transition-colors"
                   >
                     <Upload className="w-6 h-6 text-muted-foreground" />
-                    <span className="text-sm font-bold text-muted-foreground">Upload Logo (Cloudinary)</span>
+                    <span className="text-sm font-semibold text-muted-foreground">Upload Logo (Cloudinary)</span>
                   </button>
                 )}
                 
@@ -355,39 +355,39 @@ export default function BasesAdminPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-bold mb-2">Submit Link (Optional)</label>
+                <label className="block text-sm font-semibold mb-2">Submit Link (Optional)</label>
                 <input
                   type="url"
                   value={submitLink}
                   onChange={(e) => setSubmitLink(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border-2 border-black bg-background font-bold focus:outline-none focus:ring-4 focus:ring-primary/20 transition-all"
+                  className="w-full px-4 py-3 rounded-xl border border-border/50 bg-background focus:border-primary focus:ring-1 focus:ring-primary transition-all"
                   placeholder="https://secreto.site/..."
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-bold mb-2">Description</label>
+              <label className="block text-sm font-semibold mb-2">Description</label>
               <input
                 type="text"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border-2 border-black bg-background font-bold focus:outline-none focus:ring-4 focus:ring-primary/20 transition-all"
+                className="w-full px-4 py-3 rounded-xl border border-border/50 bg-background focus:border-primary focus:ring-1 focus:ring-primary transition-all"
                 placeholder="A short description of the base"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-bold mb-2">Rules</label>
+              <label className="block text-sm font-semibold mb-2">Rules</label>
               <textarea
                 value={rules}
                 onChange={(e) => setRules(e.target.value)}
                 rows={8}
-                className="w-full px-4 py-3 rounded-xl border-2 border-black bg-background font-bold focus:outline-none focus:ring-4 focus:ring-primary/20 transition-all mb-2"
+                className="w-full px-4 py-3 rounded-xl border border-border/50 bg-background focus:border-primary focus:ring-1 focus:ring-primary transition-all mb-2"
                 placeholder="1. No racism&#10;2. Be kind"
               />
-              <div className="bg-muted neo-border rounded-xl p-3 text-xs font-medium space-y-1">
-                <p className="font-bold mb-1">Markdown is supported:</p>
+              <div className="bg-muted/50 border border-border/50 rounded-xl p-3 text-xs text-muted-foreground space-y-1">
+                <p className="font-semibold mb-1 text-foreground">Markdown is supported:</p>
                 <p><code># Heading 1</code> | <code>## Heading 2</code></p>
                 <p><code>**Bold Text**</code> | <code>*Italic Text*</code></p>
                 <p><code>- List item</code> | <code>1. Numbered list</code></p>
@@ -399,14 +399,14 @@ export default function BasesAdminPage() {
               <button
                 type="button"
                 onClick={resetForm}
-                className="px-6 py-3 bg-secondary text-foreground font-bold neo-border neo-press rounded-xl hover:bg-secondary/80 transition-colors"
+                className="px-6 py-2 bg-background border border-border/50 text-foreground font-semibold rounded-xl hover:bg-muted transition-all"
                 disabled={isSubmitting}
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="px-6 py-3 bg-primary text-primary-foreground font-bold neo-border neo-press rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-50 flex items-center gap-2"
+                className="px-6 py-2 bg-primary text-primary-foreground font-semibold shadow-md shadow-primary/20 hover:-translate-y-0.5 rounded-xl disabled:opacity-50 flex items-center gap-2 transition-all"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? "Saving..." : editingBase ? "Update Base" : "Create Base"}
@@ -419,69 +419,77 @@ export default function BasesAdminPage() {
       {loading ? (
         <div className="animate-pulse space-y-4">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-24 bg-card neo-border rounded-xl w-full" />
+            <div key={i} className="h-16 bg-card border border-border/50 rounded-xl w-full" />
           ))}
         </div>
       ) : bases.length === 0 ? (
-        <div className="bg-card neo-border rounded-xl p-12 text-center flex flex-col items-center justify-center">
+        <div className="bg-card/50 backdrop-blur-md border border-border/50 rounded-2xl p-12 text-center flex flex-col items-center justify-center">
           <Hash className="w-12 h-12 text-muted-foreground mb-4 opacity-50" />
           <h3 className="text-xl font-bold">No bases found</h3>
           <p className="text-muted-foreground mt-2">Create a new base to display it on the public page.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {bases.map((base) => (
-            <div
-              key={base.id}
-              className="bg-card neo-border rounded-xl p-5 flex flex-col justify-between"
-            >
-              <div>
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <h3 className="font-extrabold text-lg flex items-center gap-2" style={{ fontFamily: "var(--font-space-grotesk)" }}>
-                      {base.name}
-                    </h3>
-                    <p className="text-sm font-bold text-muted-foreground">
-                      {base.handle}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => openEdit(base)}
-                      className="p-2 bg-secondary neo-border neo-press rounded-lg hover:bg-secondary/80 transition-colors"
-                      title="Edit base"
-                    >
-                      <Edit2 className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(base.id, base.name)}
-                      className="p-2 bg-[#ff4d4d] text-white neo-border neo-press rounded-lg hover:bg-[#ff4d4d]/90 transition-colors"
-                      title="Delete base"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-
-                <div className="space-y-2 mb-4">
-                  {base.description && (
-                    <p className="text-sm font-bold bg-muted p-2 rounded-lg border-2 border-black line-clamp-2">
-                      {base.description}
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              {base.submit_link && (
-                <div className="pt-4 border-t-2 border-black flex items-center gap-2 text-sm font-bold text-primary">
-                  <LinkIcon className="w-4 h-4" />
-                  <a href={base.submit_link} target="_blank" rel="noopener noreferrer" className="hover:underline truncate">
-                    {base.submit_link}
-                  </a>
-                </div>
-              )}
-            </div>
-          ))}
+        <div className="bg-card/50 backdrop-blur-md border border-border/50 rounded-2xl overflow-hidden shadow-sm">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-muted/50 border-b border-border/50">
+                  <th className="px-6 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Base</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Description</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Submit Link</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border/50">
+                {bases.map((base) => (
+                  <tr key={base.id} className="hover:bg-muted/20 transition-colors group">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        {base.logo_url && (
+                          <img src={base.logo_url} alt={base.name} className="w-10 h-10 rounded-lg object-cover bg-muted" />
+                        )}
+                        <div>
+                          <div className="font-bold text-sm text-foreground">{base.name}</div>
+                          <div className="text-xs text-muted-foreground">{base.handle}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="text-sm text-muted-foreground line-clamp-2 max-w-xs">{base.description || '-'}</div>
+                    </td>
+                    <td className="px-6 py-4">
+                      {base.submit_link ? (
+                        <a href={base.submit_link} target="_blank" rel="noopener noreferrer" className="text-xs font-medium text-primary hover:underline flex items-center gap-1">
+                          <LinkIcon className="w-3 h-3" />
+                          Open Link
+                        </a>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">-</span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button
+                          onClick={() => openEdit(base)}
+                          className="p-2 bg-background border border-border/50 text-foreground rounded-lg hover:bg-muted transition-colors"
+                          title="Edit base"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(base.id, base.name)}
+                          className="p-2 bg-danger/10 text-danger rounded-lg hover:bg-danger hover:text-danger-foreground transition-colors"
+                          title="Delete base"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>

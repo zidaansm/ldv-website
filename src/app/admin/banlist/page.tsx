@@ -115,16 +115,16 @@ export default function BanListAdminPage() {
     <div className="max-w-6xl mx-auto p-4 md:p-8 space-y-8">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Link href="/admin" className="p-2 rounded-xl neo-border bg-card hover:bg-muted transition-colors">
+          <Link href="/admin" className="p-2 rounded-xl bg-background border border-border/50 hover:bg-muted transition-colors shadow-sm">
             <ArrowLeft className="w-5 h-5" />
           </Link>
-          <h1 className="text-3xl font-extrabold" style={{ fontFamily: "var(--font-space-grotesk)" }}>
+          <h1 className="text-3xl font-bold" style={{ fontFamily: "var(--font-space-grotesk)" }}>
             Hall of Shame (Ban List)
           </h1>
         </div>
         <button
           onClick={() => isFormOpen ? resetForm() : setIsFormOpen(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground neo-border neo-shadow-sm neo-press rounded-xl font-bold"
+          className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground shadow-md shadow-primary/20 hover:-translate-y-0.5 rounded-xl font-semibold transition-all"
         >
           <Plus className={`w-5 h-5 transition-transform ${isFormOpen ? "rotate-45" : ""}`} />
           {isFormOpen ? "Cancel" : "Add Record"}
@@ -132,35 +132,35 @@ export default function BanListAdminPage() {
       </div>
 
       {isFormOpen && (
-        <form onSubmit={handleSubmit} className="neo-border rounded-2xl p-6 bg-card space-y-4 animate-in fade-in slide-in-from-top-4 duration-300">
+        <form onSubmit={handleSubmit} className="border border-border/50 shadow-sm rounded-2xl p-6 bg-card/50 backdrop-blur-md space-y-4 animate-in fade-in slide-in-from-top-4 duration-300">
           <h2 className="text-xl font-bold mb-4">{editingId ? "Edit Record" : "Add New Banned User"}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-bold mb-1">Username</label>
-              <input required value={username} onChange={e => setUsername(e.target.value)} className="w-full neo-border rounded-lg px-3 py-2 bg-background" />
+              <label className="block text-sm font-semibold mb-1">Username</label>
+              <input required value={username} onChange={e => setUsername(e.target.value)} className="w-full border border-border/50 rounded-lg px-3 py-2 bg-background focus:border-danger focus:ring-1 focus:ring-danger transition-all" />
             </div>
             <div>
-              <label className="block text-sm font-bold mb-1">Discord ID (Optional)</label>
-              <input value={discordId} onChange={e => setDiscordId(e.target.value)} className="w-full neo-border rounded-lg px-3 py-2 bg-background" />
+              <label className="block text-sm font-semibold mb-1">Discord ID (Optional)</label>
+              <input value={discordId} onChange={e => setDiscordId(e.target.value)} className="w-full border border-border/50 rounded-lg px-3 py-2 bg-background focus:border-danger focus:ring-1 focus:ring-danger transition-all" />
             </div>
             <div>
-              <label className="block text-sm font-bold mb-1">Duration (e.g. Permanent, 30 Days)</label>
-              <input required value={duration} onChange={e => setDuration(e.target.value)} className="w-full neo-border rounded-lg px-3 py-2 bg-background" />
+              <label className="block text-sm font-semibold mb-1">Duration (e.g. Permanent, 30 Days)</label>
+              <input required value={duration} onChange={e => setDuration(e.target.value)} className="w-full border border-border/50 rounded-lg px-3 py-2 bg-background focus:border-danger focus:ring-1 focus:ring-danger transition-all" />
             </div>
             <div>
-              <label className="block text-sm font-bold mb-1">Banned At (Date)</label>
-              <input required type="date" value={bannedAt} onChange={e => setBannedAt(e.target.value)} className="w-full neo-border rounded-lg px-3 py-2 bg-background" />
+              <label className="block text-sm font-semibold mb-1">Banned At (Date)</label>
+              <input required type="date" value={bannedAt} onChange={e => setBannedAt(e.target.value)} className="w-full border border-border/50 rounded-lg px-3 py-2 bg-background focus:border-danger focus:ring-1 focus:ring-danger transition-all" />
             </div>
             <div className="md:col-span-2">
-              <label className="block text-sm font-bold mb-1">Reason</label>
-              <textarea required value={reason} onChange={e => setReason(e.target.value)} className="w-full neo-border rounded-lg px-3 py-2 bg-background h-24" />
+              <label className="block text-sm font-semibold mb-1">Reason</label>
+              <textarea required value={reason} onChange={e => setReason(e.target.value)} className="w-full border border-border/50 rounded-lg px-3 py-2 bg-background h-24 focus:border-danger focus:ring-1 focus:ring-danger transition-all" />
             </div>
           </div>
           <div className="flex justify-end pt-4">
             <button 
               type="submit" 
               disabled={isSubmitting}
-              className="px-6 py-2 bg-danger text-danger-foreground font-bold neo-border rounded-xl disabled:opacity-50"
+              className="px-6 py-2 bg-danger text-danger-foreground font-semibold shadow-md shadow-danger/20 hover:-translate-y-0.5 rounded-xl disabled:opacity-50 transition-all"
             >
               {isSubmitting ? "Saving..." : "Save Record"}
             </button>
@@ -169,38 +169,42 @@ export default function BanListAdminPage() {
       )}
 
       {banList.length === 0 ? (
-        <div className="neo-border rounded-2xl p-12 bg-card text-center flex flex-col items-center justify-center text-muted-foreground">
-          <ShieldAlert className="w-12 h-12 mb-4 opacity-50" />
-          <p className="font-bold text-lg">Clean sheet!</p>
+        <div className="border border-border/50 shadow-sm rounded-2xl p-12 bg-card/50 backdrop-blur-md text-center flex flex-col items-center justify-center text-muted-foreground">
+          <ShieldAlert className="w-12 h-12 mb-4 opacity-50 text-success" />
+          <p className="font-bold text-lg text-foreground">Clean sheet!</p>
           <p className="text-sm">No one is currently banned. Good job community!</p>
         </div>
       ) : (
-        <div className="neo-border rounded-2xl overflow-hidden bg-card">
+        <div className="border border-border/50 shadow-sm rounded-2xl overflow-hidden bg-card/50 backdrop-blur-md">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-muted border-b-2 border-[var(--border)]">
-                  <th className="p-4 font-bold">Username</th>
-                  <th className="p-4 font-bold">Reason</th>
-                  <th className="p-4 font-bold">Duration</th>
-                  <th className="p-4 font-bold">Date Banned</th>
-                  <th className="p-4 font-bold text-right">Actions</th>
+                <tr className="bg-muted/50 border-b border-border/50">
+                  <th className="px-6 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Username</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Reason</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Duration</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Date Banned</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-border/50">
                 {banList.map((record) => (
-                  <tr key={record.id} className="border-b-2 border-[var(--border)] last:border-0 hover:bg-muted/50 transition-colors">
-                    <td className="p-4 font-bold text-danger">{record.username}</td>
-                    <td className="p-4">{record.reason}</td>
-                    <td className="p-4 font-medium">{record.duration}</td>
-                    <td className="p-4 font-medium text-muted-foreground">{new Date(record.banned_at).toLocaleDateString()}</td>
-                    <td className="p-4 text-right">
-                      <div className="flex justify-end gap-2">
-                        <button onClick={() => handleEditClick(record)} className="p-2 text-primary hover:bg-primary/10 rounded-lg transition-colors">
-                          <Edit2 className="w-5 h-5" />
+                  <tr key={record.id} className="hover:bg-muted/20 transition-colors group">
+                    <td className="px-6 py-4 font-bold text-sm text-danger">{record.username}</td>
+                    <td className="px-6 py-4 text-sm text-foreground/80">{record.reason}</td>
+                    <td className="px-6 py-4">
+                      <span className="px-2 py-1 rounded-md text-xs font-semibold bg-danger/10 text-danger border border-danger/20">
+                        {record.duration}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-sm font-medium text-muted-foreground">{new Date(record.banned_at).toLocaleDateString()}</td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button onClick={() => handleEditClick(record)} className="p-2 bg-background border border-border/50 text-foreground hover:bg-muted rounded-lg transition-colors" title="Edit Record">
+                          <Edit2 className="w-4 h-4" />
                         </button>
-                        <button onClick={() => handleDelete(record.id)} className="p-2 text-danger hover:bg-danger/10 rounded-lg transition-colors">
-                          <Trash2 className="w-5 h-5" />
+                        <button onClick={() => handleDelete(record.id)} className="p-2 bg-success/10 text-success hover:bg-success hover:text-success-foreground rounded-lg transition-colors" title="Remove Ban">
+                          <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
                     </td>

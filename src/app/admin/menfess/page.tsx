@@ -160,7 +160,7 @@ export default function AdminMenfessPage() {
     <div className="space-y-6 max-w-5xl mx-auto">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div className="flex flex-col gap-2">
-          <h1 className="text-3xl font-extrabold" style={{ fontFamily: "var(--font-space-grotesk)" }}>
+          <h1 className="text-3xl font-bold" style={{ fontFamily: "var(--font-space-grotesk)" }}>
             Menfess Moderation
           </h1>
           <p className="text-muted-foreground font-medium">
@@ -168,28 +168,28 @@ export default function AdminMenfessPage() {
           </p>
         </div>
         
-        <div className="flex bg-muted p-1 rounded-xl neo-border w-full md:w-auto">
+        <div className="flex bg-muted/50 p-1 rounded-xl border border-border/50 w-full md:w-auto shadow-inner">
           <button
             onClick={() => setActiveTab("pending")}
-            className={`flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-2 rounded-lg font-bold text-sm transition-all ${
+            className={`flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-2 rounded-lg font-semibold text-sm transition-all ${
               activeTab === "pending" 
                 ? "bg-warning text-warning-foreground shadow-sm" 
-                : "text-muted-foreground hover:bg-black/5"
+                : "text-muted-foreground hover:text-foreground hover:bg-background/50"
             }`}
           >
             Pending
             {pendingCount > 0 && (
-              <span className="bg-black text-white text-[10px] px-2 py-0.5 rounded-full">
+              <span className="bg-background/20 text-warning-foreground text-[10px] px-2 py-0.5 rounded-full font-bold">
                 {pendingCount}
               </span>
             )}
           </button>
           <button
             onClick={() => setActiveTab("approved")}
-            className={`flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-2 rounded-lg font-bold text-sm transition-all ${
+            className={`flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-2 rounded-lg font-semibold text-sm transition-all ${
               activeTab === "approved" 
                 ? "bg-primary text-primary-foreground shadow-sm" 
-                : "text-muted-foreground hover:bg-black/5"
+                : "text-muted-foreground hover:text-foreground hover:bg-background/50"
             }`}
           >
             Approved
@@ -198,9 +198,9 @@ export default function AdminMenfessPage() {
       </div>
 
       {activeTab === "pending" && (
-        <div className="bg-warning/20 border-2 border-warning p-4 rounded-xl flex gap-3 items-start">
+        <div className="bg-warning/10 border border-warning/20 p-4 rounded-xl flex gap-3 items-start shadow-sm">
           <AlertCircle className="w-5 h-5 text-warning shrink-0 mt-0.5" />
-          <p className="text-sm font-semibold">
+          <p className="text-sm font-medium text-warning-foreground/90">
             Posts waiting for approval will not be visible on the public board until you approve them.
           </p>
         </div>
@@ -208,7 +208,7 @@ export default function AdminMenfessPage() {
 
       <div className="space-y-8">
         {filteredPosts.length === 0 ? (
-          <div className="text-center py-12 neo-border rounded-2xl bg-card border-dashed">
+          <div className="text-center py-12 border border-dashed border-border/50 rounded-2xl bg-card/50 backdrop-blur-md">
             <MessageSquare className="w-12 h-12 mx-auto mb-4 text-muted-foreground opacity-50" />
             <h3 className="font-bold text-lg">
               {activeTab === "pending" ? "No pending posts" : "No approved posts"}
@@ -219,32 +219,32 @@ export default function AdminMenfessPage() {
           </div>
         ) : (
           filteredPosts.map((post) => (
-            <div key={post.id} className="neo-border bg-card rounded-2xl overflow-hidden">
+            <div key={post.id} className="border border-border/50 bg-card/50 backdrop-blur-md shadow-sm rounded-2xl overflow-hidden transition-all hover:shadow-md">
               {/* Post Header/Content */}
               <div className="p-6">
                 <div className="flex justify-between items-start gap-4">
                   <div>
-                    <div className="flex items-center flex-wrap gap-2 mb-2">
-                      <span className="font-extrabold text-lg">
+                    <div className="flex items-center flex-wrap gap-2 mb-3">
+                      <span className="font-bold text-lg text-foreground">
                         {post.is_anonymous ? "Anonymous" : post.sender_name}
                       </span>
-                      <span className="px-2 py-0.5 rounded-md text-xs font-bold bg-muted neo-border">
+                      <span className="px-2 py-0.5 rounded-md text-xs font-semibold bg-muted border border-border/50 text-muted-foreground">
                         {post.is_anonymous ? "Anon" : "Public"}
                       </span>
                       {post.is_approved ? (
-                        <span className="px-2 py-0.5 rounded-md text-xs font-bold bg-primary/20 text-primary flex items-center gap-1">
+                        <span className="px-2 py-0.5 rounded-md text-xs font-semibold bg-success/10 text-success border border-success/20 flex items-center gap-1">
                           <CheckCircle className="w-3 h-3" /> Approved
                         </span>
                       ) : (
-                        <span className="px-2 py-0.5 rounded-md text-xs font-bold bg-warning/20 text-warning flex items-center gap-1">
+                        <span className="px-2 py-0.5 rounded-md text-xs font-semibold bg-warning/10 text-warning border border-warning/20 flex items-center gap-1">
                           <Clock className="w-3 h-3" /> Pending
                         </span>
                       )}
-                      <span className="text-sm text-muted-foreground font-semibold">
+                      <span className="text-xs text-muted-foreground font-medium ml-1">
                         {format(new Date(post.created_at), "MMM d, yyyy 'at' h:mm a")}
                       </span>
                     </div>
-                    <p className="text-foreground whitespace-pre-wrap">{post.content}</p>
+                    <p className="text-foreground/90 whitespace-pre-wrap leading-relaxed">{post.content}</p>
                   </div>
                   
                   <div className="flex items-center gap-2 shrink-0">
@@ -252,7 +252,7 @@ export default function AdminMenfessPage() {
                       <button
                         onClick={() => handleApprovePost(post.id)}
                         disabled={processingId === post.id}
-                        className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground font-bold text-sm rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50"
+                        className="flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground border border-primary/20 font-semibold text-sm rounded-xl transition-all disabled:opacity-50"
                         title="Approve Post"
                       >
                         {processingId === post.id ? (
@@ -269,7 +269,7 @@ export default function AdminMenfessPage() {
                     <button
                       onClick={() => handleDeletePost(post.id)}
                       disabled={processingId === post.id}
-                      className="p-2.5 text-danger hover:bg-danger/10 rounded-xl transition-colors disabled:opacity-50"
+                      className="p-2 text-danger hover:bg-danger hover:text-danger-foreground border border-transparent hover:border-danger/20 rounded-xl transition-all disabled:opacity-50"
                       title={activeTab === "pending" ? "Reject & Delete" : "Delete Post"}
                     >
                       {processingId === post.id ? (
@@ -284,31 +284,31 @@ export default function AdminMenfessPage() {
 
               {/* Comments Section */}
               {post.menfess_comments && post.menfess_comments.length > 0 && (
-                <div className="bg-muted border-t-2 border-black p-4 sm:p-6 space-y-4">
-                  <h4 className="font-bold text-sm text-muted-foreground flex items-center gap-2">
+                <div className="bg-muted/30 border-t border-border/50 p-4 sm:p-6 space-y-4">
+                  <h4 className="font-semibold text-sm text-muted-foreground flex items-center gap-2">
                     <MessageSquare className="w-4 h-4" />
                     {post.menfess_comments.length} Comments
                   </h4>
                   
                   <div className="space-y-3">
                     {post.menfess_comments.map((comment) => (
-                      <div key={comment.id} className="flex justify-between items-start gap-4 bg-background neo-border rounded-xl p-4">
+                      <div key={comment.id} className="flex justify-between items-start gap-4 bg-background/50 border border-border/50 rounded-xl p-4 shadow-sm group transition-all hover:bg-background">
                         <div>
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="font-bold text-sm">
+                          <div className="flex items-center gap-2 mb-1.5">
+                            <span className="font-semibold text-sm text-foreground">
                               {comment.is_anonymous ? "Anonymous" : comment.sender_name}
                             </span>
-                            <span className="text-xs text-muted-foreground font-semibold">
+                            <span className="text-xs text-muted-foreground font-medium">
                               {format(new Date(comment.created_at), "MMM d, h:mm a")}
                             </span>
                           </div>
-                          <p className="text-sm text-foreground whitespace-pre-wrap">{comment.content}</p>
+                          <p className="text-sm text-foreground/80 whitespace-pre-wrap leading-relaxed">{comment.content}</p>
                         </div>
 
                         <button
                           onClick={() => handleDeleteComment(comment.id)}
                           disabled={processingId === comment.id}
-                          className="p-2 text-danger hover:bg-danger/10 rounded-lg transition-colors shrink-0 disabled:opacity-50"
+                          className="p-2 text-danger hover:bg-danger hover:text-danger-foreground rounded-lg transition-colors shrink-0 disabled:opacity-50 opacity-0 group-hover:opacity-100"
                           title="Delete Comment"
                         >
                           {processingId === comment.id ? (

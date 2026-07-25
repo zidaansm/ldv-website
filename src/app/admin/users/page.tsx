@@ -159,16 +159,16 @@ export default function UsersAdminPage() {
     <div className="max-w-6xl mx-auto p-4 md:p-8 space-y-8">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Link href="/admin" className="p-2 rounded-xl neo-border bg-card hover:bg-muted transition-colors">
+          <Link href="/admin" className="p-2 rounded-xl bg-background border border-border/50 hover:bg-muted transition-colors shadow-sm text-foreground">
             <ArrowLeft className="w-5 h-5" />
           </Link>
-          <h1 className="text-3xl font-extrabold" style={{ fontFamily: "var(--font-space-grotesk)" }}>
+          <h1 className="text-3xl font-bold text-foreground" style={{ fontFamily: "var(--font-space-grotesk)" }}>
             Admin Accounts
           </h1>
         </div>
         <button
           onClick={() => isFormOpen ? resetForm() : setIsFormOpen(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground neo-border neo-shadow-sm neo-press rounded-xl font-bold"
+          className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground shadow-md shadow-primary/20 hover:-translate-y-0.5 rounded-xl font-semibold transition-all"
         >
           {isFormOpen ? <X className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
           {isFormOpen ? "Cancel" : "Add Account"}
@@ -176,27 +176,27 @@ export default function UsersAdminPage() {
       </div>
 
       {currentUserRole !== 'super_admin' && (
-        <div className="p-4 rounded-xl border-2 border-warning bg-warning/10 text-warning-foreground font-bold flex items-start gap-3">
+        <div className="p-4 rounded-xl border border-warning/50 bg-warning/10 text-warning font-semibold flex items-start gap-3 shadow-sm">
           <AlertCircle className="w-5 h-5 mt-0.5 shrink-0" />
           <p>You are logged in as an Admin. You can only create or delete Event Organizer accounts.</p>
         </div>
       )}
 
       {isFormOpen && (
-        <form onSubmit={handleSubmit} className="neo-border rounded-2xl p-6 bg-card space-y-4 animate-in fade-in slide-in-from-top-4 duration-300">
-          <h2 className="text-xl font-bold mb-4">{editingUser ? `Edit Account: ${editingUser.email}` : "Add New Account"}</h2>
+        <form onSubmit={handleSubmit} className="border border-border/50 rounded-2xl p-6 bg-card/50 backdrop-blur-md shadow-sm space-y-4 animate-in fade-in slide-in-from-top-4 duration-300">
+          <h2 className="text-xl font-bold mb-4 text-foreground">{editingUser ? `Edit Account: ${editingUser.email}` : "Add New Account"}</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-bold mb-1">Email</label>
-              <input required type="email" value={email} onChange={e => setEmail(e.target.value)} className="w-full neo-border rounded-lg px-3 py-2 bg-background" />
+              <label className="block text-sm font-semibold mb-1 text-foreground">Email</label>
+              <input required type="email" value={email} onChange={e => setEmail(e.target.value)} className="w-full border border-border/50 rounded-lg px-3 py-2 bg-background focus:border-primary focus:ring-1 focus:ring-primary transition-all" />
             </div>
             <div>
-              <label className="block text-sm font-bold mb-1">{editingUser ? "New Password (Optional)" : "Password"}</label>
-              <input required={!editingUser} type="password" minLength={6} value={password} onChange={e => setPassword(e.target.value)} className="w-full neo-border rounded-lg px-3 py-2 bg-background" placeholder="Min. 6 characters" />
+              <label className="block text-sm font-semibold mb-1 text-foreground">{editingUser ? "New Password (Optional)" : "Password"}</label>
+              <input required={!editingUser} type="password" minLength={6} value={password} onChange={e => setPassword(e.target.value)} className="w-full border border-border/50 rounded-lg px-3 py-2 bg-background focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="Min. 6 characters" />
             </div>
             <div>
-              <label className="block text-sm font-bold mb-1">Role</label>
-              <select value={role} onChange={e => setRole(e.target.value)} className="w-full neo-border rounded-lg px-3 py-2 bg-background">
+              <label className="block text-sm font-semibold mb-1 text-foreground">Role</label>
+              <select value={role} onChange={e => setRole(e.target.value)} className="w-full border border-border/50 rounded-lg px-3 py-2 bg-background focus:border-primary focus:ring-1 focus:ring-primary transition-all appearance-none">
                 {currentUserRole === 'super_admin' && (
                   <>
                     <option value="super_admin">Super Admin</option>
@@ -207,12 +207,12 @@ export default function UsersAdminPage() {
               </select>
             </div>
           </div>
-          <div className="flex justify-end pt-4 gap-3">
+          <div className="flex justify-end pt-4 gap-3 border-t border-border/50 mt-6">
             {editingUser && (
               <button 
                 type="button" 
                 onClick={resetForm}
-                className="px-6 py-2 bg-background text-foreground font-bold neo-border rounded-xl"
+                className="px-6 py-2 bg-background border border-border/50 text-foreground font-semibold rounded-xl hover:bg-muted transition-colors shadow-sm"
               >
                 Cancel
               </button>
@@ -220,7 +220,7 @@ export default function UsersAdminPage() {
             <button 
               type="submit" 
               disabled={isSubmitting}
-              className="px-6 py-2 bg-accent text-accent-foreground font-bold neo-border rounded-xl disabled:opacity-50"
+              className="px-6 py-2 bg-primary text-primary-foreground font-semibold rounded-xl disabled:opacity-50 shadow-md shadow-primary/20 hover:-translate-y-0.5 transition-all"
             >
               {isSubmitting ? "Saving..." : (editingUser ? "Save Changes" : "Create Account")}
             </button>
@@ -229,19 +229,19 @@ export default function UsersAdminPage() {
       )}
 
       {users.length === 0 ? (
-        <div className="neo-border rounded-2xl p-12 bg-card text-center flex flex-col items-center justify-center text-muted-foreground">
+        <div className="border border-border/50 rounded-2xl p-12 bg-card/50 backdrop-blur-md text-center flex flex-col items-center justify-center text-muted-foreground shadow-sm">
           <Shield className="w-12 h-12 mb-4 opacity-50" />
-          <p className="font-bold text-lg">No admin accounts found</p>
+          <p className="font-bold text-lg text-foreground">No admin accounts found</p>
         </div>
       ) : (
-        <div className="overflow-x-auto neo-border rounded-2xl bg-card">
+        <div className="overflow-x-auto border border-border/50 rounded-2xl bg-card/50 backdrop-blur-md shadow-sm">
           <table className="w-full text-left">
             <thead>
-              <tr className="border-b-2 border-[var(--neo-border)] bg-muted/50">
-                <th className="p-4 font-bold">Email</th>
-                <th className="p-4 font-bold">Role</th>
-                <th className="p-4 font-bold">Created At</th>
-                <th className="p-4 font-bold text-right">Actions</th>
+              <tr className="border-b border-border/50 bg-muted/50">
+                <th className="p-4 font-semibold text-foreground">Email</th>
+                <th className="p-4 font-semibold text-foreground">Role</th>
+                <th className="p-4 font-semibold text-foreground">Created At</th>
+                <th className="p-4 font-semibold text-foreground text-right">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -257,32 +257,32 @@ export default function UsersAdminPage() {
                 );
 
                 return (
-                  <tr key={user.id} className="border-b-2 border-[var(--neo-border)] last:border-0 hover:bg-muted/30">
-                    <td className="p-4 font-semibold">{user.email} {isSelf && <span className="ml-2 text-xs bg-primary/20 text-primary px-2 py-1 rounded-full">You</span>}</td>
+                  <tr key={user.id} className="border-b border-border/50 last:border-0 hover:bg-muted/30 transition-colors">
+                    <td className="p-4 font-medium text-foreground">{user.email} {isSelf && <span className="ml-2 text-xs bg-primary/20 text-primary font-bold px-2 py-1 rounded-full border border-primary/20">You</span>}</td>
                     <td className="p-4">
-                      <span className={`px-3 py-1 rounded-full text-xs font-bold border-2 border-[var(--neo-border)] shadow-[2px_2px_0_0_var(--neo-border)] ${
-                        isSuperAdmin ? 'bg-danger text-danger-foreground' :
-                        isEventOrg ? 'bg-warning text-warning-foreground' : 'bg-primary text-primary-foreground'
+                      <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${
+                        isSuperAdmin ? 'bg-danger/10 text-danger border-danger/20' :
+                        isEventOrg ? 'bg-warning/10 text-warning border-warning/20' : 'bg-primary/10 text-primary border-primary/20'
                       }`}>
                         {user.role.replace('_', ' ').toUpperCase()}
                       </span>
                     </td>
-                    <td className="p-4 text-sm text-muted-foreground">
+                    <td className="p-4 text-sm text-muted-foreground font-medium">
                       {new Date(user.created_at).toLocaleDateString()}
                     </td>
                     <td className="p-4 text-right">
                       {canDelete && (
-                        <div className="flex items-center justify-end gap-2">
+                        <div className="flex items-center justify-end gap-2 opacity-50 hover:opacity-100 transition-opacity">
                           <button 
                             onClick={() => openEdit(user)} 
-                            className="p-2 bg-background neo-border text-primary hover:bg-primary/10 rounded-lg transition-colors"
+                            className="p-2 bg-background border border-border/50 text-foreground hover:bg-muted rounded-lg transition-colors shadow-sm"
                             title="Edit account"
                           >
                             <Edit2 className="w-4 h-4" />
                           </button>
                           <button 
                             onClick={() => handleDelete(user.id, user.email)} 
-                            className="p-2 bg-background neo-border text-danger hover:bg-danger/10 rounded-lg transition-colors"
+                            className="p-2 bg-danger/10 border border-transparent text-danger hover:bg-danger hover:text-danger-foreground rounded-lg transition-colors shadow-sm"
                             title="Delete account"
                           >
                             <Trash2 className="w-4 h-4" />

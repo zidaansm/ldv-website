@@ -110,42 +110,42 @@ export default function TeamAdminPage() {
     <div className="max-w-6xl mx-auto p-4 md:p-8 space-y-8">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Link href="/admin" className="p-2 rounded-xl neo-border bg-card hover:bg-muted transition-colors">
+          <Link href="/admin" className="p-2 rounded-xl bg-background border border-border/50 hover:bg-muted transition-colors shadow-sm">
             <ArrowLeft className="w-5 h-5" />
           </Link>
-          <h1 className="text-3xl font-extrabold" style={{ fontFamily: "var(--font-space-grotesk)" }}>
+          <h1 className="text-3xl font-bold" style={{ fontFamily: "var(--font-space-grotesk)" }}>
             Team Management
           </h1>
         </div>
         <button
           onClick={() => isFormOpen ? resetForm() : setIsFormOpen(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground neo-border neo-shadow-sm neo-press rounded-xl font-bold"
+          className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground shadow-md shadow-primary/20 hover:-translate-y-0.5 rounded-xl font-semibold transition-all"
         >
           <Plus className={`w-5 h-5 transition-transform ${isFormOpen ? "rotate-45" : ""}`} />
-          {isFormOpen ? "Cancel" : "Add Team"}
+          {isFormOpen ? "Cancel" : "Add Team Member"}
         </button>
       </div>
 
       {isFormOpen && (
-        <form onSubmit={handleSubmit} className="neo-border rounded-2xl p-6 bg-card space-y-4 animate-in fade-in slide-in-from-top-4 duration-300">
+        <form onSubmit={handleSubmit} className="border border-border/50 shadow-sm rounded-2xl p-6 bg-card/50 backdrop-blur-md space-y-4 animate-in fade-in slide-in-from-top-4 duration-300">
           <h2 className="text-xl font-bold mb-4">{editingId ? "Edit Team Member" : "Add New Team Member"}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-bold mb-1">Name</label>
-              <input required value={name} onChange={e => setName(e.target.value)} className="w-full neo-border rounded-lg px-3 py-2 bg-background" />
+              <label className="block text-sm font-semibold mb-1">Name</label>
+              <input required value={name} onChange={e => setName(e.target.value)} className="w-full border border-border/50 rounded-lg px-3 py-2 bg-background focus:border-primary focus:ring-1 focus:ring-primary transition-all" />
             </div>
             <div>
-              <label className="block text-sm font-bold mb-1">Role (e.g. Admin, Mod)</label>
-              <input required value={role} onChange={e => setRole(e.target.value)} className="w-full neo-border rounded-lg px-3 py-2 bg-background" />
+              <label className="block text-sm font-semibold mb-1">Role (e.g. Admin, Mod)</label>
+              <input required value={role} onChange={e => setRole(e.target.value)} className="w-full border border-border/50 rounded-lg px-3 py-2 bg-background focus:border-primary focus:ring-1 focus:ring-primary transition-all" />
             </div>
             <div>
-              <label className="block text-sm font-bold mb-1">Roblox Avatar URL</label>
-              <input required value={avatarUrl} onChange={e => setAvatarUrl(e.target.value)} className="w-full neo-border rounded-lg px-3 py-2 bg-background" />
+              <label className="block text-sm font-semibold mb-1">Roblox Avatar URL</label>
+              <input required value={avatarUrl} onChange={e => setAvatarUrl(e.target.value)} className="w-full border border-border/50 rounded-lg px-3 py-2 bg-background focus:border-primary focus:ring-1 focus:ring-primary transition-all" />
               <p className="text-xs text-muted-foreground mt-1">Right-click avatar image on Roblox &rarr; Copy Image Address</p>
             </div>
             <div>
-              <label className="block text-sm font-bold mb-1">Theme Color</label>
-              <select value={accentColor} onChange={e => setAccentColor(e.target.value)} className="w-full neo-border rounded-lg px-3 py-2 bg-background">
+              <label className="block text-sm font-semibold mb-1">Theme Color</label>
+              <select value={accentColor} onChange={e => setAccentColor(e.target.value)} className="w-full border border-border/50 rounded-lg px-3 py-2 bg-background focus:border-primary focus:ring-1 focus:ring-primary transition-all">
                 <optgroup label="Pastel Colors">
                   <option value="purple">Purple</option>
                   <option value="pink">Pink</option>
@@ -171,69 +171,78 @@ export default function TeamAdminPage() {
             <button 
               type="submit" 
               disabled={isSubmitting}
-              className="px-6 py-2 bg-accent text-accent-foreground font-bold neo-border rounded-xl disabled:opacity-50"
+              className="px-6 py-2 bg-accent text-accent-foreground font-semibold shadow-md shadow-accent/20 hover:-translate-y-0.5 rounded-xl disabled:opacity-50 transition-all"
             >
-              {isSubmitting ? "Saving..." : "Save Team"}
+              {isSubmitting ? "Saving..." : "Save Team Member"}
             </button>
           </div>
         </form>
       )}
 
       {TeamList.length === 0 ? (
-        <div className="neo-border rounded-2xl p-12 bg-card text-center flex flex-col items-center justify-center text-muted-foreground">
+        <div className="border border-border/50 shadow-sm rounded-2xl p-12 bg-card/50 backdrop-blur-md text-center flex flex-col items-center justify-center text-muted-foreground">
           <Users className="w-12 h-12 mb-4 opacity-50" />
           <p className="font-bold text-lg">No Team members found</p>
-          <p className="text-sm">Click "Add Team" to start building your team.</p>
+          <p className="text-sm">Click "Add Team Member" to start building your team.</p>
         </div>
       ) : (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {TeamList.map((Team) => {
-            const colorMap: Record<string, string> = {
-              purple: "#6b2157",
-              pink: "#db2777",
-              cyan: "#0891b2",
-              danger: "#e53e3e",
-              success: "#38a169",
-              warning: "#d69e2e",
-              "neo-red": "#FF2B2B",
-              "neo-yellow": "#FFD600",
-              "neo-blue": "#0047FF",
-              "neo-purple": "#7B00FF",
-              "neo-pink": "#FF006E",
-              "neo-orange": "#FF5C00",
-              "neo-green": "#00C44F",
-              "neo-dark": "#1A1A2E",
-            };
-            const color = colorMap[Team.accent_color] || colorMap.purple;
+        <div className="border border-border/50 shadow-sm rounded-2xl overflow-hidden bg-card/50 backdrop-blur-md">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-muted/50 border-b border-border/50">
+                  <th className="px-6 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider w-16">Avatar</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Name</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Role</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider w-32">Theme</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider w-32 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border/50">
+                {TeamList.map((Team) => {
+                  const colorMap: Record<string, string> = {
+                    purple: "#6b2157", pink: "#db2777", cyan: "#0891b2", danger: "#e53e3e",
+                    success: "#38a169", warning: "#d69e2e", "neo-red": "#FF2B2B", "neo-yellow": "#FFD600",
+                    "neo-blue": "#0047FF", "neo-purple": "#7B00FF", "neo-pink": "#FF006E",
+                    "neo-orange": "#FF5C00", "neo-green": "#00C44F", "neo-dark": "#1A1A2E",
+                  };
+                  const color = colorMap[Team.accent_color] || colorMap.purple;
 
-            return (
-              <div
-                key={Team.id}
-                className="rounded-2xl bg-card p-6 flex flex-col items-center relative group"
-                style={{
-                  border: `3px solid ${color}`,
-                  boxShadow: `4px 4px 0 ${color}`,
-                }}
-              >
-                <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button onClick={() => handleEditClick(Team)} className="p-2 bg-background neo-border hover:bg-muted rounded-lg transition-colors">
-                    <Edit2 className="w-4 h-4" />
-                  </button>
-                  <button onClick={() => handleDelete(Team.id)} className="p-2 bg-background neo-border text-danger hover:bg-danger/10 rounded-lg transition-colors">
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-                <div
-                  className="w-24 h-24 rounded-full mb-4 overflow-hidden flex items-center justify-center relative"
-                  style={{ border: `3px solid ${color}` }}
-                >
-                  <Image src={Team.avatar_url} alt={Team.name} fill sizes="96px" className="object-cover" />
-                </div>
-                <h3 className="text-xl font-bold">{Team.name}</h3>
-                <p className="font-semibold" style={{ color }}>{Team.role}</p>
-              </div>
-            );
-          })}
+                  return (
+                    <tr key={Team.id} className="hover:bg-muted/20 transition-colors group">
+                      <td className="px-6 py-4">
+                        <div className="w-12 h-12 rounded-xl overflow-hidden bg-muted flex items-center justify-center border-2 shadow-sm relative" style={{ borderColor: color }}>
+                          <Image src={Team.avatar_url} alt={Team.name} fill sizes="48px" className="object-cover" />
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 font-bold text-sm text-foreground">{Team.name}</td>
+                      <td className="px-6 py-4">
+                        <span className="px-3 py-1 rounded-full text-xs font-semibold" style={{ backgroundColor: `${color}20`, color: color }}>
+                          {Team.role}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-2">
+                          <span className="w-4 h-4 rounded-full border border-black/20 shadow-inner" style={{ backgroundColor: color }} />
+                          <span className="text-xs font-semibold tracking-wider">{Team.accent_color.replace('neo-', '').toUpperCase()}</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button onClick={() => handleEditClick(Team)} className="p-2 bg-background border border-border/50 text-foreground hover:bg-muted rounded-lg transition-colors" title="Edit Team Member">
+                            <Edit2 className="w-4 h-4" />
+                          </button>
+                          <button onClick={() => handleDelete(Team.id)} className="p-2 bg-danger/10 text-danger hover:bg-danger hover:text-danger-foreground rounded-lg transition-colors" title="Delete Team Member">
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>

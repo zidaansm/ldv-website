@@ -218,16 +218,16 @@ export default function GalleryAdminPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Link href="/admin" className="p-2 rounded-xl neo-border bg-card hover:bg-muted transition-colors">
+          <Link href="/admin" className="p-2 rounded-xl bg-background border border-border/50 hover:bg-muted transition-colors shadow-sm">
             <ArrowLeft className="w-5 h-5" />
           </Link>
-          <h1 className="text-3xl font-extrabold" style={{ fontFamily: "var(--font-space-grotesk)" }}>
+          <h1 className="text-3xl font-bold" style={{ fontFamily: "var(--font-space-grotesk)" }}>
             Gallery Management
           </h1>
         </div>
         <button
           onClick={() => (isFormOpen ? resetForm() : setIsFormOpen(true))}
-          className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground neo-border neo-shadow-sm neo-press rounded-xl font-bold"
+          className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground shadow-md shadow-primary/20 hover:-translate-y-0.5 rounded-xl font-semibold transition-all"
         >
           <Plus className={`w-5 h-5 transition-transform duration-300 ${isFormOpen ? "rotate-45" : ""}`} />
           {isFormOpen ? "Cancel" : "Add Media"}
@@ -236,28 +236,28 @@ export default function GalleryAdminPage() {
 
       {/* Form */}
       {isFormOpen && (
-        <form onSubmit={handleSubmit} className="neo-border rounded-2xl p-6 bg-card space-y-5 animate-in fade-in slide-in-from-top-4 duration-300">
+        <form onSubmit={handleSubmit} className="border border-border/50 shadow-sm rounded-2xl p-6 bg-card/50 backdrop-blur-md space-y-5 animate-in fade-in slide-in-from-top-4 duration-300">
           <h2 className="text-xl font-bold">{editingId ? "Edit Media" : "Add New Media"}</h2>
 
           {/* Title & Description */}
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-bold mb-1">Title</label>
+              <label className="block text-sm font-semibold mb-1">Title</label>
               <input
                 required
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="e.g. Winner of Tournament 2026"
-                className="w-full neo-border rounded-lg px-3 py-2 bg-background"
+                className="w-full border border-border/50 rounded-lg px-3 py-2 bg-background focus:border-primary focus:ring-1 focus:ring-primary transition-all"
               />
             </div>
             <div>
-              <label className="block text-sm font-bold mb-1">Description (Optional)</label>
+              <label className="block text-sm font-semibold mb-1">Description (Optional)</label>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Add a short caption or description..."
-                className="w-full neo-border rounded-lg px-3 py-2 bg-background min-h-[80px]"
+                className="w-full border border-border/50 rounded-lg px-3 py-2 bg-background min-h-[80px] focus:border-primary focus:ring-1 focus:ring-primary transition-all"
               />
             </div>
           </div>
@@ -267,18 +267,18 @@ export default function GalleryAdminPage() {
 
 
           {/* Mode Switcher */}
-          <div className="flex gap-2 p-1 bg-muted rounded-lg w-fit">
+          <div className="flex gap-2 p-1 bg-muted/50 border border-border/50 rounded-lg w-fit shadow-inner">
             <button
               type="button"
               onClick={() => { setInputMode("file"); setPreviewFile(file ? { url: URL.createObjectURL(file), type: file.type.startsWith("video") ? "video" : "image" } : null); }}
-              className={`px-4 py-1.5 rounded-md text-sm font-bold flex items-center gap-2 transition-all ${inputMode === "file" ? "bg-background neo-shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+              className={`px-4 py-1.5 rounded-md text-sm font-semibold flex items-center gap-2 transition-all ${inputMode === "file" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"}`}
             >
               <Upload className="w-4 h-4" /> Upload File (Cloudinary)
             </button>
             <button
               type="button"
               onClick={() => { setInputMode("link"); handleLinkChange(linkUrl); }}
-              className={`px-4 py-1.5 rounded-md text-sm font-bold flex items-center gap-2 transition-all ${inputMode === "link" ? "bg-background neo-shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+              className={`px-4 py-1.5 rounded-md text-sm font-semibold flex items-center gap-2 transition-all ${inputMode === "link" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"}`}
             >
               <Link2 className="w-4 h-4" /> Paste Link
             </button>
@@ -287,7 +287,7 @@ export default function GalleryAdminPage() {
           {/* FILE UPLOAD INPUT */}
           {inputMode === "file" && (
             <div>
-              <label className="block text-sm font-bold mb-1">Upload Media</label>
+              <label className="block text-sm font-semibold mb-1">Upload Media</label>
               <div className="relative group">
                 <input
                   type="file"
@@ -295,18 +295,18 @@ export default function GalleryAdminPage() {
                   onChange={handleFileChange}
                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                 />
-                <div className="w-full neo-border rounded-xl border-dashed p-8 bg-muted/30 flex flex-col items-center justify-center gap-2 group-hover:bg-muted/50 transition-colors">
+                <div className="w-full border border-border/50 rounded-xl border-dashed p-8 bg-muted/10 hover:bg-muted/30 flex flex-col items-center justify-center gap-2 transition-colors">
                   {file ? (
                     <>
                       {file.type.startsWith("video") ? <FileVideo className="w-10 h-10 text-primary" /> : <ImageIcon className="w-10 h-10 text-primary" />}
-                      <span className="font-bold text-center">{file.name}</span>
-                      <span className="text-xs text-muted-foreground">{(file.size / 1024 / 1024).toFixed(2)} MB</span>
+                      <span className="font-semibold text-center">{file.name}</span>
+                      <span className="text-xs text-muted-foreground font-medium">{(file.size / 1024 / 1024).toFixed(2)} MB</span>
                     </>
                   ) : (
                     <>
                       <Upload className="w-10 h-10 text-muted-foreground group-hover:text-primary transition-colors" />
-                      <span className="font-bold">Click or drag file to upload</span>
-                      <span className="text-xs text-muted-foreground text-center">
+                      <span className="font-semibold">Click or drag file to upload</span>
+                      <span className="text-xs text-muted-foreground text-center font-medium">
                         Images (max {MAX_IMAGE_MB}MB): JPG, PNG, GIF, WEBP<br />
                         Videos (max {MAX_VIDEO_MB}MB): MP4, WEBM
                       </span>
@@ -338,11 +338,11 @@ export default function GalleryAdminPage() {
             <div className="space-y-3">
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <label className="text-sm font-bold">Direct Link URL</label>
+                  <label className="text-sm font-semibold">Direct Link URL</label>
                   <button
                     type="button"
                     onClick={() => setShowLinkGuide(!showLinkGuide)}
-                    className="flex items-center gap-1 text-xs text-primary hover:underline"
+                    className="flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
                   >
                     <Info className="w-3.5 h-3.5" />
                     Cara dapat link?
@@ -352,16 +352,16 @@ export default function GalleryAdminPage() {
                   value={linkUrl}
                   onChange={(e) => handleLinkChange(e.target.value)}
                   placeholder="https://cdn.example.com/image.png"
-                  className="w-full neo-border rounded-lg px-3 py-2 bg-background font-mono text-sm"
+                  className="w-full border border-border/50 rounded-lg px-3 py-2 bg-background font-mono text-sm focus:border-primary focus:ring-1 focus:ring-primary transition-all"
                 />
-                <p className="text-xs text-muted-foreground mt-1">
-                  Harus berakhiran <code className="bg-muted px-1 rounded">.jpg</code> <code className="bg-muted px-1 rounded">.png</code> <code className="bg-muted px-1 rounded">.mp4</code> dll — link langsung ke filenya, bukan ke halaman website.
+                <p className="text-xs font-medium text-muted-foreground mt-1.5">
+                  Harus berakhiran <code className="bg-muted px-1.5 py-0.5 rounded-md border border-border/50 font-mono">.jpg</code> <code className="bg-muted px-1.5 py-0.5 rounded-md border border-border/50 font-mono">.png</code> <code className="bg-muted px-1.5 py-0.5 rounded-md border border-border/50 font-mono">.mp4</code> dll — link langsung ke filenya, bukan ke halaman website.
                 </p>
               </div>
 
               {/* Link Guide */}
               {showLinkGuide && (
-                <div className="neo-border rounded-xl bg-muted/50 p-4 space-y-4 text-sm">
+                <div className="border border-border/50 rounded-xl bg-muted/30 p-5 space-y-5 text-sm">
                   <p className="font-bold text-base">📖 Panduan Cara Dapat Direct Link</p>
 
                   <div className="space-y-1.5">
@@ -418,12 +418,12 @@ export default function GalleryAdminPage() {
 
           {/* Preview */}
           {previewFile && (
-            <div className="rounded-xl overflow-hidden neo-border bg-muted max-h-64 relative">
+            <div className="rounded-xl overflow-hidden border border-border/50 bg-muted/20 max-h-64 relative flex items-center justify-center">
               {inputMode === "file" && file && (
                  <button
                    type="button"
                    onClick={() => { setFile(null); setPreviewFile(null); }}
-                   className="absolute top-2 right-2 p-1.5 bg-background/80 hover:bg-danger text-foreground hover:text-white rounded-lg transition-colors z-20"
+                   className="absolute top-2 right-2 p-1.5 bg-background/80 hover:bg-danger text-foreground hover:text-white rounded-lg transition-colors z-20 backdrop-blur-sm"
                  >
                    <X className="w-4 h-4" />
                  </button>
@@ -439,7 +439,7 @@ export default function GalleryAdminPage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-6 py-2.5 bg-accent text-accent-foreground font-bold neo-border rounded-xl disabled:opacity-50 flex items-center gap-2"
+              className="px-6 py-2.5 bg-accent text-accent-foreground font-semibold shadow-md shadow-accent/20 hover:-translate-y-0.5 rounded-xl disabled:opacity-50 flex items-center gap-2 transition-all"
             >
               {isSubmitting ? (
                 <><span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />Saving...</>
@@ -453,39 +453,39 @@ export default function GalleryAdminPage() {
 
       {/* Gallery Grid */}
       {images.length === 0 ? (
-        <div className="neo-border rounded-2xl p-12 bg-card text-center flex flex-col items-center justify-center text-muted-foreground">
+        <div className="border border-border/50 shadow-sm rounded-2xl p-12 bg-card/50 backdrop-blur-md text-center flex flex-col items-center justify-center text-muted-foreground">
           <ImageIcon className="w-12 h-12 mb-4 opacity-50" />
-          <p className="font-bold text-lg">No media found</p>
-          <p className="text-sm">Click &quot;Add Media&quot; to start filling up your community gallery.</p>
+          <p className="font-bold text-lg text-foreground">No media found</p>
+          <p className="text-sm font-medium">Click &quot;Add Media&quot; to start filling up your community gallery.</p>
         </div>
       ) : (
         <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6">
           {images.map((image) => (
-            <div key={image.id} className="break-inside-avoid neo-border neo-shadow-sm rounded-2xl bg-card overflow-hidden flex flex-col relative group">
+            <div key={image.id} className="break-inside-avoid border border-border/50 shadow-sm rounded-2xl bg-card/50 backdrop-blur-md overflow-hidden flex flex-col relative group transition-all hover:shadow-md">
               <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-                <button onClick={() => handleEditClick(image)} className="p-2 bg-background/90 backdrop-blur-sm neo-border hover:bg-muted rounded-lg transition-colors shadow-sm">
+                <button onClick={() => handleEditClick(image)} className="p-2 bg-background/90 backdrop-blur-sm border border-border/50 text-foreground hover:bg-muted rounded-lg transition-colors shadow-sm">
                   <Edit2 className="w-4 h-4" />
                 </button>
-                <button onClick={() => handleDelete(image.id)} className="p-2 bg-background/90 backdrop-blur-sm neo-border text-danger hover:bg-danger/10 rounded-lg transition-colors shadow-sm">
+                <button onClick={() => handleDelete(image.id)} className="p-2 bg-danger/90 backdrop-blur-sm border border-danger/50 text-danger-foreground hover:bg-danger rounded-lg transition-colors shadow-sm">
                   <Trash2 className="w-4 h-4" />
                 </button>
               </div>
-              <div className="relative w-full overflow-hidden bg-muted">
+              <div className="relative w-full overflow-hidden bg-muted/20 aspect-video md:aspect-auto">
                 {isVideo(image.image_url) ? (
-                  <video src={image.image_url} autoPlay loop muted playsInline className="w-full h-auto object-cover" />
+                  <video src={image.image_url} autoPlay loop muted playsInline className="w-full h-full object-cover" />
                 ) : (
                   <Image
                     src={image.image_url}
                     alt={image.title}
                     width={600}
                     height={400}
-                    className="w-full h-auto object-cover"
+                    className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                 )}
               </div>
-              <div className="p-4 bg-card border-t-2 border-[var(--border)]">
-                <h3 className="font-bold text-foreground">{image.title}</h3>
-                <p className="text-xs font-semibold text-muted-foreground mt-1">{new Date(image.created_at).toLocaleDateString()}</p>
+              <div className="p-4 bg-card/50 backdrop-blur-sm border-t border-border/50">
+                <h3 className="font-semibold text-foreground leading-tight">{image.title}</h3>
+                <p className="text-xs font-medium text-muted-foreground mt-1.5">{new Date(image.created_at).toLocaleDateString()}</p>
               </div>
             </div>
           ))}
