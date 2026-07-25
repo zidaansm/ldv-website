@@ -37,7 +37,7 @@ export default function AdminDashboard() {
     setIsLoading(true);
     try {
       // Fetch exact counts concurrently
-      const tables = ["events", "staff", "members", "faq", "banlist", "menfess", "gallery"];
+      const tables = ["events", "staff", "members", "faq", "banlist", "menfess", "gallery", "twitter_bases", "collaborations", "story_sections", "social_links"];
       const countPromises = tables.map(table => 
         supabase.from(table).select("*", { count: "exact", head: true })
       );
@@ -141,6 +141,10 @@ export default function AdminDashboard() {
     { name: "FAQ", icon: MessageSquare, path: "/admin/faq", color: "accent", count: counts["faq"] || 0 },
     { name: "Ban List", icon: ShieldAlert, path: "/admin/banlist", color: "danger", count: counts["banlist"] || 0 },
     { name: "Menfess", icon: MessageSquare, path: "/admin/menfess", color: "purple", count: counts["menfess"] || 0 },
+    { name: "Twitter Bases", icon: MessageSquare, path: "/admin/bases", color: "accent", count: counts["twitter_bases"] || 0 },
+    { name: "Collaborations", icon: MessageSquare, path: "/admin/collaborations", color: "primary", count: counts["collaborations"] || 0 },
+    { name: "Story", icon: MessageSquare, path: "/admin/story", color: "pink", count: counts["story_sections"] || 0 },
+    { name: "Socials", icon: MessageSquare, path: "/admin/socials", color: "cyan", count: counts["social_links"] || 0 },
   ];
 
   if (currentUserRole === "super_admin" || currentUserRole === "admin") {

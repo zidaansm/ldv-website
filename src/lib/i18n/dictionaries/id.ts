@@ -8,6 +8,10 @@ export const id = {
     faq: "FAQ",
     banlist: "Daftar Banned",
     menfess: "Menfess",
+    bases: "Bases",
+    collab: "Kolab",
+    story: "Cerita",
+    socials: "Sosmed",
     joinDiscord: "Gabung Discord",
   },
   hero: {

@@ -8,6 +8,10 @@ export const en = {
     faq: "FAQ",
     banlist: "Ban List",
     menfess: "Menfess",
+    bases: "Bases",
+    collab: "Collab",
+    story: "Story",
+    socials: "Socials",
     joinDiscord: "Join Discord",
   },
   hero: {

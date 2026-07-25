@@ -21,11 +21,12 @@ export const SITE_CONFIG = {
 
 export const NAV_LINKS: NavLink[] = [
   { label: "About", href: "/#about" },
+  { label: "Story", href: "/story" },
   { label: "Events", href: "/#events" },
-  { label: "Gallery", href: "/#gallery" },
   { label: "Members", href: "/members" },
-  { label: "Team", href: "/#team" },
-  { label: "Menfess", href: "/menfess" },
+  { label: "Bases", href: "/bases" },
+  { label: "Collab", href: "/collaboration" },
+  { label: "Socials", href: "/links" },
   { label: "FAQ", href: "/#faq" },
 ];
 
