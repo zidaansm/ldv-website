@@ -3,9 +3,10 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { useTheme } from "next-themes";
 import { 
   LayoutDashboard, Users, Calendar, MessageSquare, ShieldAlert, 
-  ImageIcon, Activity, Globe, BookOpen, UserPlus, LogOut, ChevronRight, CheckSquare, MessageCircle
+  ImageIcon, Activity, Globe, BookOpen, UserPlus, LogOut, ChevronRight, CheckSquare, MessageCircle, Moon, Sun
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
@@ -31,6 +32,7 @@ export function AdminSidebar({ className, onNavigate }: { className?: string; on
   const pathname = usePathname();
   const router = useRouter();
   const supabase = createClient();
+  const { theme, setTheme } = useTheme();
   const [currentUserRole, setCurrentUserRole] = useState<string>("");
   const [allowedPaths, setAllowedPaths] = useState<string[] | null>(null);
 
@@ -115,7 +117,16 @@ export function AdminSidebar({ className, onNavigate }: { className?: string; on
         })}
       </div>
 
-      <div className="p-4 border-t border-border/50">
+      <div className="p-4 border-t border-border/50 space-y-2">
+        <button
+          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+          className="flex items-center justify-between w-full px-4 py-3 rounded-xl text-sm font-medium text-muted-foreground hover:bg-muted/50 hover:text-foreground transition-colors"
+        >
+          <div className="flex items-center gap-3">
+            {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            {theme === "dark" ? "Light Mode" : "Dark Mode"}
+          </div>
+        </button>
         <button
           onClick={handleLogout}
           className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium text-danger hover:bg-danger/10 transition-colors"
