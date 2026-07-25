@@ -42,7 +42,7 @@ export default function AdminMenfessPage() {
       .order("created_at", { ascending: false });
     
     if (data) {
-      const sortedData = data.map(post => ({
+      const sortedData = data.map((post: any) => ({
         ...post,
         menfess_comments: post.menfess_comments.sort((a: Comment, b: Comment) => 
           new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
