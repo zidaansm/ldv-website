@@ -24,6 +24,7 @@ export default function AdminDashboard() {
   const [upcomingEvents, setUpcomingEvents] = useState<any[]>([]);
   const [teamChatPreview, setTeamChatPreview] = useState<any[]>([]);
   const [chartData, setChartData] = useState<any[]>([]);
+  const [allowedModules, setAllowedModules] = useState<string[]>([]);
 
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [oldPassword, setOldPassword] = useState("");
@@ -72,6 +73,10 @@ export default function AdminDashboard() {
         const { data: roleData } = await supabase.from('user_roles').select('role').eq('id', session.user.id).single();
         if (roleData) {
           setCurrentUserRole(roleData.role);
+          const { data: permData } = await supabase.from('role_permissions').select('allowed_modules').eq('role', roleData.role).single();
+          if (permData) {
+            setAllowedModules(permData.allowed_modules || []);
+          }
         }
 
         // Fetch user tasks
@@ -342,26 +347,30 @@ export default function AdminDashboard() {
                   <div className="text-sm font-medium text-muted-foreground">Total Events</div>
                 </div>
               </div>
-              <div className="border border-border/50 shadow-sm rounded-2xl p-5 bg-card flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-all">
-                <div className="absolute top-0 right-0 w-24 h-24 bg-purple/5 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
-                <MessageSquare className="w-6 h-6 text-purple mb-2" />
-                <div>
-                  <div className="text-3xl font-extrabold" style={{ fontFamily: "var(--font-space-grotesk)" }}>
-                    {isLoading ? "-" : counts["menfess"] || 0}
+              {(allowedModules.includes("/admin/menfess") || currentUserRole === 'super_admin' || currentUserRole === 'admin') && (
+                <div className="border border-border/50 shadow-sm rounded-2xl p-5 bg-card flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-all">
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-purple/5 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+                  <MessageSquare className="w-6 h-6 text-purple mb-2" />
+                  <div>
+                    <div className="text-3xl font-extrabold" style={{ fontFamily: "var(--font-space-grotesk)" }}>
+                      {isLoading ? "-" : counts["menfess"] || 0}
+                    </div>
+                    <div className="text-sm font-medium text-muted-foreground">Total Menfess</div>
                   </div>
-                  <div className="text-sm font-medium text-muted-foreground">Total Menfess</div>
                 </div>
-              </div>
-              <div className="border border-border/50 shadow-sm rounded-2xl p-5 bg-card flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-all">
-                <div className="absolute top-0 right-0 w-24 h-24 bg-danger/5 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
-                <ShieldAlert className="w-6 h-6 text-danger mb-2" />
-                <div>
-                  <div className="text-3xl font-extrabold" style={{ fontFamily: "var(--font-space-grotesk)" }}>
-                    {isLoading ? "-" : counts["banlist"] || 0}
+              )}
+              {(allowedModules.includes("/admin/banlist") || currentUserRole === 'super_admin' || currentUserRole === 'admin') && (
+                <div className="border border-border/50 shadow-sm rounded-2xl p-5 bg-card flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-all">
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-danger/5 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+                  <ShieldAlert className="w-6 h-6 text-danger mb-2" />
+                  <div>
+                    <div className="text-3xl font-extrabold" style={{ fontFamily: "var(--font-space-grotesk)" }}>
+                      {isLoading ? "-" : counts["banlist"] || 0}
+                    </div>
+                    <div className="text-sm font-medium text-muted-foreground">Banned Users</div>
                   </div>
-                  <div className="text-sm font-medium text-muted-foreground">Banned Users</div>
                 </div>
-              </div>
+              )}
             </div>
 
             {/* Community Growth Chart */}
@@ -401,41 +410,43 @@ export default function AdminDashboard() {
             </div>
 
             {/* Menfess Inbox */}
-            <div className="border border-border/50 shadow-sm rounded-2xl p-6 bg-card/50 backdrop-blur-md">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold flex items-center gap-2">
-                  <Inbox className="w-5 h-5 text-purple" />
-                  Recent Menfess Inbox
-                </h2>
-                <Link href="/admin/menfess" className="text-xs font-bold text-primary hover:underline">Manage All</Link>
-              </div>
-              <div className="space-y-3">
-                {isLoading ? (
-                  <div className="text-sm text-muted-foreground animate-pulse">Loading inbox...</div>
-                ) : pendingMenfess.length === 0 ? (
-                  <div className="text-sm text-muted-foreground bg-background p-4 rounded-xl border border-border/50 text-center">
-                    ✨ Inbox is empty! All menfess have been moderated.
-                  </div>
-                ) : (
-                  pendingMenfess.map(post => (
-                    <div key={post.id} className="p-4 rounded-xl bg-background border border-border/50 shadow-sm flex flex-col gap-2 group hover:border-purple/30 transition-colors">
-                      <div className="flex justify-between items-start gap-2">
-                        <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-purple/10 text-purple border border-purple/20">
-                          {post.to_name}
-                        </span>
-                        <span className="text-[10px] font-medium text-muted-foreground">{safeFormatDate(post.created_at)}</span>
-                      </div>
-                      <p className="text-sm font-medium line-clamp-2 text-foreground/90">{post.content}</p>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="text-[10px] font-semibold text-muted-foreground flex items-center gap-1">
-                          From: {post.from_name || "Anonymous"}
-                        </span>
-                      </div>
+            {(allowedModules.includes("/admin/menfess") || currentUserRole === 'super_admin' || currentUserRole === 'admin') && (
+              <div className="border border-border/50 shadow-sm rounded-2xl p-6 bg-card/50 backdrop-blur-md">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-xl font-bold flex items-center gap-2">
+                    <Inbox className="w-5 h-5 text-purple" />
+                    Recent Menfess Inbox
+                  </h2>
+                  <Link href="/admin/menfess" className="text-xs font-bold text-primary hover:underline">Manage All</Link>
+                </div>
+                <div className="space-y-3">
+                  {isLoading ? (
+                    <div className="text-sm text-muted-foreground animate-pulse">Loading inbox...</div>
+                  ) : pendingMenfess.length === 0 ? (
+                    <div className="text-sm text-muted-foreground bg-background p-4 rounded-xl border border-border/50 text-center">
+                      ✨ Inbox is empty! All menfess have been moderated.
                     </div>
-                  ))
-                )}
+                  ) : (
+                    pendingMenfess.map(post => (
+                      <div key={post.id} className="p-4 rounded-xl bg-background border border-border/50 shadow-sm flex flex-col gap-2 group hover:border-purple/30 transition-colors">
+                        <div className="flex justify-between items-start gap-2">
+                          <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-purple/10 text-purple border border-purple/20">
+                            {post.to_name}
+                          </span>
+                          <span className="text-[10px] font-medium text-muted-foreground">{safeFormatDate(post.created_at)}</span>
+                        </div>
+                        <p className="text-sm font-medium line-clamp-2 text-foreground/90">{post.content}</p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-[10px] font-semibold text-muted-foreground flex items-center gap-1">
+                            From: {post.from_name || "Anonymous"}
+                          </span>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Quick Actions */}
             <div className="border border-border/50 shadow-sm rounded-2xl p-6 bg-card/50 backdrop-blur-md">
