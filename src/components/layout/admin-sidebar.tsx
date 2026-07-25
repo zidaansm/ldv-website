@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { 
   LayoutDashboard, Users, Calendar, MessageSquare, ShieldAlert, 
-  ImageIcon, Activity, Globe, BookOpen, UserPlus, LogOut, ChevronRight
+  ImageIcon, Activity, Globe, BookOpen, UserPlus, LogOut, ChevronRight, CheckSquare
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
@@ -23,6 +23,7 @@ const allModules = [
   { name: "Collaborations", icon: Globe, path: "/admin/collaborations" },
   { name: "Story", icon: BookOpen, path: "/admin/story" },
   { name: "Social Links", icon: Globe, path: "/admin/socials" },
+  { name: "Tasks", icon: CheckSquare, path: "/admin/tasks" },
 ];
 
 export function AdminSidebar({ className, onNavigate }: { className?: string; onNavigate?: () => void }) {
