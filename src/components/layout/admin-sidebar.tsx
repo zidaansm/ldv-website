@@ -30,18 +30,28 @@ export function AdminSidebar({ className, onNavigate }: { className?: string; on
   const router = useRouter();
   const supabase = createClient();
   const [currentUserRole, setCurrentUserRole] = useState<string>("");
+  const [allowedPaths, setAllowedPaths] = useState<string[] | null>(null);
 
   useEffect(() => {
-    const fetchRole = async () => {
+    const fetchRoleAndPermissions = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         const { data: roleData } = await supabase.from('user_roles').select('role').eq('id', session.user.id).single();
         if (roleData) {
           setCurrentUserRole(roleData.role);
+          
+          const { data: permData } = await supabase.from('role_permissions')
+            .select('allowed_modules')
+            .eq('role', roleData.role)
+            .single();
+            
+          if (permData && permData.allowed_modules) {
+            setAllowedPaths(permData.allowed_modules);
+          }
         }
       }
     };
-    fetchRole();
+    fetchRoleAndPermissions();
   }, [supabase]);
 
   const handleLogout = async () => {
@@ -49,11 +59,14 @@ export function AdminSidebar({ className, onNavigate }: { className?: string; on
     router.push("/admin/login");
   };
 
-  let allowedModules = allModules;
-  if (currentUserRole === "super_admin" || currentUserRole === "admin") {
-    allowedModules = [...allModules, { name: "Accounts", icon: ShieldAlert, path: "/admin/users" }];
-  } else if (currentUserRole === "event_organizer") {
-    allowedModules = allModules.filter(m => m.name === "Dashboard" || m.name === "Events");
+  const allPossibleModules = [...allModules, { name: "Accounts", icon: ShieldAlert, path: "/admin/users" }];
+  
+  let allowedModules = allPossibleModules;
+  if (allowedPaths) {
+    allowedModules = allPossibleModules.filter(m => allowedPaths.includes(m.path));
+  } else {
+    // Fallback before permissions load
+    allowedModules = [{ name: "Dashboard", icon: LayoutDashboard, path: "/admin" }];
   }
 
   if (pathname === "/admin/login") return null;

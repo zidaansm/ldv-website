@@ -31,17 +31,25 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         const { data } = await supabase.from('user_roles').select('role').eq('id', session.user.id).single();
         const role = data?.role || 'unassigned';
 
-        if (role === 'event_organizer') {
-          // Event Organizers can only access dashboard and events management
-          if (pathname !== "/admin" && !pathname.startsWith("/admin/events")) {
-            router.push("/admin");
-            return;
-          }
-        } else if (role === 'unassigned') {
+        if (role === 'unassigned') {
           // Unassigned users can only view dashboard (where they will see 0 stats due to RLS)
           if (pathname !== "/admin") {
              router.push("/admin");
              return;
+          }
+        } else {
+          // Fetch dynamic permissions for this role
+          const { data: permData } = await supabase.from('role_permissions').select('allowed_modules').eq('role', role).single();
+          
+          if (permData && permData.allowed_modules) {
+             const allowed = permData.allowed_modules;
+             const isAllowed = allowed.some((m: string) => pathname === m || (m !== "/admin" && pathname.startsWith(m + "/")));
+             
+             // Dashboard (/admin) is always accessible to prevent redirect loops
+             if (!isAllowed && pathname !== "/admin") {
+                router.push("/admin");
+                return;
+             }
           }
         }
       }
