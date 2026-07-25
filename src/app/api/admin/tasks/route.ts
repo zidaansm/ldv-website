@@ -74,7 +74,7 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json();
-    const { title, description, assignee_id, status } = body;
+    const { title, description, assignee_id, status, priority, due_date } = body;
 
     if (!title) {
       return NextResponse.json({ error: "Title is required" }, { status: 400 });
@@ -87,6 +87,8 @@ export async function POST(request: Request) {
         description: description || null,
         assignee_id: assignee_id || null,
         status: status || 'todo',
+        priority: priority || 'medium',
+        due_date: due_date || null,
         creator_id: auth.userId
       })
       .select()
@@ -108,7 +110,7 @@ export async function PUT(request: Request) {
 
   try {
     const body = await request.json();
-    const { id, title, description, status, assignee_id } = body;
+    const { id, title, description, status, assignee_id, priority, due_date } = body;
 
     if (!id) {
       return NextResponse.json({ error: "Task ID is required" }, { status: 400 });
@@ -120,6 +122,8 @@ export async function PUT(request: Request) {
     if (description !== undefined) updates.description = description;
     if (status !== undefined) updates.status = status;
     if (assignee_id !== undefined) updates.assignee_id = assignee_id;
+    if (priority !== undefined) updates.priority = priority;
+    if (due_date !== undefined) updates.due_date = due_date;
 
     const { data, error } = await supabaseAdmin
       .from("admin_tasks")
