@@ -80,7 +80,7 @@ export async function POST(request: Request) {
     if (auth.role === "admin" && role !== "event_organizer") {
       return NextResponse.json({ error: "Admins can only create event organizers" }, { status: 403 });
     }
-    if (auth.role === "super_admin" && !["super_admin", "admin", "event_organizer"].includes(role)) {
+    if (auth.role === "super_admin" && !["super_admin", "admin", "event_organizer", "creative", "socmed"].includes(role)) {
       return NextResponse.json({ error: "Invalid role" }, { status: 400 });
     }
 
@@ -194,7 +194,7 @@ export async function PUT(request: Request) {
       }
     }
     
-    if (auth.role === "super_admin" && role && !["super_admin", "admin", "event_organizer"].includes(role)) {
+    if (auth.role === "super_admin" && role && !["super_admin", "admin", "event_organizer", "creative", "socmed"].includes(role)) {
       return NextResponse.json({ error: "Invalid role" }, { status: 400 });
     }
 

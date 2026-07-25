@@ -296,6 +296,8 @@ export default function UsersAdminPage() {
                       <>
                         <option value="super_admin">Super Admin</option>
                         <option value="admin">Admin</option>
+                        <option value="creative">Creative</option>
+                        <option value="socmed">Social Media</option>
                       </>
                     )}
                     <option value="event_organizer">Event Organizer</option>
@@ -343,6 +345,8 @@ export default function UsersAdminPage() {
                   {users.map((user) => {
                     const isSuperAdmin = user.role === 'super_admin';
                     const isEventOrg = user.role === 'event_organizer';
+                    const isCreative = user.role === 'creative';
+                    const isSocmed = user.role === 'socmed';
                     const isSelf = user.id === currentUserId;
                     
                     const canDelete = !isSelf && (
@@ -356,7 +360,10 @@ export default function UsersAdminPage() {
                         <td className="p-4">
                           <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${
                             isSuperAdmin ? 'bg-danger/10 text-danger border-danger/20' :
-                            isEventOrg ? 'bg-warning/10 text-warning border-warning/20' : 'bg-primary/10 text-primary border-primary/20'
+                            isEventOrg ? 'bg-warning/10 text-warning border-warning/20' :
+                            isCreative ? 'bg-purple-500/10 text-purple-500 border-purple-500/20' :
+                            isSocmed ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' :
+                            'bg-primary/10 text-primary border-primary/20'
                           }`}>
                             {user.role.replace('_', ' ').toUpperCase()}
                           </span>
