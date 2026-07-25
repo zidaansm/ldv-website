@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { createClient as createServerClient } from "@/lib/supabase/server";
 import { createClient } from "@supabase/supabase-js";
 
 const supabaseAdmin = createClient(
@@ -6,7 +7,37 @@ const supabaseAdmin = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
+// Helper function to verify admin access
+async function verifyAdminAccess() {
+  const supabase = await createServerClient();
+  const { data: { session } } = await supabase.auth.getSession();
+  
+  if (!session) {
+    return { authorized: false, error: "Unauthorized", status: 401 };
+  }
+
+  const { data: roleData, error } = await supabase
+    .from("user_roles")
+    .select("role")
+    .eq("id", session.user.id)
+    .single();
+
+  if (error || !roleData) {
+    return { authorized: false, error: "Forbidden: No role assigned", status: 403 };
+  }
+
+  const role = roleData.role;
+  if (role !== "super_admin" && role !== "admin") {
+    return { authorized: false, error: "Forbidden: Insufficient permissions", status: 403 };
+  }
+
+  return { authorized: true, role, userId: session.user.id };
+}
+
 export async function GET() {
+  const auth = await verifyAdminAccess();
+  if (!auth.authorized) return NextResponse.json({ error: auth.error }, { status: auth.status });
+
   const { data: socials, error } = await supabaseAdmin
     .from("social_links")
     .select("*")
@@ -20,6 +51,9 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const auth = await verifyAdminAccess();
+  if (!auth.authorized) return NextResponse.json({ error: auth.error }, { status: auth.status });
+
   try {
     const json = await request.json();
     const { platform, url, username, icon_name, order_index, is_active } = json;
@@ -52,6 +86,9 @@ export async function POST(request: Request) {
 }
 
 export async function PUT(request: Request) {
+  const auth = await verifyAdminAccess();
+  if (!auth.authorized) return NextResponse.json({ error: auth.error }, { status: auth.status });
+
   try {
     const json = await request.json();
     const { id, platform, url, username, icon_name, order_index, is_active } = json;
@@ -84,6 +121,9 @@ export async function PUT(request: Request) {
 }
 
 export async function DELETE(request: Request) {
+  const auth = await verifyAdminAccess();
+  if (!auth.authorized) return NextResponse.json({ error: auth.error }, { status: auth.status });
+
   try {
     const url = new URL(request.url);
     const id = url.searchParams.get("id");
