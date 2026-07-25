@@ -34,12 +34,12 @@ export default function TeamChatPage() {
     const channel = supabase
       .channel('team_chat')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'admin_chat_messages' }, payload => {
-        // We fetch again to get the populated email and role
-        // A better way would be to fetch just the new message, but for simplicity we fetch all or just the missing user details.
-        // For this demo, let's just trigger a re-fetch of the messages to get the correct user emails
+        console.log('New message received via realtime!', payload);
         fetchMessages();
       })
-      .subscribe();
+      .subscribe((status) => {
+        console.log('Realtime subscription status:', status);
+      });
       
     // Get current user to align messages left/right
     const getUser = async () => {
@@ -65,7 +65,7 @@ export default function TeamChatPage() {
 
   const fetchMessages = async () => {
     try {
-      const res = await fetch("/api/admin/chat");
+      const res = await fetch(`/api/admin/chat?t=${Date.now()}`, { cache: 'no-store' });
       const data = await res.json();
       if (res.ok) {
         setMessages(data.messages || []);

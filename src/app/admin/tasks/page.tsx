@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import { Plus, CheckSquare, Edit2, Trash2, Calendar, Clock, User, Send, MessageSquare } from "lucide-react";
 import { format } from "date-fns";
+import { createClient } from "@/lib/supabase/client";
 
 interface Task {
   id: string;
@@ -60,13 +61,32 @@ export default function TasksPage() {
   const [dueDate, setDueDate] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const supabase = createClient();
+
   useEffect(() => {
     fetchTasks();
-  }, []);
+    
+    // Subscribe to task updates and comments
+    const channel = supabase
+      .channel('tasks_channel')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'task_comments' }, payload => {
+        if (isModalOpen && editingTask) {
+          fetchComments(editingTask.id);
+        }
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'tasks' }, payload => {
+        fetchTasks();
+      })
+      .subscribe();
+      
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [isModalOpen, editingTask]);
 
   const fetchTasks = async () => {
     try {
-      const res = await fetch("/api/admin/tasks");
+      const res = await fetch(`/api/admin/tasks?t=${Date.now()}`, { cache: 'no-store' });
       const data = await res.json();
       if (res.ok) {
         setTasks(data.tasks || []);
@@ -106,9 +126,8 @@ export default function TasksPage() {
 
   const fetchComments = async (taskId: string) => {
     setIsLoadingComments(true);
-    setComments([]);
     try {
-      const res = await fetch(`/api/admin/tasks/comments?taskId=${taskId}`);
+      const res = await fetch(`/api/admin/tasks/comments?taskId=${taskId}&t=${Date.now()}`, { cache: 'no-store' });
       if (res.ok) {
         const data = await res.json();
         setComments(data.comments || []);
