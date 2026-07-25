@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import { LogOut, LayoutDashboard, Users, Calendar, MessageSquare, ShieldAlert, Image as ImageIcon, Activity, PlusCircle, ArrowRight, Eye, RefreshCw, Key, X } from "lucide-react";
+import { LogOut, LayoutDashboard, Users, Calendar, MessageSquare, ShieldAlert, Image as ImageIcon, Activity, PlusCircle, ArrowRight, Eye, RefreshCw, Key, X, Upload, Camera } from "lucide-react";
 import Link from "next/link";
 import { formatDistanceToNow, format } from "date-fns";
 import toast from "react-hot-toast";
@@ -25,6 +25,12 @@ export default function AdminDashboard() {
   const [newPassword, setNewPassword] = useState("");
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
   const [currentUserEmail, setCurrentUserEmail] = useState<string>("");
+
+  const [fullName, setFullName] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState("");
+  const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   const safeFormatDate = (dateStr: string) => {
     try {
@@ -55,6 +61,9 @@ export default function AdminDashboard() {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         setCurrentUserEmail(session.user.email || "");
+        setFullName(session.user.user_metadata?.full_name || "");
+        setAvatarUrl(session.user.user_metadata?.avatar_url || "");
+        
         const { data: roleData } = await supabase.from('user_roles').select('role').eq('id', session.user.id).single();
         if (roleData) {
           setCurrentUserRole(roleData.role);
@@ -146,6 +155,63 @@ export default function AdminDashboard() {
     setIsUpdatingPassword(false);
   };
 
+  const handleUpdateProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsUpdatingProfile(true);
+    const loadingToast = toast.loading("Updating profile...");
+
+    try {
+      let finalAvatarUrl = avatarUrl;
+
+      if (avatarFile) {
+        toast.loading("Uploading avatar to Cloudinary...", { id: loadingToast });
+        const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+        const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
+
+        if (!cloudName || !uploadPreset) throw new Error("Cloudinary credentials missing");
+
+        const formData = new FormData();
+        formData.append("file", avatarFile);
+        formData.append("upload_preset", uploadPreset);
+
+        const uploadResponse = await new Promise<string>((resolve, reject) => {
+          const xhr = new XMLHttpRequest();
+          xhr.open("POST", `https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`);
+          xhr.upload.onprogress = (event) => {
+            if (event.lengthComputable) {
+              setUploadProgress(Math.round((event.loaded / event.total) * 100));
+            }
+          };
+          xhr.onload = () => {
+            if (xhr.status === 200) resolve(JSON.parse(xhr.responseText).secure_url);
+            else reject(new Error("Upload failed"));
+          };
+          xhr.onerror = () => reject(new Error("Network error"));
+          xhr.send(formData);
+        });
+        finalAvatarUrl = uploadResponse;
+        setAvatarUrl(finalAvatarUrl);
+      }
+
+      toast.loading("Saving profile...", { id: loadingToast });
+      const { error } = await supabase.auth.updateUser({
+        data: { full_name: fullName, avatar_url: finalAvatarUrl }
+      });
+
+      if (error) throw error;
+      toast.success("Profile updated successfully!", { id: loadingToast });
+      setAvatarFile(null);
+      setUploadProgress(0);
+      
+      // Update team chat avatars optionally if you wanted to sync, but we rely on next reload or realtime updates usually.
+    } catch (error: any) {
+      toast.error(error.message, { id: loadingToast });
+    } finally {
+      setIsUpdatingProfile(false);
+      setUploadProgress(0);
+    }
+  };
+
   let adminModules: any[] = [];
   const allModules = [
     { name: "Events", icon: Calendar, path: "/admin/events", color: "primary", count: counts["events"] || 0 },
@@ -176,12 +242,16 @@ export default function AdminDashboard() {
         {/* Header */}
         <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-border/50 shadow-sm rounded-2xl p-6 bg-card/50 backdrop-blur-md">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-primary text-primary-foreground flex items-center justify-center shadow-lg shadow-primary/20">
-              <LayoutDashboard className="w-6 h-6" />
-            </div>
+            {avatarUrl ? (
+              <img src={avatarUrl} alt="Avatar" className="w-12 h-12 rounded-xl object-cover shadow-lg shadow-primary/20 border border-border/50" />
+            ) : (
+              <div className="w-12 h-12 rounded-xl bg-primary text-primary-foreground flex items-center justify-center shadow-lg shadow-primary/20">
+                <LayoutDashboard className="w-6 h-6" />
+              </div>
+            )}
             <div>
               <h1 className="text-2xl font-extrabold" style={{ fontFamily: "var(--font-space-grotesk)" }}>
-                LDV Command Center
+                {fullName ? `Welcome back, ${fullName.split(' ')[0]}!` : "LDV Command Center"}
               </h1>
               <div className="flex items-center gap-2 mt-1">
                 <span className={`px-2 py-0.5 text-xs font-bold rounded-full shadow-sm ${
@@ -470,6 +540,57 @@ export default function AdminDashboard() {
                   </span>
                 </div>
               </div>
+
+              {/* Profile Edit Form */}
+              <form onSubmit={handleUpdateProfile} className="space-y-4">
+                
+                <div className="flex flex-col sm:flex-row gap-4 items-center mb-4">
+                  <div className="relative group w-20 h-20 rounded-full border border-border/50 bg-muted flex-shrink-0 overflow-hidden shadow-inner">
+                    {avatarFile ? (
+                      <img src={URL.createObjectURL(avatarFile)} alt="Avatar preview" className="w-full h-full object-cover" />
+                    ) : avatarUrl ? (
+                      <img src={avatarUrl} alt="Current avatar" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                        <Users className="w-8 h-8" />
+                      </div>
+                    )}
+                    
+                    <label className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                      <Camera className="w-6 h-6 text-white" />
+                      <input type="file" accept="image/*" className="hidden" onChange={e => {
+                        if (e.target.files && e.target.files[0]) {
+                          if (e.target.files[0].size > 5 * 1024 * 1024) {
+                            toast.error("Avatar size must be less than 5MB");
+                            return;
+                          }
+                          setAvatarFile(e.target.files[0]);
+                        }
+                      }} />
+                    </label>
+                  </div>
+                  
+                  <div className="flex-1 w-full">
+                    <label className="block text-sm font-bold mb-1">Full Name</label>
+                    <input type="text" value={fullName} onChange={e => setFullName(e.target.value)} className="w-full border border-border/50 focus:border-primary focus:ring-1 focus:ring-primary rounded-lg px-3 py-2 bg-background transition-colors" placeholder="e.g. John Doe" />
+                  </div>
+                </div>
+                
+                {isUpdatingProfile && uploadProgress > 0 && uploadProgress < 100 && (
+                  <div className="w-full bg-muted rounded-full h-1.5 overflow-hidden">
+                    <div className="bg-primary h-full transition-all duration-300" style={{ width: `${uploadProgress}%` }} />
+                  </div>
+                )}
+                
+                <button 
+                  type="submit" 
+                  disabled={isUpdatingProfile}
+                  className="w-full py-2 bg-background border border-border/50 hover:bg-muted font-bold transition-all rounded-xl disabled:opacity-50 mt-2 flex items-center justify-center gap-2"
+                >
+                  {isUpdatingProfile ? <RefreshCw className="w-4 h-4 animate-spin" /> : null}
+                  {isUpdatingProfile ? "Saving..." : "Save Profile Details"}
+                </button>
+              </form>
 
               <div className="h-px w-full bg-border/50" />
 
