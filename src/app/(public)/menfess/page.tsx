@@ -57,7 +57,7 @@ function MenfessContent() {
   const [loading, setLoading] = useState(true);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [activePost, setActivePost] = useState<Menfess | null>(null);
-  
+  const [mounted, setMounted] = useState(false);  
   // Submit Post State
   const [content, setContent] = useState("");
   const [senderName, setSenderName] = useState("");
@@ -114,6 +114,7 @@ function MenfessContent() {
       }
     }
     setLikedPosts(likes);
+    setMounted(true);
 
     // Cleanup realtime subscription
     return () => {
@@ -347,7 +348,7 @@ function MenfessContent() {
                       {post.is_anonymous ? "Anonymous" : post.sender_name}
                     </p>
                     <p className="text-xs text-muted-foreground font-semibold">
-                      {new Date(post.created_at).toLocaleDateString()}
+                      {mounted ? new Date(post.created_at).toLocaleDateString() : ""}
                     </p>
                   </div>
                 </div>

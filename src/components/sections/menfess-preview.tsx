@@ -103,9 +103,11 @@ export function MenfessPreview({ initialPosts, initialAvatars }: { initialPosts?
   }, []);
 
   const [sessionSalt, setSessionSalt] = useState(0);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setSessionSalt(Math.floor(Math.random() * 10000));
+    setMounted(true);
   }, []);
 
   const getPostAvatars = (postId: string) => {
@@ -230,7 +232,7 @@ export function MenfessPreview({ initialPosts, initialAvatars }: { initialPosts?
                         {post.is_anonymous ? "Anonymous" : post.sender_name}
                       </p>
                       <p className="text-xs text-muted-foreground font-semibold">
-                        {new Date(post.created_at).toLocaleDateString()}
+                        {mounted ? new Date(post.created_at).toLocaleDateString() : ""}
                       </p>
                     </div>
                   </div>
