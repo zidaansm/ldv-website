@@ -72,7 +72,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center admin-theme">
         <div className="animate-spin-slow w-12 h-12 border-4 border-primary border-t-transparent rounded-full"></div>
       </div>
     );
@@ -81,7 +81,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const isLoginPage = pathname === "/admin/login";
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex">
+    <div className="min-h-screen bg-background text-foreground flex admin-theme">
       {!isLoginPage && <AdminSidebar className="hidden lg:flex" />}
       {!isLoginPage && <AdminHeader />}
       
