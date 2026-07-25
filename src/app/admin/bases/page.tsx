@@ -135,26 +135,53 @@ export default function BasesAdminPage() {
     let finalLogoUrl = logoUrl;
 
     if (selectedFile) {
-      toast.loading("Uploading logo...", { id: loadingToast });
-      const ext = selectedFile.name.split(".").pop();
-      const filename = `bases/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      toast.loading("Uploading logo to Cloudinary...", { id: loadingToast });
       setUploadProgress(20);
 
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from("gallery")
-        .upload(filename, selectedFile, { contentType: selectedFile.type, upsert: false });
+      try {
+        const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+        const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
 
-      if (uploadError) {
+        if (!cloudName || !uploadPreset) {
+          throw new Error("Cloudinary credentials missing");
+        }
+
+        const formData = new FormData();
+        formData.append("file", selectedFile);
+        formData.append("upload_preset", uploadPreset);
+
+        const uploadResponse = await new Promise<string>((resolve, reject) => {
+          const xhr = new XMLHttpRequest();
+          xhr.open("POST", `https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`);
+          
+          xhr.upload.onprogress = (event) => {
+            if (event.lengthComputable) {
+              const percentComplete = Math.round((event.loaded / event.total) * 100);
+              setUploadProgress(percentComplete);
+            }
+          };
+
+          xhr.onload = () => {
+            if (xhr.status === 200) {
+              const response = JSON.parse(xhr.responseText);
+              resolve(response.secure_url);
+            } else {
+              reject(new Error(`Upload failed`));
+            }
+          };
+
+          xhr.onerror = () => reject(new Error("Network error"));
+          xhr.send(formData);
+        });
+
+        finalLogoUrl = uploadResponse;
+        setUploadProgress(100);
+      } catch (err: any) {
         setIsSubmitting(false);
         setUploadProgress(0);
-        toast.error(`Upload failed: ${uploadError.message}`, { id: loadingToast });
+        toast.error(`Upload failed: ${err.message}`, { id: loadingToast });
         return;
       }
-      
-      setUploadProgress(80);
-      const { data: urlData } = supabase.storage.from("gallery").getPublicUrl(uploadData.path);
-      finalLogoUrl = urlData.publicUrl;
-      setUploadProgress(100);
     }
 
     const payload = {
@@ -288,6 +315,22 @@ export default function BasesAdminPage() {
                       <span className="text-xs font-bold">Remove</span>
                     </button>
                   </div>
+                ) : logoUrl ? (
+                  <div className="relative inline-block border-2 border-black rounded-xl overflow-hidden bg-white neo-shadow-sm group">
+                    <img src={logoUrl} alt="Preview" className="w-32 h-32 object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedFile(null);
+                        setPreviewUrl("");
+                        setLogoUrl("");
+                      }}
+                      className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <Trash2 className="w-6 h-6 mb-1" />
+                      <span className="text-xs font-bold">Remove</span>
+                    </button>
+                  </div>
                 ) : (
                   <button
                     type="button"
@@ -295,7 +338,7 @@ export default function BasesAdminPage() {
                     className="w-full sm:w-64 h-32 flex flex-col items-center justify-center gap-2 border-2 border-dashed border-black rounded-xl bg-muted hover:bg-secondary neo-press transition-colors"
                   >
                     <Upload className="w-6 h-6 text-muted-foreground" />
-                    <span className="text-sm font-bold text-muted-foreground">Upload Logo</span>
+                    <span className="text-sm font-bold text-muted-foreground">Upload Logo (Cloudinary)</span>
                   </button>
                 )}
                 
