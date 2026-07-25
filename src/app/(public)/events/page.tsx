@@ -107,15 +107,35 @@ export default function EventsGalleryPage() {
       let finalFormData = { ...formData };
       
       for (const [label, file] of Object.entries(fileData)) {
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${selectedEvent.id}/${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
-        
-        const { error: uploadError } = await supabase.storage
-          .from('registration-files')
-          .upload(fileName, file);
+        const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+        const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
 
-        if (uploadError) throw uploadError;
-        finalFormData[label] = `https://${process.env.NEXT_PUBLIC_SUPABASE_URL?.split('//')[1]}/storage/v1/object/public/registration-files/${fileName}`;
+        if (!cloudName || !uploadPreset) {
+          throw new Error("Cloudinary credentials missing");
+        }
+
+        const uploadFormData = new FormData();
+        uploadFormData.append("file", file);
+        uploadFormData.append("upload_preset", uploadPreset);
+
+        const uploadResponse = await new Promise<string>((resolve, reject) => {
+          const xhr = new XMLHttpRequest();
+          xhr.open("POST", `https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`);
+          
+          xhr.onload = () => {
+            if (xhr.status === 200) {
+              const response = JSON.parse(xhr.responseText);
+              resolve(response.secure_url);
+            } else {
+              reject(new Error(`File upload failed`));
+            }
+          };
+
+          xhr.onerror = () => reject(new Error("Network error during file upload"));
+          xhr.send(uploadFormData);
+        });
+
+        finalFormData[label] = uploadResponse;
       }
 
       const { error: insertError } = await supabase.from("event_registrations").insert([{
