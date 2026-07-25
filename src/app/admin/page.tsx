@@ -5,9 +5,10 @@ import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { LogOut, LayoutDashboard, Users, Calendar, MessageSquare, ShieldAlert, Image as ImageIcon, Activity, PlusCircle, ArrowRight, Eye, RefreshCw, Key, X, Upload, Camera } from "lucide-react";
 import Link from "next/link";
-import { formatDistanceToNow, format } from "date-fns";
+import { formatDistanceToNow, format, subDays } from "date-fns";
 import toast from "react-hot-toast";
-import { CheckSquare, Clock } from "lucide-react";
+import { CheckSquare, Clock, Send, TrendingUp, Inbox } from "lucide-react";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -19,6 +20,10 @@ export default function AdminDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [currentUserRole, setCurrentUserRole] = useState<string>("");
   const [myTasks, setMyTasks] = useState<any[]>([]);
+  const [pendingMenfess, setPendingMenfess] = useState<any[]>([]);
+  const [upcomingEvents, setUpcomingEvents] = useState<any[]>([]);
+  const [teamChatPreview, setTeamChatPreview] = useState<any[]>([]);
+  const [chartData, setChartData] = useState<any[]>([]);
 
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [oldPassword, setOldPassword] = useState("");
@@ -85,6 +90,26 @@ export default function AdminDashboard() {
       // Fetch admin logs
       const { data: logs } = await supabase.from("admin_logs").select("*").order("created_at", { ascending: false }).limit(50);
       if (logs) setAdminLogs(logs);
+
+      // Fetch pending Menfess
+      const { data: pendingMenfessData } = await supabase.from("menfess").select("*").eq("is_approved", false).order("created_at", { ascending: false }).limit(5);
+      if (pendingMenfessData) setPendingMenfess(pendingMenfessData);
+
+      // Fetch upcoming Events
+      const { data: eventsData } = await supabase.from("events").select("*").eq("type", "upcoming").order("date", { ascending: true }).limit(3);
+      if (eventsData) setUpcomingEvents(eventsData);
+
+      // Generate Mock Chart Data for Community Engagement
+      const mockChartData = Array.from({ length: 7 }).map((_, i) => {
+        const d = subDays(new Date(), 6 - i);
+        return {
+          name: format(d, 'MMM dd'),
+          visitors: Math.floor(Math.random() * 50) + 20,
+          members: Math.floor(Math.random() * 10) + 5
+        };
+      });
+      setChartData(mockChartData);
+
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
     } finally {
@@ -339,53 +364,74 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            {/* Modules Grid */}
-            <div className="space-y-4">
+            {/* Community Growth Chart */}
+            <div className="border border-border/50 shadow-sm rounded-2xl p-6 bg-card/50 backdrop-blur-md space-y-4">
               <h2 className="text-xl font-bold flex items-center gap-2">
-                <LayoutDashboard className="w-5 h-5 text-primary" />
-                Management Modules
+                <TrendingUp className="w-5 h-5 text-primary" />
+                Community Engagement
               </h2>
-              <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
+              <div className="h-[250px] w-full">
                 {isLoading ? (
-                  Array(adminModules.length > 0 ? adminModules.length : 3).fill(0).map((_, i) => (
-                    <div key={i} className="border border-border/50 shadow-sm rounded-2xl p-5 bg-card aspect-[4/3] animate-pulse flex flex-col justify-between">
-                      <div className="w-12 h-12 bg-muted rounded-xl"></div>
-                      <div>
-                        <div className="h-5 bg-muted rounded w-2/3 mb-2"></div>
-                        <div className="h-3 bg-muted rounded w-1/3"></div>
+                  <div className="w-full h-full bg-muted/50 rounded-xl animate-pulse flex items-center justify-center">
+                    <span className="text-muted-foreground font-medium">Loading Chart...</span>
+                  </div>
+                ) : (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                      <defs>
+                        <linearGradient id="colorVisitors" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3}/>
+                          <stop offset="95%" stopColor="var(--primary)" stopOpacity={0}/>
+                        </linearGradient>
+                        <linearGradient id="colorMembers" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="var(--secondary)" stopOpacity={0.3}/>
+                          <stop offset="95%" stopColor="var(--secondary)" stopOpacity={0}/>
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+                      <XAxis dataKey="name" tick={{fill: 'hsl(var(--muted-foreground))', fontSize: 12}} tickLine={false} axisLine={false} />
+                      <YAxis tick={{fill: 'hsl(var(--muted-foreground))', fontSize: 12}} tickLine={false} axisLine={false} />
+                      <Tooltip contentStyle={{backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', borderRadius: '8px'}} itemStyle={{color: 'hsl(var(--foreground))'}} />
+                      <Area type="monotone" dataKey="visitors" stroke="var(--primary)" fillOpacity={1} fill="url(#colorVisitors)" name="Visitors" strokeWidth={2} />
+                      <Area type="monotone" dataKey="members" stroke="var(--secondary)" fillOpacity={1} fill="url(#colorMembers)" name="New Members" strokeWidth={2} />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                )}
+              </div>
+            </div>
+
+            {/* Menfess Inbox */}
+            <div className="border border-border/50 shadow-sm rounded-2xl p-6 bg-card/50 backdrop-blur-md">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold flex items-center gap-2">
+                  <Inbox className="w-5 h-5 text-purple" />
+                  Recent Menfess Inbox
+                </h2>
+                <Link href="/admin/menfess" className="text-xs font-bold text-primary hover:underline">Manage All</Link>
+              </div>
+              <div className="space-y-3">
+                {isLoading ? (
+                  <div className="text-sm text-muted-foreground animate-pulse">Loading inbox...</div>
+                ) : pendingMenfess.length === 0 ? (
+                  <div className="text-sm text-muted-foreground bg-background p-4 rounded-xl border border-border/50 text-center">
+                    ✨ Inbox is empty! All menfess have been moderated.
+                  </div>
+                ) : (
+                  pendingMenfess.map(post => (
+                    <div key={post.id} className="p-4 rounded-xl bg-background border border-border/50 shadow-sm flex flex-col gap-2 group hover:border-purple/30 transition-colors">
+                      <div className="flex justify-between items-start gap-2">
+                        <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-purple/10 text-purple border border-purple/20">
+                          {post.to_name}
+                        </span>
+                        <span className="text-[10px] font-medium text-muted-foreground">{safeFormatDate(post.created_at)}</span>
+                      </div>
+                      <p className="text-sm font-medium line-clamp-2 text-foreground/90">{post.content}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-[10px] font-semibold text-muted-foreground flex items-center gap-1">
+                          From: {post.from_name || "Anonymous"}
+                        </span>
                       </div>
                     </div>
-                  ))
-                ) : (
-                  adminModules.map((mod) => (
-                    <Link
-                      key={mod.name}
-                      href={mod.path}
-                      className="border border-border/50 shadow-sm rounded-2xl p-5 bg-card flex flex-col justify-between aspect-[4/3] group hover:shadow-md hover:-translate-y-1 transition-all"
-                    >
-                      <div className="flex justify-between items-start">
-                        <div
-                          className="w-12 h-12 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110 shadow-sm"
-                          style={{
-                            backgroundColor: `var(--${mod.color === "danger" ? "danger" : mod.color})`,
-                            color: mod.color === "accent" ? "var(--accent-foreground)" : "var(--primary-foreground)"
-                          }}
-                        >
-                          <mod.icon className="w-6 h-6" />
-                        </div>
-                        <div className="bg-background border border-border/50 rounded-full px-3 py-1 text-xs font-bold text-muted-foreground group-hover:text-foreground transition-colors">
-                          {isLoading ? "..." : mod.count} Items
-                        </div>
-                      </div>
-                      <div>
-                        <h2 className="text-lg font-bold" style={{ fontFamily: "var(--font-space-grotesk)" }}>
-                          {mod.name}
-                        </h2>
-                        <div className="text-muted-foreground font-medium text-xs mt-1 flex items-center gap-1 group-hover:text-primary transition-colors">
-                          Manage <ArrowRight className="w-3 h-3" />
-                        </div>
-                      </div>
-                    </Link>
                   ))
                 )}
               </div>
@@ -431,6 +477,39 @@ export default function AdminDashboard() {
                 <p className="text-sm font-medium text-muted-foreground mt-2">
                   People are currently viewing the website right now.
                 </p>
+              </div>
+            </div>
+
+            {/* Upcoming Events Widget */}
+            <div className="border border-border/50 shadow-sm rounded-2xl p-6 bg-card/50 backdrop-blur-md">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold flex items-center gap-2">
+                  <Calendar className="w-5 h-5 text-secondary" />
+                  Upcoming Events
+                </h2>
+                <Link href="/admin/events" className="text-xs font-bold text-primary hover:underline">View All</Link>
+              </div>
+              <div className="space-y-3">
+                {isLoading ? (
+                  <div className="text-sm text-muted-foreground animate-pulse">Loading events...</div>
+                ) : upcomingEvents.length === 0 ? (
+                  <div className="text-sm text-muted-foreground bg-background p-4 rounded-xl border border-border/50 text-center">
+                    No upcoming events scheduled.
+                  </div>
+                ) : (
+                  upcomingEvents.map(event => (
+                    <div key={event.id} className="p-3 rounded-xl bg-background border border-border/50 shadow-sm flex items-start gap-3">
+                      <div className="flex flex-col items-center justify-center min-w-[40px] px-2 py-1 bg-secondary/10 rounded-lg text-secondary border border-secondary/20">
+                        <span className="text-xs font-bold uppercase">{format(new Date(event.date), 'MMM')}</span>
+                        <span className="text-lg font-extrabold leading-none" style={{ fontFamily: "var(--font-space-grotesk)" }}>{format(new Date(event.date), 'dd')}</span>
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-sm text-foreground line-clamp-1">{event.title}</h3>
+                        <p className="text-xs font-medium text-muted-foreground line-clamp-1">{event.category || "General"}</p>
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
 
