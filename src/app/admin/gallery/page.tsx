@@ -41,17 +41,13 @@ export default function GalleryAdminPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [dragOver, setDragOver] = useState(false);
   const [previewFile, setPreviewFile] = useState<{ url: string; type: "image" | "video" } | null>(null);
-  const [inputMode, setInputMode] = useState<InputMode>("file");
   const [showLinkGuide, setShowLinkGuide] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const supabase = createClient();
 
   // Form State
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [linkUrl, setLinkUrl] = useState("");
   const [existingUrl, setExistingUrl] = useState("");
 
@@ -63,23 +59,7 @@ export default function GalleryAdminPage() {
     setLoading(false);
   };
 
-  const handleFileSelect = (file: File) => {
-    if (!fileSizeOk(file)) {
-      const limit = file.type.startsWith("video") ? MAX_VIDEO_MB : MAX_IMAGE_MB;
-      toast.error(`File too large! Max ${limit}MB for ${file.type.startsWith("video") ? "videos" : "images"}.`);
-      return;
-    }
-    setSelectedFile(file);
-    const objectUrl = URL.createObjectURL(file);
-    setPreviewFile({ url: objectUrl, type: file.type.startsWith("video") ? "video" : "image" });
-  };
 
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setDragOver(false);
-    const file = e.dataTransfer.files[0];
-    if (file) handleFileSelect(file);
-  };
 
   const handleLinkChange = (url: string) => {
     setLinkUrl(url);
@@ -95,9 +75,7 @@ export default function GalleryAdminPage() {
     setTitle(image.title);
     setDescription(image.description || "");
     setExistingUrl(image.image_url);
-    setSelectedFile(null);
     setLinkUrl(image.image_url);
-    setInputMode("link");
     setPreviewFile({ url: image.image_url, type: isVideo(image.image_url) ? "video" : "image" });
     setIsFormOpen(true);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -107,7 +85,6 @@ export default function GalleryAdminPage() {
     setEditingId(null);
     setTitle("");
     setDescription("");
-    setSelectedFile(null);
     setLinkUrl("");
     setExistingUrl("");
     setPreviewFile(null);
@@ -133,38 +110,15 @@ export default function GalleryAdminPage() {
     e.preventDefault();
     if (!title.trim()) { toast.error("Please enter a title"); return; }
 
-    if (inputMode === "link" && !linkUrl.trim() && !existingUrl) {
+    if (!linkUrl.trim() && !existingUrl) {
       toast.error("Please enter a valid URL"); return;
-    }
-    if (inputMode === "file" && !selectedFile && !existingUrl) {
-      toast.error("Please select a file to upload"); return;
     }
 
     setIsSubmitting(true);
     const loadingToast = toast.loading("Saving...");
-    let finalUrl = inputMode === "link" ? linkUrl.trim() : existingUrl;
+    const finalUrl = linkUrl.trim() || existingUrl;
 
-    if (inputMode === "file" && selectedFile) {
-      toast.loading("Uploading file...", { id: loadingToast });
-      const ext = selectedFile.name.split(".").pop();
-      const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-      setUploadProgress(15);
 
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from("gallery")
-        .upload(filename, selectedFile, { contentType: selectedFile.type, upsert: false });
-
-      if (uploadError) {
-        setIsSubmitting(false);
-        setUploadProgress(0);
-        toast.error(`Upload failed: ${uploadError.message}`, { id: loadingToast });
-        return;
-      }
-      setUploadProgress(85);
-      const { data: urlData } = supabase.storage.from("gallery").getPublicUrl(uploadData.path);
-      finalUrl = urlData.publicUrl;
-      setUploadProgress(100);
-    }
 
     toast.loading(editingId ? "Saving changes..." : "Adding to gallery...", { id: loadingToast });
     const payload = { title: title.trim(), image_url: finalUrl, description: description.trim() };
@@ -238,104 +192,12 @@ export default function GalleryAdminPage() {
             </div>
           </div>
 
-          {/* Mode Toggle */}
-          <div>
-            <label className="block text-sm font-bold mb-2">Source</label>
-            <div className="flex gap-2 p-1 bg-muted rounded-xl w-fit">
-              <button
-                type="button"
-                onClick={() => { setInputMode("file"); setShowLinkGuide(false); }}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-sm transition-all ${inputMode === "file" ? "bg-card neo-border shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
-              >
-                <Upload className="w-4 h-4" />
-                Upload File
-              </button>
-              <button
-                type="button"
-                onClick={() => setInputMode("link")}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-sm transition-all ${inputMode === "link" ? "bg-card neo-border shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
-              >
-                <Link2 className="w-4 h-4" />
-                Paste Link
-              </button>
-            </div>
-          </div>
 
-          {/* FILE MODE */}
-          {inputMode === "file" && (
-            <div className="space-y-3">
-              {/* Size info */}
-              <div className="flex items-start gap-2 text-xs text-muted-foreground bg-muted rounded-lg p-3">
-                <Info className="w-4 h-4 mt-0.5 shrink-0 text-primary" />
-                <div>
-                  <span className="font-semibold text-foreground">File size limits:</span>
-                  <span className="ml-1">Images max <strong>{MAX_IMAGE_MB}MB</strong> · Videos max <strong>{MAX_VIDEO_MB}MB</strong></span>
-                  <br />
-                  <span>Supported: JPG, PNG, GIF, WEBP, MP4, MOV, WEBM</span>
-                </div>
-              </div>
 
-              {/* Drop zone */}
-              <div
-                onDrop={handleDrop}
-                onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
-                onDragLeave={() => setDragOver(false)}
-                onClick={() => fileInputRef.current?.click()}
-                className={`relative cursor-pointer rounded-xl border-2 border-dashed transition-all duration-200 flex flex-col items-center justify-center gap-3 p-8 text-center
-                  ${dragOver ? "border-primary bg-primary/10" : "border-border hover:border-primary/60 hover:bg-muted/40"}`}
-              >
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*,video/*"
-                  className="hidden"
-                  onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFileSelect(f); }}
-                />
-                {selectedFile ? (
-                  <div className="flex items-center gap-3 text-left w-full">
-                    {selectedFile.type.startsWith("video")
-                      ? <FileVideo className="w-10 h-10 text-primary shrink-0" />
-                      : <ImageIcon className="w-10 h-10 text-primary shrink-0" />}
-                    <div className="min-w-0 flex-1">
-                      <p className="font-bold truncate">{selectedFile.name}</p>
-                      <p className="text-sm text-muted-foreground">{(selectedFile.size / 1024 / 1024).toFixed(1)} MB — click to change</p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={(e) => { e.stopPropagation(); setSelectedFile(null); setPreviewFile(null); }}
-                      className="p-1 rounded-full hover:bg-muted shrink-0"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                ) : (
-                  <>
-                    <Upload className="w-10 h-10 text-muted-foreground" />
-                    <div>
-                      <p className="font-bold text-foreground">Drag & drop or click to upload</p>
-                      <p className="text-sm text-muted-foreground mt-1">Images up to {MAX_IMAGE_MB}MB · Videos up to {MAX_VIDEO_MB}MB</p>
-                    </div>
-                  </>
-                )}
-              </div>
 
-              {/* Progress */}
-              {isSubmitting && uploadProgress > 0 && uploadProgress < 100 && (
-                <div className="space-y-1">
-                  <div className="flex justify-between text-sm font-semibold">
-                    <span>Uploading...</span><span>{uploadProgress}%</span>
-                  </div>
-                  <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
-                    <div className="h-2 bg-primary rounded-full transition-all duration-300" style={{ width: `${uploadProgress}%` }} />
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
 
-          {/* LINK MODE */}
-          {inputMode === "link" && (
-            <div className="space-y-3">
+          {/* URL INPUT */}
+          <div className="space-y-3">
               <div>
                 <div className="flex items-center justify-between mb-1">
                   <label className="text-sm font-bold">Direct Link URL</label>
@@ -433,7 +295,7 @@ export default function GalleryAdminPage() {
               className="px-6 py-2.5 bg-accent text-accent-foreground font-bold neo-border rounded-xl disabled:opacity-50 flex items-center gap-2"
             >
               {isSubmitting ? (
-                <><span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />{inputMode === "file" ? "Uploading..." : "Saving..."}</>
+                <><span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />Saving...</>
               ) : (
                 editingId ? "Save Changes" : "Add to Gallery"
               )}
