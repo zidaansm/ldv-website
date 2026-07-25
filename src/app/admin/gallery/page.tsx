@@ -48,6 +48,8 @@ export default function GalleryAdminPage() {
   // Form State
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [inputMode, setInputMode] = useState<InputMode>("file");
+  const [file, setFile] = useState<File | null>(null);
   const [linkUrl, setLinkUrl] = useState("");
   const [existingUrl, setExistingUrl] = useState("");
 
@@ -60,6 +62,21 @@ export default function GalleryAdminPage() {
   };
 
 
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const selected = e.target.files[0];
+      if (!fileSizeOk(selected)) {
+        toast.error(`File too large. Max ${MAX_IMAGE_MB}MB for images, ${MAX_VIDEO_MB}MB for videos.`);
+        return;
+      }
+      setFile(selected);
+      setPreviewFile({
+        url: URL.createObjectURL(selected),
+        type: selected.type.startsWith("video") ? "video" : "image",
+      });
+    }
+  };
 
   const handleLinkChange = (url: string) => {
     setLinkUrl(url);
@@ -85,6 +102,8 @@ export default function GalleryAdminPage() {
     setEditingId(null);
     setTitle("");
     setDescription("");
+    setInputMode("file");
+    setFile(null);
     setLinkUrl("");
     setExistingUrl("");
     setPreviewFile(null);
@@ -110,36 +129,87 @@ export default function GalleryAdminPage() {
     e.preventDefault();
     if (!title.trim()) { toast.error("Please enter a title"); return; }
 
-    if (!linkUrl.trim() && !existingUrl) {
+    if (inputMode === "link" && !linkUrl.trim() && !existingUrl) {
       toast.error("Please enter a valid URL"); return;
+    }
+    if (inputMode === "file" && !file && !existingUrl) {
+      toast.error("Please select a file to upload"); return;
     }
 
     setIsSubmitting(true);
     const loadingToast = toast.loading("Saving...");
-    const finalUrl = linkUrl.trim() || existingUrl;
+    
+    let finalUrl = existingUrl;
 
+    try {
+      // CLOUDINARY UPLOAD LOGIC
+      if (inputMode === "file" && file) {
+        toast.loading("Uploading to Cloudinary... (Please do not close this page)", { id: loadingToast });
+        
+        const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+        const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
 
+        if (!cloudName || !uploadPreset) {
+          throw new Error("Cloudinary credentials are not configured in .env.local");
+        }
 
-    toast.loading(editingId ? "Saving changes..." : "Adding to gallery...", { id: loadingToast });
-    const payload = { title: title.trim(), image_url: finalUrl, description: description.trim() };
-    let error;
-    if (editingId) {
-      ({ error } = await supabase.from("gallery").update(payload).eq("id", editingId));
-    } else {
-      ({ error } = await supabase.from("gallery").insert([payload]));
-    }
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("upload_preset", uploadPreset);
 
-    setIsSubmitting(false);
-    setUploadProgress(0);
+        // Gunakan XMLHttpRequest untuk melihat progress upload
+        const uploadResponse = await new Promise<string>((resolve, reject) => {
+          const xhr = new XMLHttpRequest();
+          xhr.open("POST", `https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`);
+          
+          xhr.upload.onprogress = (event) => {
+            if (event.lengthComputable) {
+              const percentComplete = Math.round((event.loaded / event.total) * 100);
+              setUploadProgress(percentComplete);
+            }
+          };
 
-    if (error) {
-      toast.error(`Failed to save: ${error.message}`, { id: loadingToast });
-    } else {
+          xhr.onload = () => {
+            if (xhr.status === 200) {
+              const response = JSON.parse(xhr.responseText);
+              resolve(response.secure_url);
+            } else {
+              reject(new Error(`Upload failed: ${xhr.statusText}`));
+            }
+          };
+
+          xhr.onerror = () => reject(new Error("Network error during upload"));
+          xhr.send(formData);
+        });
+
+        finalUrl = uploadResponse;
+      } else if (inputMode === "link" && linkUrl.trim()) {
+        finalUrl = linkUrl.trim();
+      }
+
+      toast.loading(editingId ? "Saving changes to database..." : "Adding to gallery...", { id: loadingToast });
+      const payload = { title: title.trim(), image_url: finalUrl, description: description.trim() };
+      let error;
+      if (editingId) {
+        ({ error } = await supabase.from("gallery").update(payload).eq("id", editingId));
+      } else {
+        ({ error } = await supabase.from("gallery").insert([payload]));
+      }
+
+      if (error) throw error;
+      
       toast.success(editingId ? "Updated!" : "Added to gallery!", { id: loadingToast });
       resetForm();
       fetchImages();
+    } catch (err: any) {
+      toast.error(`Failed: ${err.message}`, { id: loadingToast });
+    } finally {
+      setIsSubmitting(false);
+      setUploadProgress(0);
     }
   };
+
+
 
   if (loading) return <div className="p-8 font-bold text-center">Loading gallery...</div>;
 
@@ -196,8 +266,76 @@ export default function GalleryAdminPage() {
 
 
 
+          {/* Mode Switcher */}
+          <div className="flex gap-2 p-1 bg-muted rounded-lg w-fit">
+            <button
+              type="button"
+              onClick={() => { setInputMode("file"); setPreviewFile(file ? { url: URL.createObjectURL(file), type: file.type.startsWith("video") ? "video" : "image" } : null); }}
+              className={`px-4 py-1.5 rounded-md text-sm font-bold flex items-center gap-2 transition-all ${inputMode === "file" ? "bg-background neo-shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+            >
+              <Upload className="w-4 h-4" /> Upload File (Cloudinary)
+            </button>
+            <button
+              type="button"
+              onClick={() => { setInputMode("link"); handleLinkChange(linkUrl); }}
+              className={`px-4 py-1.5 rounded-md text-sm font-bold flex items-center gap-2 transition-all ${inputMode === "link" ? "bg-background neo-shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+            >
+              <Link2 className="w-4 h-4" /> Paste Link
+            </button>
+          </div>
+
+          {/* FILE UPLOAD INPUT */}
+          {inputMode === "file" && (
+            <div>
+              <label className="block text-sm font-bold mb-1">Upload Media</label>
+              <div className="relative group">
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/gif,image/webp,video/mp4,video/webm"
+                  onChange={handleFileChange}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                />
+                <div className="w-full neo-border rounded-xl border-dashed p-8 bg-muted/30 flex flex-col items-center justify-center gap-2 group-hover:bg-muted/50 transition-colors">
+                  {file ? (
+                    <>
+                      {file.type.startsWith("video") ? <FileVideo className="w-10 h-10 text-primary" /> : <ImageIcon className="w-10 h-10 text-primary" />}
+                      <span className="font-bold text-center">{file.name}</span>
+                      <span className="text-xs text-muted-foreground">{(file.size / 1024 / 1024).toFixed(2)} MB</span>
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="w-10 h-10 text-muted-foreground group-hover:text-primary transition-colors" />
+                      <span className="font-bold">Click or drag file to upload</span>
+                      <span className="text-xs text-muted-foreground text-center">
+                        Images (max {MAX_IMAGE_MB}MB): JPG, PNG, GIF, WEBP<br />
+                        Videos (max {MAX_VIDEO_MB}MB): MP4, WEBM
+                      </span>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {/* Progress Bar */}
+              {isSubmitting && inputMode === "file" && uploadProgress > 0 && uploadProgress < 100 && (
+                <div className="mt-4 space-y-1">
+                  <div className="flex justify-between text-xs font-bold">
+                    <span>Uploading to Cloudinary...</span>
+                    <span>{uploadProgress}%</span>
+                  </div>
+                  <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
+                    <div
+                      className="bg-primary h-full transition-all duration-300 ease-out"
+                      style={{ width: `${uploadProgress}%` }}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* URL INPUT */}
-          <div className="space-y-3">
+          {inputMode === "link" && (
+            <div className="space-y-3">
               <div>
                 <div className="flex items-center justify-between mb-1">
                   <label className="text-sm font-bold">Direct Link URL</label>
@@ -276,10 +414,20 @@ export default function GalleryAdminPage() {
                 </div>
               )}
             </div>
+          )}
 
           {/* Preview */}
           {previewFile && (
-            <div className="rounded-xl overflow-hidden neo-border bg-muted max-h-64">
+            <div className="rounded-xl overflow-hidden neo-border bg-muted max-h-64 relative">
+              {inputMode === "file" && file && (
+                 <button
+                   type="button"
+                   onClick={() => { setFile(null); setPreviewFile(null); }}
+                   className="absolute top-2 right-2 p-1.5 bg-background/80 hover:bg-danger text-foreground hover:text-white rounded-lg transition-colors z-20"
+                 >
+                   <X className="w-4 h-4" />
+                 </button>
+              )}
               {previewFile.type === "video"
                 ? <video src={previewFile.url} controls muted className="w-full max-h-64 object-contain" />
                 : <img src={previewFile.url} alt="Preview" className="w-full max-h-64 object-contain" onError={(e) => { e.currentTarget.style.display = "none"; }} />}
