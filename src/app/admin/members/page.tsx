@@ -7,7 +7,7 @@ import Link from "next/link";
 import { logAdminAction } from "@/lib/admin-logger";
 import toast from "react-hot-toast";
 import { confirmDelete } from "@/components/shared";
-import Image from "next/image";
+import Image from "@/components/ui/smart-image";
 
 type Member = {
   id: string;

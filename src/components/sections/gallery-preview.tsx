@@ -8,7 +8,7 @@ import { Section } from "@/components/layout";
 import { SectionHeading } from "@/components/shared";
 import { fadeInUp } from "@/lib/animations";
 import Link from "next/link";
-import Image from "next/image";
+import Image from "@/components/ui/smart-image";
 import { ArrowRight, Image as ImageIcon } from "lucide-react";
 import { GalleryLightbox } from "@/components/shared/gallery-lightbox";
 import { useTranslation } from "@/lib/i18n/LanguageContext";

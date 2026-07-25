@@ -7,7 +7,7 @@ import { Container } from "@/components/layout";
 import { SectionHeading } from "@/components/shared";
 import { Users, ArrowLeft, ChevronLeft, ChevronRight, Search, X } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
+import Image from "@/components/ui/smart-image";
 
 type Member = {
   id: string;

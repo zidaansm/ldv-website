@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { User } from "lucide-react";
-import Image from "next/image";
+import Image from "@/components/ui/smart-image";
 import { Section } from "@/components/layout";
 import { SectionHeading } from "@/components/shared";
 import { staggerContainer, fadeInUp, hoverLift } from "@/lib/animations";

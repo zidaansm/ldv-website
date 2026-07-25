@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
-import Image from "next/image";
+import Image from "@/components/ui/smart-image";
 import { useFocusTrap } from "@/hooks/use-focus-trap";
 
 type GalleryItem = {

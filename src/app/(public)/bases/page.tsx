@@ -7,7 +7,7 @@ import { SectionHeading } from "@/components/shared/section-heading";
 import { motion, AnimatePresence } from "framer-motion";
 import { Hash, Send, ChevronRight, X, Loader2 } from "lucide-react";
 import { playClick } from "@/lib/sounds";
-import Image from "next/image";
+import Image from "@/components/ui/smart-image";
 import ReactMarkdown from "react-markdown";
 
 type TwitterBase = {

@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import { motion } from "framer-motion";
 import { useTranslation } from "@/lib/i18n/LanguageContext";
 import Link from "next/link";
-import Image from "next/image";
+import Image from "@/components/ui/smart-image";
 import { ArrowRight } from "lucide-react";
 
 type Member = {
