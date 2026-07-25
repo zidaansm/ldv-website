@@ -30,17 +30,6 @@ export default function TeamChatPage() {
   useEffect(() => {
     fetchMessages();
     
-    // Subscribe to new messages
-    const channel = supabase
-      .channel('team_chat')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'admin_chat_messages' }, payload => {
-        console.log('New message received via realtime!', payload);
-        fetchMessages();
-      })
-      .subscribe((status) => {
-        console.log('Realtime subscription status:', status);
-      });
-      
     // Get current user to align messages left/right
     const getUser = async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -50,8 +39,25 @@ export default function TeamChatPage() {
     };
     getUser();
 
+    // Subscribe to new messages via Supabase Realtime
+    const channel = supabase
+      .channel('team_chat_realtime')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'admin_chat_messages' }, payload => {
+        console.log('Realtime message received:', payload);
+        fetchMessages();
+      })
+      .subscribe((status) => {
+        console.log('Realtime subscription status:', status);
+      });
+
+    // Fallback polling every 3 seconds in case realtime doesn't work
+    const pollInterval = setInterval(() => {
+      fetchMessages();
+    }, 3000);
+
     return () => {
       supabase.removeChannel(channel);
+      clearInterval(pollInterval);
     };
   }, []);
 
