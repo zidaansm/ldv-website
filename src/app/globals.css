@@ -142,73 +142,73 @@
 }
 
 /* ============================================
-   LDV COLOR PALETTE — Premium Light Mode
+   LDV COLOR PALETTE — Premium Sleek Mode
    ============================================ */
 
 :root {
   /* --- Core --- */
-  --background: #F8F6F2;
-  --foreground: #1E1E1E;
-  --card: #F2E8D5;
-  --card-foreground: #1E1E1E;
-  --popover: #F2E8D5;
-  --popover-foreground: #1E1E1E;
+  --background: #F5F5F7;
+  --foreground: #1A1A1A;
+  --card: rgba(255, 255, 255, 0.6);
+  --card-foreground: #1A1A1A;
+  --popover: rgba(255, 255, 255, 0.8);
+  --popover-foreground: #1A1A1A;
 
   /* --- Brand: Burgundy Primary --- */
-  --primary: #6D071A;
-  --primary-foreground: #F8F6F2;
+  --primary: #7A0A20;
+  --primary-foreground: #FFFFFF;
 
   /* --- Brand: Gold Secondary --- */
   --secondary: #D4AF37;
-  --secondary-foreground: #1E1E1E;
+  --secondary-foreground: #1A1A1A;
 
-  /* --- Brand: Beige Accent --- */
-  --accent: #F2E8D5;
-  --accent-foreground: #1E1E1E;
+  /* --- Brand: Accent --- */
+  --accent: rgba(122, 10, 32, 0.05);
+  --accent-foreground: #7A0A20;
 
   /* --- Muted --- */
-  --muted: #E8DFCC;
-  --muted-foreground: #555555;
+  --muted: rgba(0, 0, 0, 0.05);
+  --muted-foreground: #666666;
 
   /* --- Borders & Inputs --- */
-  --border: #1E1E1E;
-  --input: #1E1E1E;
-  --ring: #6D071A;
+  --border: rgba(0, 0, 0, 0.08);
+  --input: rgba(0, 0, 0, 0.1);
+  --ring: rgba(122, 10, 32, 0.3);
 
-  /* --- Neo-Brutalist --- */
-  --neo-border: #1E1E1E;
+  /* --- Old Neo-Brutalist Compatibility --- */
+  --neo-border: rgba(0, 0, 0, 0.1);
 
   /* --- Semantic --- */
-  --destructive: #6D071A;
-  --success: #22c55e;
-  --warning: #D4AF37;
-  --danger: #6D071A;
-  --danger-foreground: #F8F6F2;
+  --destructive: #DC2626;
+  --success: #16A34A;
+  --warning: #D97706;
+  --danger: #DC2626;
+  --danger-foreground: #FFFFFF;
 
   /* --- Extended Palette --- */
-  --purple: #6D071A;
-  --pink: #D4AF37;
-  --cyan: #1E1E1E;
+  --purple: #8B5CF6;
+  --pink: #EC4899;
+  --cyan: #06B6D4;
 
   /* --- Charts --- */
-  --chart-1: #6D071A;
+  --chart-1: #7A0A20;
   --chart-2: #D4AF37;
-  --chart-3: #1E1E1E;
-  --chart-4: #22c55e;
-  --chart-5: #D4AF37;
+  --chart-3: #1A1A1A;
+  --chart-4: #16A34A;
+  --chart-5: #8B5CF6;
 
   /* --- Radius --- */
   --radius: 1rem;
 
-  /* --- Sidebar (light) --- */
-  --sidebar: #F8F6F2;
-  --sidebar-foreground: #1E1E1E;
-  --sidebar-primary: #6D071A;
-  --sidebar-primary-foreground: #F8F6F2;
-  --sidebar-accent: #F2E8D5;
-  --sidebar-accent-foreground: #1E1E1E;
-  --sidebar-border: #1E1E1E;
-  --sidebar-ring: #6D071A;
+  /* --- Sidebar (Premium Light) --- */
+  --sidebar: rgba(255, 255, 255, 0.7);
+  --sidebar-foreground: #1A1A1A;
+  --sidebar-primary: #7A0A20;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: rgba(0, 0, 0, 0.04);
+  --sidebar-accent-foreground: #1A1A1A;
+  --sidebar-border: rgba(0, 0, 0, 0.08);
+  --sidebar-ring: rgba(122, 10, 32, 0.3);
 }
 
 /* ============================================
@@ -222,6 +222,13 @@
 
   body {
     @apply bg-background text-foreground;
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(212, 175, 55, 0.15) 0px, transparent 50%),
+      radial-gradient(at 100% 0%, rgba(122, 10, 32, 0.1) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(212, 175, 55, 0.1) 0px, transparent 50%),
+      radial-gradient(at 0% 100%, rgba(122, 10, 32, 0.15) 0px, transparent 50%);
+    background-attachment: fixed;
+    background-size: cover;
     font-feature-settings: "rlig" 1, "calt" 1;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
