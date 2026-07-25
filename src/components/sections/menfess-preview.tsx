@@ -29,17 +29,19 @@ function getAvatarStyle(color: string) {
   };
 }
 
-export function MenfessPreview() {
-  const [posts, setPosts] = useState<Menfess[]>([]);
-  const [memberAvatars, setMemberAvatars] = useState<string[]>([]);
+export function MenfessPreview({ initialPosts, initialAvatars }: { initialPosts?: Menfess[], initialAvatars?: string[] }) {
+  const [posts, setPosts] = useState<Menfess[]>(initialPosts || []);
+  const [memberAvatars, setMemberAvatars] = useState<string[]>(initialAvatars || []);
   const [likedPosts, setLikedPosts] = useState<Record<string, boolean>>({});
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(!initialPosts);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const supabase = createClient();
   const { t } = useTranslation();
   const router = useRouter();
 
   useEffect(() => {
+    if (initialPosts && initialAvatars) return;
+
     const fetchPostsAndAvatars = async () => {
       const [postsRes, membersRes] = await Promise.all([
         supabase
@@ -85,7 +87,9 @@ export function MenfessPreview() {
     };
     
     fetchPostsAndAvatars();
+  }, [initialPosts, initialAvatars]);
 
+  useEffect(() => {
     // Read likes from localStorage
     const likes: Record<string, boolean> = {};
     for (let i = 0; i < localStorage.length; i++) {

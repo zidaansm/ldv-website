@@ -41,12 +41,13 @@ function StaffAvatar({ name, src, bgColor }: { name: string; src: string; bgColo
   );
 }
 
-export function Staff() {
+export function Staff({ initialStaff }: { initialStaff?: any[] }) {
   const { t } = useTranslation();
-  const [staffList, setStaffList] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [staffList, setStaffList] = useState<any[]>(initialStaff || []);
+  const [isLoading, setIsLoading] = useState(!initialStaff);
 
   useEffect(() => {
+    if (initialStaff) return;
     async function fetchStaff() {
       try {
         const { data } = await supabase.from("staff").select("*").order("created_at", { ascending: true });
@@ -58,7 +59,7 @@ export function Staff() {
       }
     }
     fetchStaff();
-  }, []);
+  }, [initialStaff]);
 
   return (
     <Section id="team" withPattern>

@@ -18,16 +18,16 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-export function Events() {
+export function Events({ initialEvents }: { initialEvents?: any[] }) {
   const { t, language } = useTranslation();
-  const [events, setEvents] = useState<any[]>([]);
+  const [events, setEvents] = useState<any[]>(initialEvents || []);
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
   const [formData, setFormData] = useState<Record<string, string>>({});
   const [fileData, setFileData] = useState<Record<string, File>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(!initialEvents);
   const [error, setError] = useState<string | null>(null);
 
   const fetchEvents = async (retryCount = 0) => {
@@ -57,8 +57,10 @@ export function Events() {
   };
 
   useEffect(() => {
-    fetchEvents();
-  }, []);
+    if (!initialEvents) {
+      fetchEvents();
+    }
+  }, [initialEvents]);
 
   const handleFileChange = (fieldLabel: string, file: File | null) => {
     if (file) {

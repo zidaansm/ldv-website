@@ -14,12 +14,13 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-export function BanList() {
+export function BanList({ initialBanList }: { initialBanList?: any[] }) {
   const { t } = useTranslation();
-  const [banList, setBanList] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [banList, setBanList] = useState<any[]>(initialBanList || []);
+  const [isLoading, setIsLoading] = useState(!initialBanList);
 
   useEffect(() => {
+    if (initialBanList) return;
     async function fetchBanList() {
       try {
         const { data } = await supabase.from("banlist").select("*").order("banned_at", { ascending: false });
@@ -31,7 +32,7 @@ export function BanList() {
       }
     }
     fetchBanList();
-  }, []);
+  }, [initialBanList]);
   return (
     <Section id="banlist" withPattern>
       <div className="space-y-16">

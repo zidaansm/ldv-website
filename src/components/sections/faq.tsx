@@ -15,13 +15,14 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-export function FAQ() {
+export function FAQ({ initialFaqs }: { initialFaqs?: any[] }) {
   const { t } = useTranslation();
   const [openIndex, setOpenIndex] = useState<number | null>(0);
-  const [faqItems, setFaqItems] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [faqItems, setFaqItems] = useState<any[]>(initialFaqs || []);
+  const [isLoading, setIsLoading] = useState(!initialFaqs);
 
   useEffect(() => {
+    if (initialFaqs) return;
     async function fetchFaqs() {
       try {
         const { data } = await supabase.from("faq").select("*").order("created_at", { ascending: true });
@@ -33,7 +34,7 @@ export function FAQ() {
       }
     }
     fetchFaqs();
-  }, []);
+  }, [initialFaqs]);
 
   return (
     <Section id="faq" withPattern={false} className="bg-[var(--muted)]/50">

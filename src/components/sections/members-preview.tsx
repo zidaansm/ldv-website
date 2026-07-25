@@ -19,14 +19,24 @@ type Member = {
 interface MembersPreviewProps {
   direction?: "left" | "right";
   speed?: number;
+  initialMembers?: Member[];
 }
 
-export function MembersPreview({ direction = "left", speed = 40 }: MembersPreviewProps) {
+export function MembersPreview({ direction = "left", speed = 40, initialMembers }: MembersPreviewProps) {
   const [members, setMembers] = useState<Member[]>([]);
   const supabase = createClient();
   const { t } = useTranslation();
 
   useEffect(() => {
+    if (initialMembers) {
+      if (initialMembers.length > 0) {
+        const shuffled = [...initialMembers].sort(() => 0.5 - Math.random());
+        const selectedMembers = shuffled.slice(0, 15);
+        setMembers([...selectedMembers, ...selectedMembers, ...selectedMembers]);
+      }
+      return;
+    }
+
     const fetchMembers = async () => {
       // Fetch more members so we have a pool to randomize from
       const { data } = await supabase
@@ -44,7 +54,7 @@ export function MembersPreview({ direction = "left", speed = 40 }: MembersPrevie
       }
     };
     fetchMembers();
-  }, []);
+  }, [initialMembers]);
 
   if (members.length === 0) return null;
 

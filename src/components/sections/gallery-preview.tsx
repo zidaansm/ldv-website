@@ -20,10 +20,10 @@ type GalleryImage = {
   description?: string;
 };
 
-export function GalleryPreview() {
+export function GalleryPreview({ initialImages }: { initialImages?: GalleryImage[] }) {
   const { t } = useTranslation();
-  const [images, setImages] = useState<GalleryImage[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [images, setImages] = useState<GalleryImage[]>(initialImages || []);
+  const [loading, setLoading] = useState(!initialImages);
   const [startIndex, setStartIndex] = useState(0);
   const [direction, setDirection] = useState(0);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
@@ -33,6 +33,8 @@ export function GalleryPreview() {
   const VISIBLE = isDesktop ? 4 : 2;
 
   useEffect(() => {
+    if (initialImages) return;
+
     const fetchImages = async () => {
       const { data, error } = await supabase
         .from("gallery")
@@ -55,7 +57,7 @@ export function GalleryPreview() {
     };
 
     fetchImages();
-  }, []);
+  }, [initialImages]);
 
   // Get the currently visible cards using modular indexing (infinite loop)
   const getVisibleImages = useCallback(() => {
