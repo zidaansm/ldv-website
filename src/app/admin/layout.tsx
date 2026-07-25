@@ -3,7 +3,10 @@
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { cn } from "@/lib/utils";
 
+import { AdminSidebar } from "@/components/layout/admin-sidebar";
+import { AdminHeader } from "@/components/layout/admin-header";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
@@ -67,9 +70,19 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     );
   }
 
+  const isLoginPage = pathname === "/admin/login";
+
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      {children}
+    <div className="min-h-screen bg-background text-foreground flex">
+      {!isLoginPage && <AdminSidebar className="hidden lg:flex" />}
+      {!isLoginPage && <AdminHeader />}
+      
+      <main className={cn(
+        "flex-1 flex flex-col min-h-screen",
+        !isLoginPage && "lg:pl-72 pt-[60px] lg:pt-0" // Add padding for sidebar and mobile header
+      )}>
+        {children}
+      </main>
     </div>
   );
 }

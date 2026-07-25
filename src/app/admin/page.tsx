@@ -160,9 +160,9 @@ export default function AdminDashboard() {
       <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
         
         {/* Header */}
-        <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 neo-border rounded-2xl p-6 bg-card">
+        <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-border/50 shadow-sm rounded-2xl p-6 bg-card/50 backdrop-blur-md">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-primary text-primary-foreground flex items-center justify-center neo-border">
+            <div className="w-12 h-12 rounded-xl bg-primary text-primary-foreground flex items-center justify-center shadow-lg shadow-primary/20">
               <LayoutDashboard className="w-6 h-6" />
             </div>
             <div>
@@ -170,7 +170,7 @@ export default function AdminDashboard() {
                 LDV Command Center
               </h1>
               <div className="flex items-center gap-2 mt-1">
-                <span className={`px-2 py-0.5 text-xs font-bold rounded-full border-2 border-black shadow-[1px_1px_0_0_black] ${
+                <span className={`px-2 py-0.5 text-xs font-bold rounded-full shadow-sm ${
                   currentUserRole === 'super_admin' ? 'bg-danger text-danger-foreground' : 
                   currentUserRole === 'event_organizer' ? 'bg-warning text-warning-foreground' : 'bg-primary text-primary-foreground'
                 }`}>
@@ -184,21 +184,21 @@ export default function AdminDashboard() {
             <button
               onClick={fetchData}
               disabled={isLoading}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl neo-border font-bold text-sm bg-background hover:bg-muted transition-colors disabled:opacity-50"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl border border-border/50 shadow-sm font-semibold text-sm bg-background hover:bg-muted transition-all disabled:opacity-50"
             >
               <RefreshCw className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`} />
               Refresh
             </button>
             <button
               onClick={() => setIsProfileModalOpen(true)}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl neo-border font-bold text-sm bg-background hover:bg-muted transition-colors hidden sm:flex"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl border border-border/50 shadow-sm font-semibold text-sm bg-background hover:bg-muted transition-all hidden sm:flex"
             >
               <Users className="w-4 h-4" />
               My Profile
             </button>
             <button
               onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl neo-border font-bold text-sm bg-background hover:bg-danger/10 hover:text-danger transition-colors"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl border border-danger/20 shadow-sm font-semibold text-sm bg-danger/5 text-danger hover:bg-danger hover:text-danger-foreground transition-all"
             >
               <LogOut className="w-4 h-4" />
               Sign Out
@@ -213,8 +213,8 @@ export default function AdminDashboard() {
             
             {/* Quick Stats Row */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="neo-border rounded-2xl p-5 bg-card flex flex-col justify-between relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-24 h-24 bg-primary/10 rounded-bl-full -mr-4 -mt-4"></div>
+              <div className="border border-border/50 shadow-sm rounded-2xl p-5 bg-card flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-all">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
                 <Users className="w-6 h-6 text-primary mb-2" />
                 <div>
                   <div className="text-3xl font-extrabold" style={{ fontFamily: "var(--font-space-grotesk)" }}>
@@ -223,8 +223,8 @@ export default function AdminDashboard() {
                   <div className="text-sm font-medium text-muted-foreground">Total Members</div>
                 </div>
               </div>
-              <div className="neo-border rounded-2xl p-5 bg-card flex flex-col justify-between relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-24 h-24 bg-secondary/10 rounded-bl-full -mr-4 -mt-4"></div>
+              <div className="border border-border/50 shadow-sm rounded-2xl p-5 bg-card flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-all">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-secondary/5 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
                 <Calendar className="w-6 h-6 text-secondary mb-2" />
                 <div>
                   <div className="text-3xl font-extrabold" style={{ fontFamily: "var(--font-space-grotesk)" }}>
@@ -233,8 +233,8 @@ export default function AdminDashboard() {
                   <div className="text-sm font-medium text-muted-foreground">Total Events</div>
                 </div>
               </div>
-              <div className="neo-border rounded-2xl p-5 bg-card flex flex-col justify-between relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-24 h-24 bg-purple/10 rounded-bl-full -mr-4 -mt-4"></div>
+              <div className="border border-border/50 shadow-sm rounded-2xl p-5 bg-card flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-all">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-purple/5 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
                 <MessageSquare className="w-6 h-6 text-purple mb-2" />
                 <div>
                   <div className="text-3xl font-extrabold" style={{ fontFamily: "var(--font-space-grotesk)" }}>
@@ -243,8 +243,8 @@ export default function AdminDashboard() {
                   <div className="text-sm font-medium text-muted-foreground">Total Menfess</div>
                 </div>
               </div>
-              <div className="neo-border rounded-2xl p-5 bg-card flex flex-col justify-between relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-24 h-24 bg-danger/10 rounded-bl-full -mr-4 -mt-4"></div>
+              <div className="border border-border/50 shadow-sm rounded-2xl p-5 bg-card flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-all">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-danger/5 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
                 <ShieldAlert className="w-6 h-6 text-danger mb-2" />
                 <div>
                   <div className="text-3xl font-extrabold" style={{ fontFamily: "var(--font-space-grotesk)" }}>
@@ -264,8 +264,8 @@ export default function AdminDashboard() {
               <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {isLoading ? (
                   Array(adminModules.length > 0 ? adminModules.length : 3).fill(0).map((_, i) => (
-                    <div key={i} className="neo-border rounded-2xl p-5 bg-card aspect-[4/3] animate-pulse flex flex-col justify-between">
-                      <div className="w-12 h-12 bg-muted rounded-xl neo-border"></div>
+                    <div key={i} className="border border-border/50 shadow-sm rounded-2xl p-5 bg-card aspect-[4/3] animate-pulse flex flex-col justify-between">
+                      <div className="w-12 h-12 bg-muted rounded-xl"></div>
                       <div>
                         <div className="h-5 bg-muted rounded w-2/3 mb-2"></div>
                         <div className="h-3 bg-muted rounded w-1/3"></div>
@@ -277,11 +277,11 @@ export default function AdminDashboard() {
                     <Link
                       key={mod.name}
                       href={mod.path}
-                      className="neo-border neo-shadow-sm neo-hover rounded-2xl p-5 bg-card flex flex-col justify-between aspect-[4/3] group"
+                      className="border border-border/50 shadow-sm rounded-2xl p-5 bg-card flex flex-col justify-between aspect-[4/3] group hover:shadow-md hover:-translate-y-1 transition-all"
                     >
                       <div className="flex justify-between items-start">
                         <div
-                          className="w-12 h-12 rounded-xl neo-border flex items-center justify-center transition-transform group-hover:-translate-y-1"
+                          className="w-12 h-12 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110 shadow-sm"
                           style={{
                             backgroundColor: `var(--${mod.color === "danger" ? "danger" : mod.color})`,
                             color: mod.color === "accent" ? "var(--accent-foreground)" : "var(--primary-foreground)"
@@ -289,7 +289,7 @@ export default function AdminDashboard() {
                         >
                           <mod.icon className="w-6 h-6" />
                         </div>
-                        <div className="bg-background neo-border rounded-full px-3 py-1 text-xs font-bold">
+                        <div className="bg-background border border-border/50 rounded-full px-3 py-1 text-xs font-bold text-muted-foreground group-hover:text-foreground transition-colors">
                           {isLoading ? "..." : mod.count} Items
                         </div>
                       </div>
@@ -308,18 +308,18 @@ export default function AdminDashboard() {
             </div>
 
             {/* Quick Actions */}
-            <div className="neo-border rounded-2xl p-6 bg-card">
+            <div className="border border-border/50 shadow-sm rounded-2xl p-6 bg-card/50 backdrop-blur-md">
               <h2 className="text-xl font-bold mb-4">Quick Actions</h2>
               <div className="flex flex-wrap gap-3">
-                <Link href="/admin/events?action=new" className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground neo-border neo-press rounded-xl font-bold text-sm">
+                <Link href="/admin/events?action=new" className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground shadow-md shadow-primary/20 hover:-translate-y-0.5 rounded-xl font-semibold text-sm transition-all">
                   <PlusCircle className="w-4 h-4" /> New Event
                 </Link>
                 {(currentUserRole === 'super_admin' || currentUserRole === 'admin') && (
-                  <Link href="/admin/members?action=new" className="inline-flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground neo-border neo-press rounded-xl font-bold text-sm">
+                  <Link href="/admin/members?action=new" className="inline-flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground shadow-md shadow-secondary/20 hover:-translate-y-0.5 rounded-xl font-semibold text-sm transition-all">
                     <PlusCircle className="w-4 h-4" /> Add Member
                   </Link>
                 )}
-                <a href="/" target="_blank" className="inline-flex items-center gap-2 px-4 py-2 bg-background hover:bg-muted neo-border neo-press rounded-xl font-bold text-sm transition-colors">
+                <a href="/" target="_blank" className="inline-flex items-center gap-2 px-4 py-2 bg-background hover:bg-muted border border-border/50 shadow-sm rounded-xl font-semibold text-sm transition-all">
                   <Eye className="w-4 h-4" /> View Live Site
                 </a>
               </div>
@@ -331,8 +331,8 @@ export default function AdminDashboard() {
           <div className="space-y-8">
             
             {/* Live Visitors Card */}
-            <div className="neo-border rounded-2xl p-6 bg-card relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-success/20 to-transparent pointer-events-none"></div>
+            <div className="border border-border/50 shadow-sm rounded-2xl p-6 bg-card relative overflow-hidden group">
+              <div className="absolute inset-0 bg-gradient-to-br from-success/10 to-transparent pointer-events-none"></div>
               <div className="relative z-10">
                 <div className="flex items-center justify-between mb-2">
                   <h2 className="text-lg font-bold">Live Visitors</h2>
@@ -351,7 +351,7 @@ export default function AdminDashboard() {
             </div>
 
             {/* Admin Activity Logs */}
-            <div className="neo-border rounded-2xl p-6 bg-card">
+            <div className="border border-border/50 shadow-sm rounded-2xl p-6 bg-card/50 backdrop-blur-md">
               <h2 className="text-xl font-bold flex items-center gap-2 mb-6">
                 <Activity className="w-5 h-5 text-primary" />
                 Admin Activity Logs
@@ -364,7 +364,7 @@ export default function AdminDashboard() {
                   <div className="text-sm text-muted-foreground">No recent activity.</div>
                 ) : (
                   adminLogs.map(log => (
-                    <div key={log.id} className="p-3 rounded-xl bg-background neo-border space-y-1">
+                    <div key={log.id} className="p-3 rounded-xl bg-background border border-border/50 shadow-sm space-y-1">
                       <div className="font-bold text-xs flex justify-between items-center text-primary">
                         <span>{log.action}</span>
                         <span className="text-[10px] text-muted-foreground font-medium">
@@ -388,7 +388,7 @@ export default function AdminDashboard() {
 
       {isProfileModalOpen && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-card w-full max-w-md rounded-2xl neo-border p-6 shadow-xl animate-in zoom-in-95 duration-200">
+          <div className="bg-card w-full max-w-md rounded-2xl border border-border/50 shadow-xl p-6 animate-in zoom-in-95 duration-200">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-bold flex items-center gap-2"><Users className="w-5 h-5 text-primary" /> My Profile</h2>
               <button type="button" onClick={() => setIsProfileModalOpen(false)} className="text-muted-foreground hover:text-foreground"><X className="w-5 h-5" /></button>
@@ -396,14 +396,14 @@ export default function AdminDashboard() {
             
             <div className="space-y-6">
               {/* Profile Info */}
-              <div className="space-y-3 bg-muted/30 p-4 rounded-xl neo-border">
+              <div className="space-y-3 bg-muted/30 p-4 rounded-xl border border-border/50">
                 <div>
                   <label className="block text-xs font-bold text-muted-foreground uppercase mb-1">Email Address</label>
                   <div className="font-semibold text-lg">{currentUserEmail}</div>
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-muted-foreground uppercase mb-1">Current Role</label>
-                  <span className={`px-2 py-0.5 text-xs font-bold rounded-full border-2 border-black shadow-[1px_1px_0_0_black] inline-block ${
+                  <span className={`px-2 py-0.5 text-xs font-bold rounded-full border border-border/50 shadow-sm inline-block ${
                     currentUserRole === 'super_admin' ? 'bg-danger text-danger-foreground' : 
                     currentUserRole === 'event_organizer' ? 'bg-warning text-warning-foreground' : 'bg-primary text-primary-foreground'
                   }`}>
@@ -412,23 +412,23 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
-              <div className="h-px w-full bg-[var(--neo-border)]" />
+              <div className="h-px w-full bg-border/50" />
 
               {/* Change Password Form */}
               <form onSubmit={handleUpdatePassword} className="space-y-4">
                 <h3 className="font-bold flex items-center gap-2"><Key className="w-4 h-4" /> Change Password</h3>
                 <div>
                   <label className="block text-sm font-bold mb-1">Old Password</label>
-                  <input required type="password" value={oldPassword} onChange={e => setOldPassword(e.target.value)} className="w-full neo-border rounded-lg px-3 py-2 bg-background" placeholder="Enter current password" />
+                  <input required type="password" value={oldPassword} onChange={e => setOldPassword(e.target.value)} className="w-full border border-border/50 focus:border-primary focus:ring-1 focus:ring-primary rounded-lg px-3 py-2 bg-background transition-colors" placeholder="Enter current password" />
                 </div>
                 <div>
                   <label className="block text-sm font-bold mb-1">New Password</label>
-                  <input required type="password" minLength={6} value={newPassword} onChange={e => setNewPassword(e.target.value)} className="w-full neo-border rounded-lg px-3 py-2 bg-background" placeholder="Min. 6 characters" />
+                  <input required type="password" minLength={6} value={newPassword} onChange={e => setNewPassword(e.target.value)} className="w-full border border-border/50 focus:border-primary focus:ring-1 focus:ring-primary rounded-lg px-3 py-2 bg-background transition-colors" placeholder="Min. 6 characters" />
                 </div>
                 <button 
                   type="submit" 
                   disabled={isUpdatingPassword}
-                  className="w-full py-2 bg-primary text-primary-foreground font-bold neo-border rounded-xl disabled:opacity-50 mt-2 flex items-center justify-center gap-2"
+                  className="w-full py-2 bg-primary text-primary-foreground font-bold shadow-md shadow-primary/20 hover:-translate-y-0.5 transition-all rounded-xl disabled:opacity-50 mt-2 flex items-center justify-center gap-2"
                 >
                   {isUpdatingPassword ? <RefreshCw className="w-4 h-4 animate-spin" /> : null}
                   {isUpdatingPassword ? "Updating..." : "Update Password"}
