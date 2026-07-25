@@ -105,7 +105,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
     
-    const userRes = await supabaseAdmin.auth.admin.getUserById(auth.userId);
+    const userRes = await supabaseAdmin.auth.admin.getUserById(auth.userId as string);
     const user = userRes.data?.user;
     
     const messageData = {
