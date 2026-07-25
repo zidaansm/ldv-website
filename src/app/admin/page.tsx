@@ -583,16 +583,30 @@ export default function AdminDashboard() {
                   <div className="text-sm text-muted-foreground">No recent activity.</div>
                 ) : (
                   adminLogs.map(log => (
-                    <div key={log.id} className="p-3 rounded-xl bg-background border border-border/50 shadow-sm space-y-1">
-                      <div className="font-bold text-xs flex justify-between items-center text-primary">
-                        <span>{log.action}</span>
-                        <span className="text-[10px] text-muted-foreground font-medium">
-                          {safeFormatDate(log.created_at)}
+                    <div key={log.id} className="p-4 rounded-xl bg-background border border-border/50 shadow-sm flex flex-col gap-2 group hover:border-primary/30 transition-colors">
+                      <div className="flex justify-between items-start gap-2">
+                        <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 flex items-center gap-1.5">
+                          <Activity className="w-3 h-3" />
+                          {log.action}
                         </span>
+                        <div className="flex flex-col items-end">
+                          <span className="text-[10px] font-bold text-muted-foreground whitespace-nowrap">
+                            {formatDistanceToNow(new Date(log.created_at), { addSuffix: true })}
+                          </span>
+                          <span className="text-[9px] font-medium text-muted-foreground/60 whitespace-nowrap">
+                            {format(new Date(log.created_at), 'MMM d, yyyy h:mm a')}
+                          </span>
+                        </div>
                       </div>
-                      <div className="text-sm font-medium line-clamp-2">{log.details}</div>
-                      <div className="text-xs font-medium text-muted-foreground mt-1 flex items-center gap-1">
-                        <Users className="w-3 h-3" /> {log.admin_email || "Admin"}
+                      <div className="text-sm font-medium text-foreground/90 p-2.5 bg-muted/30 rounded-lg border border-border/30 mt-1 whitespace-pre-wrap">
+                        {log.details}
+                      </div>
+                      <div className="text-[11px] font-semibold text-muted-foreground mt-1 flex items-center justify-between">
+                        <span className="flex items-center gap-1.5">
+                          <Users className="w-3.5 h-3.5" /> 
+                          {log.admin_email || "Admin"}
+                        </span>
+                        <span className="opacity-40 font-mono text-[9px]">ID: {log.id.slice(0, 8)}</span>
                       </div>
                     </div>
                   ))
