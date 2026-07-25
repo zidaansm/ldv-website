@@ -96,12 +96,22 @@ export function MembersPreview({ direction = "left", speed = 40 }: MembersPrevie
                 style={{ backgroundColor: color }}
               >
                 {member.avatar_url ? (
-                  <Image src={member.avatar_url} alt={member.name} fill sizes="56px" className="object-contain group-hover:scale-110 transition-transform" draggable="false" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center font-black text-white text-xl">
-                    {member.name.charAt(0).toUpperCase()}
-                  </div>
-                )}
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={member.avatar_url}
+                    alt={member.name}
+                    className="w-full h-full object-contain group-hover:scale-110 transition-transform"
+                    draggable={false}
+                    onError={(e) => {
+                      const target = e.currentTarget;
+                      target.style.display = "none";
+                      if (target.nextElementSibling) (target.nextElementSibling as HTMLElement).style.display = "flex";
+                    }}
+                  />
+                ) : null}
+                <div className="w-full h-full items-center justify-center font-black text-white text-xl" style={{ display: member.avatar_url ? "none" : "flex" }}>
+                  {member.name.charAt(0).toUpperCase()}
+                </div>
               </div>
                 <div className="flex flex-col overflow-hidden">
                   <span className="font-bold text-foreground text-lg truncate group-hover:text-primary transition-colors">{member.name}</span>

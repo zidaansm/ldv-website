@@ -15,6 +15,32 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
+function StaffAvatar({ name, src, bgColor }: { name: string; src: string; bgColor: string }) {
+  const [hasError, setHasError] = useState(false);
+
+  if (hasError || !src) {
+    return (
+      <div
+        className="w-48 h-48 flex items-center justify-center text-6xl font-black text-foreground/30 select-none relative z-10"
+        style={{ backgroundColor: bgColor }}
+      >
+        {name.charAt(0).toUpperCase()}
+      </div>
+    );
+  }
+
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={src}
+      alt={name}
+      className="w-48 h-48 object-cover filter drop-shadow-xl relative z-10 group-hover/card:scale-110 group-hover/card:-translate-y-2 transition-all duration-300"
+      draggable={false}
+      onError={() => setHasError(true)}
+    />
+  );
+}
+
 export function Staff() {
   const { t } = useTranslation();
   const [staffList, setStaffList] = useState<any[]>([]);
@@ -125,14 +151,7 @@ export function Staff() {
                          />
 
                          {/* Avatar */}
-                         <Image
-                           src={member.avatar_url}
-                           alt={`${member.name}`}
-                           width={192}
-                           height={192}
-                           className="w-48 h-48 object-cover filter drop-shadow-xl relative z-10 group-hover/card:scale-110 group-hover/card:-translate-y-2 transition-all duration-300"
-                           draggable="false"
-                         />
+                         <StaffAvatar name={member.name} src={member.avatar_url} bgColor={bgColor} />
                       </div>
 
                       {/* Bottom Name Bar */}

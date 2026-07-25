@@ -36,6 +36,32 @@ const colorMap: Record<string, string> = {
   "neo-dark": "#1A1A2E",
 };
 
+function MemberAvatar({ member, color }: { member: Member; color: string }) {
+  const [hasError, setHasError] = useState(false);
+
+  if (hasError || !member.avatar_url) {
+    return (
+      <div
+        className="w-full h-full flex items-center justify-center text-5xl font-black text-white select-none"
+        style={{ backgroundColor: color }}
+      >
+        {member.name.charAt(0).toUpperCase()}
+      </div>
+    );
+  }
+
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={member.avatar_url}
+      alt={`${member.name} Roblox Avatar`}
+      className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300 drop-shadow-md"
+      draggable={false}
+      onError={() => setHasError(true)}
+    />
+  );
+}
+
 export default function MembersPage() {
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
@@ -203,14 +229,7 @@ export default function MembersPage() {
                         {/* Avatar Overlay */}
                         <div className="absolute top-6 left-1/2 -translate-x-1/2 z-20">
                           <div className="w-40 h-40 rounded-2xl border-[3px] border-[var(--neo-border)] bg-card overflow-hidden flex items-center justify-center relative" style={{ boxShadow: `4px 4px 0 var(--neo-border)` }}>
-                            <Image
-                              src={member.avatar_url}
-                              alt={`${member.name} Roblox Avatar`}
-                              fill
-                              sizes="(max-width: 768px) 100vw, 160px"
-                              className="object-contain group-hover:scale-110 transition-transform duration-300 drop-shadow-md"
-                              draggable="false"
-                            />
+                            <MemberAvatar member={member} color={color} />
                           </div>
                         </div>
 
