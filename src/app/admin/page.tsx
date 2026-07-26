@@ -534,7 +534,7 @@ export default function AdminDashboard() {
                         >
                           <Trash2 className="w-3 h-3" />
                         </button>
-                        <p className="text-sm font-medium whitespace-pre-wrap leading-relaxed pr-6 mb-2">{note.content}</p>
+                        <p className="text-sm font-medium whitespace-pre-wrap leading-relaxed pr-6 mb-2 break-words overflow-hidden">{note.content}</p>
                         <div className="flex items-center justify-between mt-auto opacity-70">
                           <span className="text-[10px] font-bold">{note.author_name}</span>
                           <span className="text-[10px] font-medium">{safeFormatDate(note.created_at)}</span>
@@ -572,7 +572,7 @@ export default function AdminDashboard() {
                           </span>
                           <span className="text-[10px] font-medium text-muted-foreground">{safeFormatDate(post.created_at)}</span>
                         </div>
-                        <p className="text-sm font-medium line-clamp-2 text-foreground/90">{post.content}</p>
+                        <p className="text-sm font-medium line-clamp-2 text-foreground/90 break-words">{post.content}</p>
                         <div className="flex items-center gap-2 mt-1">
                           <span className="text-[10px] font-semibold text-muted-foreground flex items-center gap-1">
                             From: {post.from_name || "Anonymous"}
@@ -735,7 +735,7 @@ export default function AdminDashboard() {
                           </span>
                         </div>
                       </div>
-                      <div className="text-sm font-medium text-foreground/90 p-2.5 bg-muted/30 rounded-lg border border-border/30 mt-1 whitespace-pre-wrap">
+                      <div className="text-sm font-medium text-foreground/90 p-2.5 bg-muted/30 rounded-lg border border-border/30 mt-1 whitespace-pre-wrap break-words">
                         {log.details}
                       </div>
                       <div className="text-[11px] font-semibold text-muted-foreground mt-1 flex items-center justify-between">
