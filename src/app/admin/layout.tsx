@@ -42,7 +42,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           const { data: permData } = await supabase.from('role_permissions').select('allowed_modules').eq('role', role).single();
           
           if (permData && permData.allowed_modules) {
-             const allowed = [...permData.allowed_modules, "/admin/team-chat", "/admin/tasks"];
+             const allowed = [...permData.allowed_modules, "/admin/team-chat", "/admin/tasks", "/admin/report"];
              const isAllowed = allowed.some((m: string) => pathname === m || (m !== "/admin" && pathname.startsWith(m + "/")));
              
              // Dashboard (/admin) is always accessible to prevent redirect loops
