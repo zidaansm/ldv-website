@@ -35,6 +35,7 @@ const AVAILABLE_MODULES = [
   { path: "/admin/story", name: "Story" },
   { path: "/admin/socials", name: "Social Links" },
   { path: "/admin/tasks", name: "Tasks" },
+  { path: "/admin/report", name: "Reports" },
   { path: "/admin/users", name: "Admin Accounts" }
 ];
 
