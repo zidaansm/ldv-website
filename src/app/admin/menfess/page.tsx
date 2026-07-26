@@ -32,14 +32,17 @@ export default function AdminMenfessPage() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"pending" | "approved">("pending");
   const [processingId, setProcessingId] = useState<string | null>(null);
+  const [limit, setLimit] = useState(50);
+  const [hasMore, setHasMore] = useState(true);
 
   const supabase = createClient();
 
   const fetchPosts = async () => {
-    const { data, error } = await supabase
+    const { data, count, error } = await supabase
       .from("menfess")
-      .select("*, menfess_comments(*)")
-      .order("created_at", { ascending: false });
+      .select("*, menfess_comments(*)", { count: "exact" })
+      .order("created_at", { ascending: false })
+      .limit(limit);
     
     if (data) {
       const sortedData = data.map((post: any) => ({
@@ -49,6 +52,7 @@ export default function AdminMenfessPage() {
         )
       }));
       setPosts(sortedData);
+      setHasMore(count !== null && sortedData.length < count);
     }
     setLoading(false);
   };
@@ -58,14 +62,14 @@ export default function AdminMenfessPage() {
 
     const channel = supabase
       .channel("admin:menfess")
-      .on("postgres_changes", { event: "*", schema: "public", table: "menfess" }, fetchPosts)
-      .on("postgres_changes", { event: "*", schema: "public", table: "menfess_comments" }, fetchPosts)
+      .on("postgres_changes", { event: "*", schema: "public", table: "menfess" }, () => fetchPosts())
+      .on("postgres_changes", { event: "*", schema: "public", table: "menfess_comments" }, () => fetchPosts())
       .subscribe();
 
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [limit]);
 
   const handleApprovePost = async (id: string) => {
     setProcessingId(id);
@@ -218,7 +222,8 @@ export default function AdminMenfessPage() {
             </p>
           </div>
         ) : (
-          filteredPosts.map((post) => (
+          <>
+            {filteredPosts.map((post) => (
             <div key={post.id} className="border border-border/50 bg-card/50 backdrop-blur-md shadow-sm rounded-2xl overflow-hidden transition-all hover:shadow-md">
               {/* Post Header/Content */}
               <div className="p-6">
@@ -324,6 +329,18 @@ export default function AdminMenfessPage() {
               )}
             </div>
           ))
+          }
+          {hasMore && (
+            <div className="flex justify-center pt-4 pb-8">
+              <button
+                onClick={() => setLimit(prev => prev + 50)}
+                className="px-8 py-3 bg-card/80 backdrop-blur-md border border-border/50 text-foreground shadow-sm hover:shadow-md hover:-translate-y-0.5 rounded-xl font-bold transition-all"
+              >
+                Load More Posts
+              </button>
+            </div>
+          )}
+          </>
         )}
       </div>
     </div>

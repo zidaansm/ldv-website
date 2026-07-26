@@ -455,8 +455,15 @@ export default function GalleryAdminPage() {
       {images.length === 0 ? (
         <div className="border border-border/50 shadow-sm rounded-2xl p-12 bg-card/50 backdrop-blur-md text-center flex flex-col items-center justify-center text-muted-foreground">
           <ImageIcon className="w-12 h-12 mb-4 opacity-50" />
-          <p className="font-bold text-lg text-foreground">No media found</p>
-          <p className="text-sm font-medium">Click &quot;Add Media&quot; to start filling up your community gallery.</p>
+          <p className="font-bold text-lg text-foreground mb-1">No media found</p>
+          <p className="text-sm font-medium mb-6">Start filling up your community gallery by adding media here.</p>
+          <button
+            onClick={() => { resetForm(); setIsFormOpen(true); }}
+            className="flex items-center gap-2 px-6 py-2.5 bg-primary text-primary-foreground shadow-md shadow-primary/20 hover:-translate-y-0.5 rounded-xl font-bold transition-all"
+          >
+            <Plus className="w-4 h-4" />
+            Add Media
+          </button>
         </div>
       ) : (
         <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6">

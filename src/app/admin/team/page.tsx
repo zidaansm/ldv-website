@@ -182,8 +182,15 @@ export default function TeamAdminPage() {
       {TeamList.length === 0 ? (
         <div className="border border-border/50 shadow-sm rounded-2xl p-12 bg-card/50 backdrop-blur-md text-center flex flex-col items-center justify-center text-muted-foreground">
           <Users className="w-12 h-12 mb-4 opacity-50" />
-          <p className="font-bold text-lg">No Team members found</p>
-          <p className="text-sm">Click "Add Team Member" to start building your team.</p>
+          <p className="font-bold text-lg mb-1 text-foreground">No Team members found</p>
+          <p className="text-sm mb-6">Start building your team by adding members here.</p>
+          <button
+            onClick={() => { resetForm(); setIsFormOpen(true); }}
+            className="flex items-center gap-2 px-6 py-2.5 bg-primary text-primary-foreground shadow-md shadow-primary/20 hover:-translate-y-0.5 rounded-xl font-bold transition-all"
+          >
+            <Plus className="w-4 h-4" />
+            Add Team Member
+          </button>
         </div>
       ) : (
         <div className="border border-border/50 shadow-sm rounded-2xl overflow-hidden bg-card/50 backdrop-blur-md">

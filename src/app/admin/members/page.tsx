@@ -32,13 +32,28 @@ export default function memberAdminPage() {
   const [avatarUrl, setAvatarUrl] = useState("https://tr.rbxcdn.com/38c6edcb50633730ff4cf3945bf13655/150/150/AvatarHeadshot/Png");
   const [accentColor, setAccentColor] = useState("purple");
 
+  const [limit, setLimit] = useState(20);
+  const [hasMore, setHasMore] = useState(true);
+
   useEffect(() => {
-    fetchmember();
-  }, []);
+    const timer = setTimeout(() => {
+      fetchmember();
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery, limit]);
 
   const fetchmember = async () => {
-    const { data } = await supabase.from("members").select("*").order("created_at", { ascending: false });
-    if (data) setmemberList(data);
+    let query = supabase.from("members").select("*", { count: "exact" }).order("created_at", { ascending: false });
+    
+    if (searchQuery.trim()) {
+      query = query.or(`name.ilike.%${searchQuery}%,bio.ilike.%${searchQuery}%`);
+    }
+    
+    const { data, count } = await query.limit(limit);
+    if (data) {
+      setmemberList(data);
+      setHasMore(count !== null && data.length < count);
+    }
     setLoading(false);
   };
 
@@ -105,12 +120,7 @@ export default function memberAdminPage() {
     }
   };
 
-  if (loading) return <div className="p-8 font-bold text-center">Loading member...</div>;
-
-  const filteredMembers = memberList.filter(m => 
-    m.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    m.bio.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  if (loading) return <div className="p-8 font-bold text-center">Loading members...</div>;
 
   return (
     <div className="max-w-6xl mx-auto p-4 md:p-8 space-y-8">
@@ -203,11 +213,18 @@ export default function memberAdminPage() {
         </form>
       )}
 
-      {filteredMembers.length === 0 ? (
+      {memberList.length === 0 ? (
         <div className="border border-border/50 shadow-sm rounded-2xl p-12 bg-card/50 backdrop-blur-md text-center flex flex-col items-center justify-center text-muted-foreground">
           <Users className="w-12 h-12 mb-4 opacity-50" />
-          <p className="font-bold text-lg">No members found</p>
-          <p className="text-sm">Click "Add Member" to start building your team.</p>
+          <p className="font-bold text-lg text-foreground mb-1">No members found</p>
+          <p className="text-sm mb-6">Start building your community by adding members here.</p>
+          <button
+            onClick={() => { resetForm(); setIsFormOpen(true); }}
+            className="flex items-center gap-2 px-6 py-2.5 bg-primary text-primary-foreground shadow-md shadow-primary/20 hover:-translate-y-0.5 rounded-xl font-bold transition-all"
+          >
+            <Plus className="w-4 h-4" />
+            Add Member
+          </button>
         </div>
       ) : (
         <div className="border border-border/50 shadow-sm rounded-2xl overflow-hidden bg-card/50 backdrop-blur-md">
@@ -223,7 +240,7 @@ export default function memberAdminPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/50">
-                {filteredMembers.map((member) => {
+                {memberList.map((member) => {
                   const colorMap: Record<string, string> = {
                     purple: "#6b2157", pink: "#db2777", cyan: "#0891b2", danger: "#e53e3e",
                     success: "#38a169", warning: "#d69e2e", "neo-red": "#FF2B2B", "neo-yellow": "#FFD600",
@@ -263,6 +280,17 @@ export default function memberAdminPage() {
               </tbody>
             </table>
           </div>
+        </div>
+      )}
+
+      {memberList.length > 0 && hasMore && (
+        <div className="flex justify-center pt-2 pb-8">
+          <button
+            onClick={() => setLimit(prev => prev + 20)}
+            className="px-8 py-3 bg-card/80 backdrop-blur-md border border-border/50 text-foreground shadow-sm hover:shadow-md hover:-translate-y-0.5 rounded-xl font-bold transition-all"
+          >
+            Load More Members
+          </button>
         </div>
       )}
     </div>
