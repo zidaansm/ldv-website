@@ -63,8 +63,10 @@ export default function TeamChatPage() {
     };
   }, []);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  const isFirstRender = useRef(true);
+
+  const scrollToBottom = (instant = false) => {
+    messagesEndRef.current?.scrollIntoView({ behavior: instant ? "auto" : "smooth" });
   };
 
   const handleScroll = () => {
@@ -78,7 +80,10 @@ export default function TeamChatPage() {
 
   useEffect(() => {
     if (shouldAutoScroll) {
-      scrollToBottom();
+      scrollToBottom(isFirstRender.current);
+      if (messages.length > 0) {
+        isFirstRender.current = false;
+      }
     }
   }, [messages, shouldAutoScroll]);
 
