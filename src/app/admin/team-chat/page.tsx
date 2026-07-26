@@ -24,6 +24,8 @@ export default function TeamChatPage() {
   const [isSending, setIsSending] = useState(false);
   const [currentUserEmail, setCurrentUserEmail] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
   
   const supabase = createClient();
 
@@ -65,9 +67,20 @@ export default function TeamChatPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  const handleScroll = () => {
+    if (scrollContainerRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = scrollContainerRef.current;
+      // If user is within 100px of the bottom, we should auto-scroll for new messages
+      const isAtBottom = scrollHeight - scrollTop - clientHeight < 100;
+      setShouldAutoScroll(isAtBottom);
+    }
+  };
+
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+    if (shouldAutoScroll) {
+      scrollToBottom();
+    }
+  }, [messages, shouldAutoScroll]);
 
   const fetchMessages = async () => {
     try {
@@ -98,6 +111,7 @@ export default function TeamChatPage() {
       if (res.ok) {
         const data = await res.json();
         // Optimistically add message
+        setShouldAutoScroll(true);
         setMessages(prev => [...prev, data.message]);
         setNewMessage("");
       } else {
@@ -136,7 +150,7 @@ export default function TeamChatPage() {
 
       <div className="flex-1 bg-card/60 backdrop-blur-xl border border-border/50 rounded-2xl shadow-sm flex flex-col overflow-hidden">
         {/* Messages Area */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
+        <div ref={scrollContainerRef} onScroll={handleScroll} className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
           {isLoading ? (
             <div className="h-full flex items-center justify-center text-muted-foreground font-semibold animate-pulse">
               Loading messages...
