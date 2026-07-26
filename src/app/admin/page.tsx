@@ -104,16 +104,27 @@ export default function AdminDashboard() {
       const { data: eventsData } = await supabase.from("events").select("*").eq("type", "upcoming").order("date", { ascending: true }).limit(3);
       if (eventsData) setUpcomingEvents(eventsData);
 
-      // Generate Mock Chart Data for Community Engagement
-      const mockChartData = Array.from({ length: 7 }).map((_, i) => {
-        const d = subDays(new Date(), 6 - i);
-        return {
-          name: format(d, 'MMM dd'),
-          visitors: Math.floor(Math.random() * 50) + 20,
-          members: Math.floor(Math.random() * 10) + 5
-        };
-      });
-      setChartData(mockChartData);
+      // Fetch Real Chart Data for Community Engagement (Last 7 Days)
+      try {
+        const d = new Date();
+        d.setDate(d.getDate() - 7);
+        const startDate = d.toISOString().split('T')[0];
+        const endDate = new Date().toISOString().split('T')[0];
+        
+        const reportRes = await fetch(`/api/admin/report?startDate=${startDate}&endDate=${endDate}`);
+        if (reportRes.ok) {
+          const reportData = await reportRes.json();
+          // Transform trendData to match the dashboard's chart format
+          const formattedChartData = reportData.trendData.map((item: any) => ({
+            name: format(new Date(item.date), 'MMM dd'),
+            visitors: item.views,
+            menfess: item.menfess // Changed members to menfess to reflect real metrics
+          }));
+          setChartData(formattedChartData);
+        }
+      } catch (e) {
+        console.error("Failed to fetch real chart data");
+      }
 
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
@@ -392,7 +403,7 @@ export default function AdminDashboard() {
                           <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3}/>
                           <stop offset="95%" stopColor="var(--primary)" stopOpacity={0}/>
                         </linearGradient>
-                        <linearGradient id="colorMembers" x1="0" y1="0" x2="0" y2="1">
+                        <linearGradient id="colorMenfess" x1="0" y1="0" x2="0" y2="1">
                           <stop offset="5%" stopColor="var(--secondary)" stopOpacity={0.3}/>
                           <stop offset="95%" stopColor="var(--secondary)" stopOpacity={0}/>
                         </linearGradient>
@@ -402,7 +413,7 @@ export default function AdminDashboard() {
                       <YAxis tick={{fill: 'hsl(var(--muted-foreground))', fontSize: 12}} tickLine={false} axisLine={false} />
                       <Tooltip contentStyle={{backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', borderRadius: '8px'}} itemStyle={{color: 'hsl(var(--foreground))'}} />
                       <Area type="monotone" dataKey="visitors" stroke="var(--primary)" fillOpacity={1} fill="url(#colorVisitors)" name="Visitors" strokeWidth={2} />
-                      <Area type="monotone" dataKey="members" stroke="var(--secondary)" fillOpacity={1} fill="url(#colorMembers)" name="New Members" strokeWidth={2} />
+                      <Area type="monotone" dataKey="menfess" stroke="var(--secondary)" fillOpacity={1} fill="url(#colorMenfess)" name="Menfess" strokeWidth={2} />
                     </AreaChart>
                   </ResponsiveContainer>
                 )}
