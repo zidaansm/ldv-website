@@ -492,4 +492,50 @@
   background-attachment: fixed;
   background-size: cover;
   background-color: var(--background);
+}
+
+/* ============================================
+   PRINT STYLES FOR REPORTS
+   ============================================ */
+@media print {
+  /* Hide unnecessary elements */
+  .no-print, aside, nav, header, button, .chat-widget {
+    display: none !important;
+  }
+  
+  /* Reset background and text color for print */
+  body, html, .report-container, .bg-card, .bg-background {
+    background: white !important;
+    color: black !important;
+    background-image: none !important;
+  }
+  
+  /* Remove borders and shadows for a clean look */
+  * {
+    box-shadow: none !important;
+    border-color: #e5e7eb !important;
+  }
+  
+  /* Make sure the main content expands to full width */
+  main, .report-container {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  
+  /* Prevent page breaks inside scorecards */
+  .report-container > div {
+    page-break-inside: avoid;
+  }
+
+  /* Force light mode variables */
+  :root, .dark {
+    --background: #ffffff;
+    --foreground: #000000;
+    --card: #ffffff;
+    --card-foreground: #000000;
+    --border: #e5e7eb;
+    --muted-foreground: #6b7280;
+  }
 }

@@ -64,6 +64,7 @@ export const metadata: Metadata = {
 };
 
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import { VisitorTracker } from "@/components/shared";
 
 export default function RootLayout({
   children,
@@ -88,6 +89,7 @@ export default function RootLayout({
         >
           <MotionProvider>
             <LanguageProvider>
+              <VisitorTracker />
               <ToastProvider />
               <MenfessLiveToaster />
               <main className="flex-grow">
