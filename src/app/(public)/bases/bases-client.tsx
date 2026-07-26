@@ -184,16 +184,16 @@ export function BasesClient({ initialBases }: { initialBases: TwitterBase[] }) {
                 </button>
               </div>
               <div className="p-6 overflow-y-auto">
-                <div className="prose prose-sm md:prose-base dark:prose-invert max-w-none">
+                <div className="max-w-none text-foreground/90">
                   <ReactMarkdown
                     components={{
-                      h1: ({node, ...props}) => <h1 className="text-2xl font-extrabold mb-4 mt-6 first:mt-0" style={{ fontFamily: "var(--font-space-grotesk)" }} {...props} />,
-                      h2: ({node, ...props}) => <h2 className="text-xl font-extrabold mb-3 mt-6 first:mt-0" style={{ fontFamily: "var(--font-space-grotesk)" }} {...props} />,
-                      h3: ({node, ...props}) => <h3 className="text-lg font-bold mb-2 mt-4 first:mt-0" {...props} />,
-                      p: ({node, ...props}) => <p className="mb-4 leading-relaxed font-medium" {...props} />,
-                      ul: ({node, ...props}) => <ul className="list-disc pl-5 mb-4 space-y-1 font-medium" {...props} />,
-                      ol: ({node, ...props}) => <ol className="list-decimal pl-5 mb-4 space-y-1 font-medium" {...props} />,
-                      li: ({node, ...props}) => <li className="" {...props} />,
+                      h1: ({node, ...props}) => <h1 className="text-2xl font-extrabold mb-4 mt-6 first:mt-0 text-foreground" style={{ fontFamily: "var(--font-space-grotesk)" }} {...props} />,
+                      h2: ({node, ...props}) => <h2 className="text-xl font-extrabold mb-3 mt-6 first:mt-0 text-foreground" style={{ fontFamily: "var(--font-space-grotesk)" }} {...props} />,
+                      h3: ({node, ...props}) => <h3 className="text-lg font-bold mb-2 mt-4 first:mt-0 text-foreground" {...props} />,
+                      p: ({node, ...props}) => <p className="mb-4 leading-relaxed font-medium text-foreground/90" {...props} />,
+                      ul: ({node, ...props}) => <ul className="list-disc pl-5 mb-4 space-y-1 font-medium text-foreground/90" {...props} />,
+                      ol: ({node, ...props}) => <ol className="list-decimal pl-5 mb-4 space-y-1 font-medium text-foreground/90" {...props} />,
+                      li: ({node, ...props}) => <li className="text-foreground/90" {...props} />,
                       strong: ({node, ...props}) => <strong className="font-extrabold text-foreground" {...props} />,
                       a: ({node, ...props}) => <a className="text-primary hover:underline font-bold" target="_blank" rel="noopener noreferrer" {...props} />
                     }}
