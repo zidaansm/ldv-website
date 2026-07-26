@@ -466,6 +466,86 @@ export default function AdminDashboard() {
               </div>
             </div>
 
+            {/* Admin Notes Widget */}
+            <div className="border border-border/50 shadow-sm rounded-2xl p-6 bg-card/50 backdrop-blur-md mt-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold flex items-center gap-2">
+                  <StickyNote className="w-5 h-5 text-warning" />
+                  Admin Notes
+                </h2>
+              </div>
+              
+              <form onSubmit={handleAddNote} className="mb-4 flex flex-col gap-2">
+                <textarea
+                  value={newNoteContent}
+                  onChange={(e) => setNewNoteContent(e.target.value)}
+                  placeholder="Write a quick note..."
+                  className="w-full bg-background border border-border/50 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none h-20"
+                  required
+                />
+                <div className="flex items-center justify-between">
+                  <div className="flex gap-2">
+                    {['yellow', 'blue', 'pink', 'green'].map(c => (
+                      <button
+                        key={c}
+                        type="button"
+                        onClick={() => setNewNoteColor(c)}
+                        className={`w-5 h-5 rounded-full border-2 transition-all ${newNoteColor === c ? 'border-primary scale-110' : 'border-transparent'} ${
+                          c === 'yellow' ? 'bg-amber-200 dark:bg-amber-800' :
+                          c === 'blue' ? 'bg-blue-200 dark:bg-blue-800' :
+                          c === 'pink' ? 'bg-pink-200 dark:bg-pink-800' :
+                          'bg-emerald-200 dark:bg-emerald-800'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={isSubmittingNote}
+                    className="inline-flex items-center gap-1 px-3 py-1.5 bg-primary text-primary-foreground shadow-md rounded-lg font-semibold text-xs transition-all disabled:opacity-50"
+                  >
+                    <Plus className="w-3 h-3" /> Add
+                  </button>
+                </div>
+              </form>
+
+              <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                {isLoading ? (
+                  <div className="text-sm text-muted-foreground animate-pulse">Loading notes...</div>
+                ) : adminNotes.length === 0 ? (
+                  <div className="text-sm text-muted-foreground bg-background p-4 rounded-xl border border-border/50 text-center">
+                    No notes yet. Leave a message for the team!
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {adminNotes.map(note => (
+                      <div 
+                        key={note.id} 
+                        className={`p-4 rounded-xl shadow-sm relative group transition-all h-full flex flex-col justify-between ${
+                          note.color === 'yellow' ? 'bg-amber-100/50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 text-amber-900 dark:text-amber-100' :
+                          note.color === 'blue' ? 'bg-blue-100/50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/50 text-blue-900 dark:text-blue-100' :
+                          note.color === 'pink' ? 'bg-pink-100/50 dark:bg-pink-900/20 border border-pink-200 dark:border-pink-800/50 text-pink-900 dark:text-pink-100' :
+                          'bg-emerald-100/50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800/50 text-emerald-900 dark:text-emerald-100'
+                        }`}
+                      >
+                        <button
+                          onClick={() => handleDeleteNote(note.id)}
+                          className="absolute top-2 right-2 p-1.5 bg-background/50 backdrop-blur-sm rounded-md opacity-0 group-hover:opacity-100 transition-opacity hover:bg-danger/20 hover:text-danger text-muted-foreground"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </button>
+                        <p className="text-sm font-medium whitespace-pre-wrap leading-relaxed pr-6 mb-2">{note.content}</p>
+                        <div className="flex items-center justify-between mt-auto opacity-70">
+                          <span className="text-[10px] font-bold">{note.author_name}</span>
+                          <span className="text-[10px] font-medium">{safeFormatDate(note.created_at)}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
             {/* Menfess Inbox */}
             {(allowedModules.includes("/admin/menfess") || currentUserRole === 'super_admin' || currentUserRole === 'admin') && (
               <div className="border border-border/50 shadow-sm rounded-2xl p-6 bg-card/50 backdrop-blur-md">
@@ -622,84 +702,6 @@ export default function AdminDashboard() {
                       </div>
                     );
                   })
-                )}
-              </div>
-            </div>
-
-            {/* Admin Notes Widget */}
-            <div className="border border-border/50 shadow-sm rounded-2xl p-6 bg-card/50 backdrop-blur-md">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold flex items-center gap-2">
-                  <StickyNote className="w-5 h-5 text-warning" />
-                  Admin Notes
-                </h2>
-              </div>
-              
-              <form onSubmit={handleAddNote} className="mb-4 flex flex-col gap-2">
-                <textarea
-                  value={newNoteContent}
-                  onChange={(e) => setNewNoteContent(e.target.value)}
-                  placeholder="Write a quick note..."
-                  className="w-full bg-background border border-border/50 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none h-20"
-                  required
-                />
-                <div className="flex items-center justify-between">
-                  <div className="flex gap-2">
-                    {['yellow', 'blue', 'pink', 'green'].map(c => (
-                      <button
-                        key={c}
-                        type="button"
-                        onClick={() => setNewNoteColor(c)}
-                        className={`w-5 h-5 rounded-full border-2 transition-all ${newNoteColor === c ? 'border-primary scale-110' : 'border-transparent'} ${
-                          c === 'yellow' ? 'bg-amber-200 dark:bg-amber-800' :
-                          c === 'blue' ? 'bg-blue-200 dark:bg-blue-800' :
-                          c === 'pink' ? 'bg-pink-200 dark:bg-pink-800' :
-                          'bg-emerald-200 dark:bg-emerald-800'
-                        }`}
-                      />
-                    ))}
-                  </div>
-                  <button
-                    type="submit"
-                    disabled={isSubmittingNote}
-                    className="inline-flex items-center gap-1 px-3 py-1.5 bg-primary text-primary-foreground shadow-md rounded-lg font-semibold text-xs transition-all disabled:opacity-50"
-                  >
-                    <Plus className="w-3 h-3" /> Add
-                  </button>
-                </div>
-              </form>
-
-              <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
-                {isLoading ? (
-                  <div className="text-sm text-muted-foreground animate-pulse">Loading notes...</div>
-                ) : adminNotes.length === 0 ? (
-                  <div className="text-sm text-muted-foreground bg-background p-4 rounded-xl border border-border/50 text-center">
-                    No notes yet. Leave a message for the team!
-                  </div>
-                ) : (
-                  adminNotes.map(note => (
-                    <div 
-                      key={note.id} 
-                      className={`p-4 rounded-xl shadow-sm relative group transition-all ${
-                        note.color === 'yellow' ? 'bg-amber-100/50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 text-amber-900 dark:text-amber-100' :
-                        note.color === 'blue' ? 'bg-blue-100/50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/50 text-blue-900 dark:text-blue-100' :
-                        note.color === 'pink' ? 'bg-pink-100/50 dark:bg-pink-900/20 border border-pink-200 dark:border-pink-800/50 text-pink-900 dark:text-pink-100' :
-                        'bg-emerald-100/50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800/50 text-emerald-900 dark:text-emerald-100'
-                      }`}
-                    >
-                      <button
-                        onClick={() => handleDeleteNote(note.id)}
-                        className="absolute top-2 right-2 p-1.5 bg-background/50 backdrop-blur-sm rounded-md opacity-0 group-hover:opacity-100 transition-opacity hover:bg-danger/20 hover:text-danger text-muted-foreground"
-                      >
-                        <Trash2 className="w-3 h-3" />
-                      </button>
-                      <p className="text-sm font-medium whitespace-pre-wrap leading-relaxed pr-6">{note.content}</p>
-                      <div className="flex items-center justify-between mt-3 opacity-70">
-                        <span className="text-[10px] font-bold">{note.author_name}</span>
-                        <span className="text-[10px] font-medium">{safeFormatDate(note.created_at)}</span>
-                      </div>
-                    </div>
-                  ))
                 )}
               </div>
             </div>
