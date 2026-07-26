@@ -57,7 +57,7 @@ export async function GET(request: Request) {
       
       tasksWithEmails = tasks.map(task => ({
         ...task,
-        assignee_email: task.assignee_id ? userMap.get(task.assignee_id) : null,
+        assignee_emails: (task.assignee_ids || []).map((id: string) => userMap.get(id) || id),
         creator_email: task.creator_id ? userMap.get(task.creator_id) : null,
       }));
     }
@@ -74,7 +74,7 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json();
-    const { title, description, assignee_id, status, priority, due_date } = body;
+    const { title, description, assignee_ids, status, priority, due_date } = body;
 
     if (!title) {
       return NextResponse.json({ error: "Title is required" }, { status: 400 });
@@ -85,7 +85,7 @@ export async function POST(request: Request) {
       .insert({
         title,
         description: description || null,
-        assignee_id: assignee_id || null,
+        assignee_ids: Array.isArray(assignee_ids) ? assignee_ids : [],
         status: status || 'todo',
         priority: priority || 'medium',
         due_date: due_date || null,
@@ -110,7 +110,7 @@ export async function PUT(request: Request) {
 
   try {
     const body = await request.json();
-    const { id, title, description, status, assignee_id, priority, due_date } = body;
+    const { id, title, description, status, assignee_ids, priority, due_date } = body;
 
     if (!id) {
       return NextResponse.json({ error: "Task ID is required" }, { status: 400 });
@@ -119,7 +119,7 @@ export async function PUT(request: Request) {
     // Security check
     const { data: existingTask, error: fetchError } = await supabaseAdmin
       .from("admin_tasks")
-      .select("creator_id, assignee_id")
+      .select("creator_id, assignee_ids")
       .eq("id", id)
       .single();
 
@@ -127,7 +127,7 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: "Task not found" }, { status: 404 });
     }
 
-    if (auth.role !== 'super_admin' && auth.userId !== existingTask.creator_id && auth.userId !== existingTask.assignee_id) {
+    if (auth.role !== 'super_admin' && auth.userId !== existingTask.creator_id && !(existingTask.assignee_ids || []).includes(auth.userId)) {
       return NextResponse.json({ error: "You do not have permission to modify this task." }, { status: 403 });
     }
 
@@ -136,7 +136,7 @@ export async function PUT(request: Request) {
     if (title !== undefined) updates.title = title;
     if (description !== undefined) updates.description = description;
     if (status !== undefined) updates.status = status;
-    if (assignee_id !== undefined) updates.assignee_id = assignee_id;
+    if (assignee_ids !== undefined) updates.assignee_ids = Array.isArray(assignee_ids) ? assignee_ids : [];
     if (priority !== undefined) updates.priority = priority;
     if (due_date !== undefined) updates.due_date = due_date;
 
@@ -172,7 +172,7 @@ export async function DELETE(request: Request) {
     // Security check
     const { data: existingTask, error: fetchError } = await supabaseAdmin
       .from("admin_tasks")
-      .select("creator_id, assignee_id")
+      .select("creator_id, assignee_ids")
       .eq("id", id)
       .single();
 
@@ -180,7 +180,7 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: "Task not found" }, { status: 404 });
     }
 
-    if (auth.role !== 'super_admin' && auth.userId !== existingTask.creator_id && auth.userId !== existingTask.assignee_id) {
+    if (auth.role !== 'super_admin' && auth.userId !== existingTask.creator_id && !(existingTask.assignee_ids || []).includes(auth.userId)) {
       return NextResponse.json({ error: "You do not have permission to modify this task." }, { status: 403 });
     }
 
