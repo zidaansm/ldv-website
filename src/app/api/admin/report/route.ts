@@ -2,8 +2,12 @@ import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
+    const { searchParams } = new URL(req.url);
+    const startDateParam = searchParams.get("startDate");
+    const endDateParam = searchParams.get("endDate");
+
     // 1. Authenticate and verify role (Admin / Super Admin only)
     const supabase = await createClient();
     const { data: { session } } = await supabase.auth.getSession();
@@ -22,10 +26,26 @@ export async function GET() {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    // 30 days ago date
-    const date30DaysAgo = new Date();
-    date30DaysAgo.setDate(date30DaysAgo.getDate() - 30);
-    const date30DaysAgoStr = date30DaysAgo.toISOString();
+    // Determine date range
+    let startDate = new Date();
+    startDate.setDate(startDate.getDate() - 30);
+    startDate.setHours(0, 0, 0, 0);
+
+    let endDate = new Date();
+    endDate.setHours(23, 59, 59, 999);
+
+    if (startDateParam && !isNaN(Date.parse(startDateParam))) {
+      startDate = new Date(startDateParam);
+      startDate.setHours(0, 0, 0, 0);
+    }
+    
+    if (endDateParam && !isNaN(Date.parse(endDateParam))) {
+      endDate = new Date(endDateParam);
+      endDate.setHours(23, 59, 59, 999);
+    }
+
+    const startDateStr = startDate.toISOString();
+    const endDateStr = endDate.toISOString();
 
     // 2. Fetch Data concurrently
     
@@ -53,35 +73,38 @@ export async function GET() {
       });
     }
 
-    // Page Views over last 30 days
+    // Page Views over selected range
     const { data: pageViews } = await supabaseAdmin
       .from("page_views")
       .select("created_at")
-      .gte("created_at", date30DaysAgoStr);
+      .gte("created_at", startDateStr)
+      .lte("created_at", endDateStr);
 
-    // Menfess over last 30 days
+    // Menfess over selected range
     const { data: menfess } = await supabaseAdmin
       .from("menfess")
       .select("created_at")
-      .gte("created_at", date30DaysAgoStr);
+      .gte("created_at", startDateStr)
+      .lte("created_at", endDateStr);
 
-    // Admin Logs over last 30 days
+    // Admin Logs over selected range
     const { data: adminLogs } = await supabaseAdmin
       .from("admin_logs")
       .select("admin_email, action")
-      .gte("created_at", date30DaysAgoStr);
+      .gte("created_at", startDateStr)
+      .lte("created_at", endDateStr);
 
     // 3. Process time-series data (Group by Day)
     const viewTrend: Record<string, number> = {};
     const menfessTrend: Record<string, number> = {};
     
-    // Initialize last 30 days with 0
-    for (let i = 29; i >= 0; i--) {
-      const d = new Date();
-      d.setDate(d.getDate() - i);
-      const dateStr = d.toISOString().split('T')[0];
+    // Initialize dates in range with 0
+    let currentDate = new Date(startDate);
+    while (currentDate <= endDate) {
+      const dateStr = currentDate.toISOString().split('T')[0];
       viewTrend[dateStr] = 0;
       menfessTrend[dateStr] = 0;
+      currentDate.setDate(currentDate.getDate() + 1);
     }
 
     if (pageViews) {
@@ -125,20 +148,24 @@ export async function GET() {
     // Combine response
     return NextResponse.json({
       scorecards: {
-        totalViews30d: pageViews?.length || 0,
-        totalMenfess30d: menfess?.length || 0,
+        totalViews: pageViews?.length || 0,
+        totalMenfess: menfess?.length || 0,
         totalCollaborations: collaborationsCount || 0,
         totalStaff: staffCount || 0,
         completedTasks,
         pendingTasks,
-        totalActions30d: adminLogs?.length || 0,
+        totalActions: adminLogs?.length || 0,
       },
       trendData,
       productivityData,
       taskData: [
         { name: "Completed", value: completedTasks },
         { name: "Pending / In Progress", value: pendingTasks }
-      ]
+      ],
+      period: {
+        startDate: startDateStr,
+        endDate: endDateStr
+      }
     });
 
   } catch (error: any) {
