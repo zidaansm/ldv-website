@@ -30,20 +30,21 @@ export async function GET(req: Request) {
 
     // Determine date range
     let startDate = new Date();
+    startDate.setHours(startDate.getHours() + 7); // convert to WIB approx for default
     startDate.setDate(startDate.getDate() - 30);
     startDate.setHours(0, 0, 0, 0);
+    startDate = new Date(startDate.getTime() - (7 * 60 * 60 * 1000)); // back to UTC
 
     let endDate = new Date();
-    endDate.setHours(23, 59, 59, 999);
-
+    
     if (startDateParam && !isNaN(Date.parse(startDateParam))) {
-      startDate = new Date(startDateParam);
-      startDate.setHours(0, 0, 0, 0);
+      // Client sends YYYY-MM-DD. Force it to be start of day in WIB (+07:00)
+      startDate = new Date(`${startDateParam}T00:00:00+07:00`);
     }
     
     if (endDateParam && !isNaN(Date.parse(endDateParam))) {
-      endDate = new Date(endDateParam);
-      endDate.setHours(23, 59, 59, 999);
+      // Force it to be end of day in WIB (+07:00)
+      endDate = new Date(`${endDateParam}T23:59:59.999+07:00`);
     }
 
     const startDateStr = startDate.toISOString();
@@ -96,14 +97,15 @@ export async function GET(req: Request) {
       .gte("created_at", startDateStr)
       .lte("created_at", endDateStr);
 
-    // 3. Process time-series data (Group by Day)
+    // 3. Process time-series data (Group by Day in WIB)
     const viewTrend: Record<string, number> = {};
     const menfessTrend: Record<string, number> = {};
     
     // Initialize dates in range with 0
     let currentDate = new Date(startDate);
     while (currentDate <= endDate) {
-      const dateStr = currentDate.toISOString().split('T')[0];
+      // Get YYYY-MM-DD in Asia/Jakarta timezone
+      const dateStr = currentDate.toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' });
       viewTrend[dateStr] = 0;
       menfessTrend[dateStr] = 0;
       currentDate.setDate(currentDate.getDate() + 1);
@@ -111,14 +113,14 @@ export async function GET(req: Request) {
 
     if (pageViews) {
       pageViews.forEach(v => {
-        const dateStr = v.created_at.split('T')[0];
+        const dateStr = new Date(v.created_at).toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' });
         if (viewTrend[dateStr] !== undefined) viewTrend[dateStr]++;
       });
     }
 
     if (menfess) {
       menfess.forEach(m => {
-        const dateStr = m.created_at.split('T')[0];
+        const dateStr = new Date(m.created_at).toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' });
         if (menfessTrend[dateStr] !== undefined) menfessTrend[dateStr]++;
       });
     }
