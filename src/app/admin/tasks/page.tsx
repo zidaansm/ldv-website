@@ -65,6 +65,17 @@ export default function TasksPage() {
   const supabase = createClient();
 
   useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        if (isEditModalOpen) closeEditModal();
+        else if (isDetailModalOpen) closeDetailModal();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isEditModalOpen, isDetailModalOpen]);
+
+  useEffect(() => {
     fetchTasks();
     
     // Subscribe to task updates and comments
@@ -458,8 +469,8 @@ export default function TasksPage() {
 
       {/* TASK DETAIL & DISCUSSION MODAL */}
       {isDetailModalOpen && selectedTask && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-card border border-border/50 rounded-2xl shadow-2xl w-full max-w-5xl overflow-hidden flex flex-col md:flex-row max-h-[90vh] animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-200" onClick={closeDetailModal}>
+          <div className="bg-card border border-border/50 rounded-2xl shadow-2xl w-full max-w-5xl overflow-hidden flex flex-col md:flex-row max-h-[90vh] animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
             
             {/* Left: Task Details */}
             <div className="md:w-1/2 flex flex-col border-b md:border-b-0 md:border-r border-border/50 overflow-y-auto custom-scrollbar">
@@ -591,8 +602,8 @@ export default function TasksPage() {
 
       {/* EDIT MODAL (FORM ONLY) */}
       {isEditModalOpen && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-card border border-border/50 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-200" onClick={closeEditModal}>
+          <div className="bg-card border border-border/50 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
             <div className="p-6 border-b border-border/50 bg-muted/20 flex justify-between items-center">
               <h2 className="text-xl font-bold">{selectedTask ? "Edit Task" : "Create New Task"}</h2>
               <button onClick={closeEditModal} className="p-2 hover:bg-muted rounded-full transition-colors">

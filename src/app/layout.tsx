@@ -65,6 +65,7 @@ export const metadata: Metadata = {
 
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { VisitorTracker } from "@/components/shared";
+import NextTopLoader from "nextjs-toploader";
 
 export default function RootLayout({
   children,
@@ -81,6 +82,7 @@ export default function RootLayout({
         className="font-sans bg-background text-foreground antialiased selection:bg-primary/30 selection:text-primary-foreground min-h-screen flex flex-col overflow-x-hidden"
         style={{ fontFamily: "var(--font-space-grotesk)" }}
       >
+        <NextTopLoader color="hsl(var(--primary))" showSpinner={false} />
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

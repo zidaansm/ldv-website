@@ -13,6 +13,14 @@ export function AdminHeader() {
   // Do not show header on login page
   if (pathname === "/admin/login") return null;
 
+  const getPageTitle = (path: string) => {
+    if (path === "/admin") return "Dashboard";
+    const segment = path.split("/")[2];
+    if (!segment) return "Dashboard";
+    if (segment === "team-chat") return "Team Chat";
+    return segment.charAt(0).toUpperCase() + segment.slice(1);
+  };
+
   return (
     <>
       <header className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-card/80 backdrop-blur-md border-b border-border/50 px-4 py-3 flex items-center justify-between">
@@ -20,7 +28,10 @@ export function AdminHeader() {
           <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
             <LayoutDashboard className="w-4 h-4 text-primary-foreground" />
           </div>
-          <h2 className="font-extrabold text-lg tracking-tight" style={{ fontFamily: "var(--font-space-grotesk)" }}>LDV Admin</h2>
+          <div className="flex flex-col">
+            <h2 className="font-extrabold text-sm tracking-tight leading-none mb-1" style={{ fontFamily: "var(--font-space-grotesk)" }}>LDV Admin</h2>
+            <span className="text-xs text-muted-foreground font-bold leading-none">{getPageTitle(pathname)}</span>
+          </div>
         </div>
         
         <button 
