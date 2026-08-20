@@ -93,7 +93,7 @@ export function Staff({ initialStaff }: { initialStaff?: any[] }) {
                 animate={{ x: ["0%", "-100%"] }}
                 transition={{
                   ease: "linear",
-                  duration: 25,
+                  duration: 60,
                   repeat: Infinity,
                 }}
               >

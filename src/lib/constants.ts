@@ -27,7 +27,7 @@ export const NAV_LINKS: NavLink[] = [
   { label: "Bases", href: "/bases" },
   { label: "Collab", href: "/collaboration" },
   { label: "Socials", href: "/links" },
-  { label: "FAQ", href: "/#faq" },
+  { label: "Team", href: "/#team" },
 ];
 
 // ============================================
