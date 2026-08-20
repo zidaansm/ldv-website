@@ -135,7 +135,7 @@ export default function CollaborationPage() {
                         transition={{ duration: 0.3 }}
                       >
                         <div className="px-5 md:px-6 pb-6 pt-2 border-t-2 border-black/10">
-                          <div className="prose prose-lg dark:prose-invert max-w-none prose-headings:font-black prose-a:text-primary prose-a:font-bold prose-a:underline prose-p:font-medium">
+                          <div className="prose prose-lg dark:prose-invert max-w-none text-foreground prose-headings:font-black prose-headings:text-foreground prose-p:text-foreground prose-li:text-foreground prose-strong:text-foreground prose-a:text-primary prose-a:font-bold prose-a:underline prose-p:font-medium">
                             <ReactMarkdown>
                               {collab.description || "_No description provided._"}
                             </ReactMarkdown>
