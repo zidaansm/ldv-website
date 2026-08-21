@@ -35,7 +35,7 @@ export function EventRegistrationModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-title"
-        className="bg-card neo-border neo-shadow-sm rounded-2xl p-6 md:p-8 max-w-md w-full animate-in zoom-in-95 duration-200"
+        className="bg-card neo-border neo-shadow-sm rounded-2xl p-6 md:p-8 max-w-md w-full max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200"
       >
         <h2 id="modal-title" className="text-2xl font-bold mb-2">Register for {selectedEvent.title}</h2>
         <p className="text-muted-foreground text-sm mb-6">Please complete the following required information to register.</p>
